@@ -1,92 +1,209 @@
-# NexaBank — Next.js Banking App
+# NexaBank — Full-Stack Banking Application
 
-A fully functional, production-grade banking web application built with **Next.js 14**, **TypeScript**, **Tailwind CSS**, and **Lucide React** icons.
+A production-grade banking simulation built with **Next.js 14**, **Node.js/Express**, and **MongoDB**.
 
-## 🏦 Features
+---
 
-### User Features
-- **Dashboard** — Live balance card, quick actions, savings goal, spending summary
-- **Checking Account** — Full account details (routing, account #, card, KYC), monthly summary
-- **Deposit** — Bank transfer, debit/credit card, crypto (BTC/ETH/USDT/BNB/SOL + QR + wallet address copy), PayPal
-- **Withdraw** — ACH/Wire toggle, debit card, crypto withdrawal with fee breakdown
-- **Transfer** — Send money to any user, live balance deduction, success animation
-- **Transaction History** — Filter by type, search, paginated (10/page), export
-- **Profile** — Edit info, 2FA toggle, linked methods, notifications
-
-### Admin Panel (`/admin`)
-- **Dashboard** — System-wide stats, all recent transactions
-- **User Management** — View/adjust balances, suspend/activate accounts
-- **Transaction Management** — Approve/reject/fail pending transactions, add manual credits/debits
-- **App Customization** — Live rename app, change accent + sidebar colors (color picker + presets), dark mode toggle, logo upload
-- **Notifications** — Send messages to specific users or all users, notification history
-
-### Design
-- **Zero gradients** — Flat, solid color throughout
-- **60/30/10 color rule** — Background / Sidebar / Accent
-- **CSS variables** — Instant global theme updates
-- **DM Sans + DM Mono** typography
-- **Lucide React** icons throughout
-
-## 🚀 Getting Started
-
-```bash
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) — it will redirect to `/dashboard`.
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
 nexabank/
-├── app/
-│   ├── dashboard/         # Main dashboard
-│   ├── account/           # Checking account details
-│   ├── deposit/           # Deposit funds
-│   ├── withdraw/          # Withdraw funds
-│   ├── transfer/          # Send money
-│   ├── history/           # Transaction history
-│   ├── profile/           # User profile
-│   └── admin/
-│       ├── page.tsx        # Admin dashboard
-│       ├── users/          # User management
-│       ├── transactions/   # Transaction management
-│       ├── settings/       # App customization
-│       └── notifications/  # Send notifications
-├── components/
-│   ├── layout/
-│   │   ├── AppShell.tsx    # Sidebar + topbar
-│   │   └── ThemeInjector.tsx
-│   ├── ui/
-│   │   ├── index.tsx       # Card, Button, Badge, Input, etc.
-│   │   └── Toast.tsx
-│   └── shared/
-│       └── TxRow.tsx       # Transaction row component
-├── store/
-│   └── index.tsx           # Global state (useReducer + Context)
-└── lib/
-    └── utils.ts            # Formatting helpers
+├── backend/          ← Node.js + Express + MongoDB API
+└── frontend/         ← Next.js 14 + TypeScript + Tailwind
 ```
 
-## 🎨 Theme Customization
+---
 
-Go to **Admin → App Customization** to:
-- Rename the app (updates sidebar instantly)
-- Upload a logo
-- Change accent color (10% — buttons, highlights)
-- Change sidebar/primary color (30%)
-- Toggle dark mode
+## ⚡ Quick Start
 
-All changes are applied via CSS variables and reflected immediately everywhere.
+### Prerequisites
+- Node.js 18+
+- MongoDB running locally (`mongod`) **or** a MongoDB Atlas URI
 
-## ⚡ Technical Notes
+---
 
-- **Single state store** — `useReducer` + React Context (no Redux, no Zustand)
-- **No localStorage** — All state in memory
-- **Next.js App Router** — Each route is a page component
-- **Type-safe** — Full TypeScript throughout
-- **No external UI library** — All components hand-built
+### 1 · Backend Setup
+
+```bash
+cd nexabank/backend
+
+# Install dependencies
+npm install
+
+# Configure environment (already set for local dev)
+# Edit .env if using MongoDB Atlas or a custom port
+
+# Seed the database with demo users & transactions
+npm run seed
+
+# Start the API server
+npm run dev
+# → API running at http://localhost:5000
+```
+
+---
+
+### 2 · Frontend Setup
+
+```bash
+cd nexabank/frontend
+
+# Install dependencies
+npm install
+
+# Start the dev server
+npm run dev
+# → App running at http://localhost:3000
+```
+
+Open **http://localhost:3000** — you'll land on the home page.
+
+---
+
+## 🔑 Demo Credentials
+
+| Role  | Email                      | Password     |
+|-------|----------------------------|--------------|
+| Admin | admin@nexabank.com         | Admin1234!   |
+| User  | jordan@nexabank.com        | Test1234!    |
+| User  | sam@nexabank.com           | Test1234!    |
+| User  | priya@nexabank.com         | Test1234!    |
+
+---
+
+## 📄 Pages
+
+### Public
+| Route        | Description                        |
+|--------------|------------------------------------|
+| `/home`      | Landing page with hero, features   |
+| `/about`     | Company story, team, values        |
+| `/services`  | All payment methods, limits table  |
+| `/contact`   | Contact form                       |
+| `/auth/login`     | Sign in                       |
+| `/auth/register`  | Create account                |
+
+### Authenticated (user)
+| Route           | Description                          |
+|-----------------|--------------------------------------|
+| `/dashboard`    | Balance card, quick actions, recent txns |
+| `/account`      | Full account + card details          |
+| `/deposit`      | Deposit via 12+ methods              |
+| `/withdraw`     | Withdraw via ACH, wire, crypto, card |
+| `/transfer`     | Send money to any NexaBank user      |
+| `/history`      | Paginated + filtered transaction history |
+| `/profile`      | Edit profile, security, notifications |
+| `/receipts/[id]`| View & download PDF receipt          |
+
+### Admin
+| Route                    | Description                        |
+|--------------------------|------------------------------------|
+| `/admin`                 | System-wide stats + recent activity|
+| `/admin/users`           | Manage users, adjust balances      |
+| `/admin/transactions`    | Approve/reject/fail transactions   |
+| `/admin/settings`        | Theme colors, app name, dark mode  |
+| `/admin/notifications`   | Broadcast messages to users        |
+
+---
+
+## 💳 Payment Methods
+
+| Method         | Deposit | Withdraw | Fee      |
+|----------------|---------|----------|----------|
+| Bank Transfer  | ✅      | ✅       | Free     |
+| ACH            | ✅      | ✅       | Free     |
+| Wire Transfer  | ✅      | ✅       | $15–$25  |
+| Debit/Credit Card | ✅   | ✅       | 2.5% / $1.50 |
+| Bitcoin (BTC)  | ✅      | ✅       | $2.50–$5 |
+| Ethereum (ETH) | ✅      | ✅       | $2.50–$5 |
+| USDT           | ✅      | ✅       | $2.50–$5 |
+| BNB            | ✅      | ✅       | $2.50–$5 |
+| Solana (SOL)   | ✅      | ✅       | $2.50–$5 |
+| PayPal         | ✅      | ❌       | Free     |
+| Cash App       | ✅      | ❌       | Free     |
+| Venmo          | ✅      | ❌       | Free     |
+| Zelle          | ✅      | ❌       | Free     |
+
+---
+
+## 🧾 PDF Receipts
+
+Every transaction (deposit, withdrawal, transfer, bill payment) automatically generates a professional PDF receipt using **PDFKit**.
+
+- Receipts are stored at `backend/uploads/receipts/`
+- Accessible via `/receipts/[transactionId]` in the frontend
+- Direct PDF download via `GET /api/receipts/:id/download`
+
+---
+
+## 🔧 Backend API Reference
+
+### Auth
+```
+POST   /api/auth/register     → Create account
+POST   /api/auth/login        → Sign in → JWT token
+GET    /api/auth/me           → Get current user
+PATCH  /api/auth/profile      → Update profile
+PATCH  /api/auth/password     → Change password
+```
+
+### Transactions (requires Bearer token)
+```
+GET    /api/transactions              → List with filters/pagination
+GET    /api/transactions/:id          → Single transaction
+POST   /api/transactions/deposit      → Deposit funds
+POST   /api/transactions/withdraw     → Withdraw funds
+POST   /api/transactions/transfer     → Transfer to another user
+POST   /api/transactions/bill-pay     → Pay a bill
+```
+
+### User
+```
+GET    /api/users/dashboard           → Dashboard summary
+GET    /api/users/notifications       → User notifications
+PATCH  /api/users/notifications/read-all → Mark all read
+```
+
+### Receipts
+```
+GET    /api/receipts/:txId            → Receipt metadata
+GET    /api/receipts/:txId/download   → Download PDF
+```
+
+### Admin (requires admin role)
+```
+GET    /api/admin/dashboard           → System stats
+GET    /api/admin/users               → All users
+GET    /api/admin/users/:id           → User detail + transactions
+PATCH  /api/admin/users/:id/toggle-status → Suspend/activate
+POST   /api/admin/balance-adjust      → Credit/debit any account
+GET    /api/admin/transactions        → All system transactions
+PATCH  /api/admin/transactions/:id/status → Change tx status
+POST   /api/admin/notifications/send  → Broadcast notification
+```
+
+---
+
+## 🛡️ Security Features
+
+- **JWT authentication** with 7-day expiry
+- **bcrypt** password hashing (12 rounds)
+- **MongoDB ACID transactions** for all money movements
+- **Rate limiting** (100 req/15min per IP)
+- **Input validation** with express-validator
+- **CORS** configured for frontend origin only
+- **Balance protection** — can never go negative
+
+---
+
+## 🎨 Tech Stack
+
+| Layer       | Technology                              |
+|-------------|-----------------------------------------|
+| Frontend    | Next.js 14, TypeScript, Tailwind CSS    |
+| Backend     | Node.js, Express.js                     |
+| Database    | MongoDB + Mongoose                      |
+| Auth        | JWT + bcryptjs                          |
+| PDF         | PDFKit                                  |
+| Fonts       | DM Sans, DM Mono, Syne                  |
+| Icons       | Lucide React                            |

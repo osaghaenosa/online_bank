@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy:   #0F1C35;
+  --navy2:  #1A2B4A;
+  --navy3:  #243456;
+  --green:  #10B981;
+  --green2: #059669;
+  --gold:   #F59E0B;
+  --red:    #EF4444;
+  --bg:     #F0F2F7;
+  --surface:#FFFFFF;
+  --border: #E2E8F0;
+  --muted:  #6B7A99;
+  --text:   #0F1C35;
+
+  --color-primary: #1A2B4A;
+  --color-accent:  #10B981;
+  --color-bg:      #F0F2F7;
+  --color-surface: #FFFFFF;
+  --color-border:  #E2E8F0;
+  --color-muted:   #6B7A99;
+  --color-text:    #0F1C35;
+}
+
+.dark {
+  --bg:     #080E1C;
+  --surface:#0F1A2E;
+  --border: #1E2D47;
+  --muted:  #8899BB;
+  --text:   #E8EDF8;
+  --color-bg:     #080E1C;
+  --color-surface:#0F1A2E;
+  --color-border: #1E2D47;
+  --color-muted:  #8899BB;
+  --color-text:   #E8EDF8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-mono  { font-family: 'DM Mono', monospace !important; }
+.font-display { font-family: 'Syne', sans-serif !important; }
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ── Shimmer skeleton ──────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 8px;
+}
+
+/* ── Toast slide-in ────────────────────────────────────────────────────────── */
+@keyframes slideInRight {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+.toast-in { animation: slideInRight 0.32s cubic-bezier(.22,1,.36,1); }
+
+/* ── Check draw ────────────────────────────────────────────────────────────── */
+@keyframes checkDraw {
+  from { stroke-dashoffset: 100; }
+  to   { stroke-dashoffset: 0;   }
+}
+.check-draw {
+  stroke-dasharray: 100;
+  animation: checkDraw 0.6s ease forwards 0.1s;
+}
+
+/* ── Fade/scale in ─────────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(18px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.45s ease both; }
+.fade-up-1 { animation: fadeUp 0.45s ease 0.05s both; }
+.fade-up-2 { animation: fadeUp 0.45s ease 0.12s both; }
+.fade-up-3 { animation: fadeUp 0.45s ease 0.20s both; }
+.fade-up-4 { animation: fadeUp 0.45s ease 0.28s both; }
+.fade-up-5 { animation: fadeUp 0.45s ease 0.36s both; }
+
+/* ── Pulse glow ────────────────────────────────────────────────────────────── */
+@keyframes pulseGlow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,.35); }
+  50%      { box-shadow: 0 0 0 10px rgba(16,185,129,0); }
+}
+.pulse-glow { animation: pulseGlow 2.4s ease infinite; }
+
+/* ── Number ticker ─────────────────────────────────────────────────────────── */
+@keyframes countUp {
+  from { transform: translateY(8px); opacity:0; }
+  to   { transform: translateY(0);   opacity:1; }
+}
+.count-up { animation: countUp 0.5s ease both; }
+
+/* ── Landing hero gradient ─────────────────────────────────────────────────── */
+.hero-gradient {
+  background: radial-gradient(ellipse 90% 60% at 60% 40%, #1E3A5F 0%, #0F1C35 60%, #080E1C 100%);
+}
+
+/* ── Card glass ────────────────────────────────────────────────────────────── */
+.glass {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ── Green dot ─────────────────────────────────────────────────────────────── */
+.status-dot-green { 
+  width:8px; height:8px; border-radius:50%; background:#10B981;
+  box-shadow: 0 0 0 3px rgba(16,185,129,.25);
+}
+.status-dot-red   { width:8px; height:8px; border-radius:50%; background:#EF4444; }
+.status-dot-amber { width:8px; height:8px; border-radius:50%; background:#F59E0B; }
+
+/* ── Public nav link ───────────────────────────────────────────────────────── */
+.nav-link {
+  position: relative;
+  color: rgba(255,255,255,0.7);
+  transition: color .2s;
+}
+.nav-link::after {
+  content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px;
+  background: #10B981; transition: width .25s ease;
+}
+.nav-link:hover { color:#fff; }
+.nav-link:hover::after { width:100%; }
+
+/* ── Stat card hover ───────────────────────────────────────────────────────── */
+.stat-card { transition: transform .2s, box-shadow .2s; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,.08); }
