@@ -4,24 +4,25 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/store/auth'
 import { AppShell } from '@/components/layout/AppShell'
-import { LayoutDashboard, Users, List, Settings, Bell } from 'lucide-react'
+import { LayoutDashboard, Users, List, Settings, Bell, FileEdit } from 'lucide-react'
 import clsx from 'clsx'
 
 const ADMIN_NAV = [
-  { href: '/admin',                  label: 'Dashboard',     icon: LayoutDashboard, exact: true },
-  { href: '/admin/users',            label: 'Users',         icon: Users },
-  { href: '/admin/transactions',     label: 'Transactions',  icon: List },
-  { href: '/admin/settings',         label: 'Customization', icon: Settings },
-  { href: '/admin/notifications',    label: 'Notifications', icon: Bell },
+  { href: '/admin',                 label: 'Dashboard',    icon: LayoutDashboard, exact: true },
+  { href: '/admin/users',           label: 'Users',        icon: Users },
+  { href: '/admin/accounts',        label: 'Accounts',     icon: FileEdit },
+  { href: '/admin/transactions',    label: 'Transactions', icon: List },
+  { href: '/admin/settings',        label: 'Customization',icon: Settings },
+  { href: '/admin/notifications',   label: 'Notifications',icon: Bell },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
-  const router = useRouter()
+  const router   = useRouter()
   const pathname = usePathname()
 
   useEffect(() => {
-    if (!loading && !user) router.replace('/auth/login')
+    if (!loading && !user)                  router.replace('/auth/login')
     if (!loading && user && user.role !== 'admin') router.replace('/dashboard')
   }, [user, loading, router])
 
@@ -34,11 +35,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <AppShell>
       <div className="max-w-7xl">
-        {/* Admin warning */}
         <div className="mb-5 p-3 rounded-xl flex items-center gap-3"
           style={{ background: '#FEF3C7', border: '1px solid #FCD34D' }}>
           <Settings size={15} className="text-amber-600 flex-shrink-0" />
-          <p className="text-sm text-amber-700 font-medium">Admin Panel — changes affect all users in real time.</p>
+          <p className="text-sm text-amber-700 font-medium">
+            Admin Panel — changes affect all users in real time.
+          </p>
         </div>
         {/* Sub-nav */}
         <div className="flex gap-1 p-1.5 rounded-2xl mb-6 overflow-x-auto"

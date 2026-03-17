@@ -11,20 +11,13 @@ exports.getDashboard = async (req, res, next) => {
       Transaction.countDocuments({ status: 'pending' }),
       User.countDocuments({ status: 'suspended' })
     ]);
-
     const balanceAgg = await User.aggregate([{ $group: { _id: null, total: { $sum: '$balance' } } }]);
     const txVolumeAgg = await Transaction.aggregate([
       { $match: { status: 'completed' } },
       { $group: { _id: '$type', total: { $sum: '$amount' }, count: { $sum: 1 } } }
     ]);
-
-    const recentTxs = await Transaction.find()
-      .sort({ createdAt: -1 }).limit(10)
-      .populate('userId', 'firstName lastName email');
-
-    const recentUsers = await User.find({ role: 'user' })
-      .sort({ createdAt: -1 }).limit(5).select('-password');
-
+    const recentTxs   = await Transaction.find().sort({ createdAt: -1 }).limit(10).populate('userId', 'firstName lastName email');
+    const recentUsers = await User.find({ role: 'user' }).sort({ createdAt: -1 }).limit(5).select('-password');
     res.json({
       stats: {
         totalUsers, totalTransactions, pendingTxs, suspendedUsers,
@@ -44,12 +37,11 @@ exports.getUsers = async (req, res, next) => {
     if (status) query.status = status;
     if (search) query.$or = [
       { firstName: { $regex: search, $options: 'i' } },
-      { lastName: { $regex: search, $options: 'i' } },
-      { email: { $regex: search, $options: 'i' } }
+      { lastName:  { $regex: search, $options: 'i' } },
+      { email:     { $regex: search, $options: 'i' } }
     ];
     const total = await User.countDocuments(query);
-    const users = await User.find(query)
-      .select('-password').sort({ createdAt: -1 })
+    const users = await User.find(query).select('-password').sort({ createdAt: -1 })
       .skip((page - 1) * limit).limit(parseInt(limit));
     res.json({ users: users.map(u => u.toPublicJSON()), pagination: { total, page: parseInt(page), pages: Math.ceil(total / limit) } });
   } catch (err) { next(err); }
@@ -64,6 +56,21 @@ exports.getUserDetail = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// ── NEW: Edit user name ───────────────────────────────────────────────────────
+exports.editUserName = async (req, res, next) => {
+  try {
+    const { firstName, lastName } = req.body;
+    if (!firstName?.trim() || !lastName?.trim()) return res.status(400).json({ error: 'First and last name required' });
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { firstName: firstName.trim(), lastName: lastName.trim() },
+      { new: true, runValidators: true }
+    ).select('-password');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json({ user: user.toPublicJSON() });
+  } catch (err) { next(err); }
+};
+
 exports.adjustBalance = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -71,14 +78,11 @@ exports.adjustBalance = async (req, res, next) => {
     const { userId, amount, type, description } = req.body;
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
-
     const user = await User.findById(userId).session(session);
     if (!user) return res.status(404).json({ error: 'User not found' });
-
     const delta = type === 'credit' ? numAmount : -numAmount;
     const newBalance = parseFloat((user.balance + delta).toFixed(2));
     if (newBalance < 0) { await session.abortTransaction(); return res.status(400).json({ error: 'Cannot reduce balance below zero' }); }
-
     const tx = new Transaction({
       userId, type, category: type === 'credit' ? 'deposit' : 'withdrawal',
       method: 'internal', amount: numAmount, fee: 0,
@@ -89,13 +93,11 @@ exports.adjustBalance = async (req, res, next) => {
     user.balance = newBalance;
     await user.save({ session });
     await session.commitTransaction();
-
     await Notification.create({
       userId, title: 'Balance Adjusted',
       message: `Your balance has been ${type === 'credit' ? 'credited' : 'debited'} $${numAmount} by an administrator. ${description || ''}`,
       type: 'system', priority: 'high'
     });
-
     res.json({ user: user.toPublicJSON(), transaction: tx, newBalance });
   } catch (err) { await session.abortTransaction(); next(err); }
   finally { session.endSession(); }
@@ -107,16 +109,14 @@ exports.toggleUserStatus = async (req, res, next) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
     user.status = user.status === 'active' ? 'suspended' : 'active';
     await user.save({ validateBeforeSave: false });
-
     await Notification.create({
       userId: user._id,
       title: user.status === 'suspended' ? 'Account Suspended' : 'Account Activated',
       message: user.status === 'suspended'
-        ? 'Your account has been suspended. Contact support for assistance.'
+        ? 'Your account has been suspended. Contact support.'
         : 'Your account has been reactivated. Welcome back!',
       type: 'security', priority: 'high'
     });
-
     res.json({ user: user.toPublicJSON() });
   } catch (err) { next(err); }
 };
@@ -126,20 +126,16 @@ exports.updateTransactionStatus = async (req, res, next) => {
     const { status, reason } = req.body;
     const tx = await Transaction.findById(req.params.id);
     if (!tx) return res.status(404).json({ error: 'Transaction not found' });
-
     const oldStatus = tx.status;
     tx.status = status;
-    if (status === 'failed') { tx.failedAt = new Date(); tx.failReason = reason; }
-    if (status === 'completed') tx.completedAt = new Date();
+    if (status === 'failed')    { tx.failedAt = new Date(); tx.failReason = reason; }
+    if (status === 'completed')   tx.completedAt = new Date();
     await tx.save();
-
     await Notification.create({
-      userId: tx.userId,
-      title: 'Transaction Updated',
-      message: `Transaction ${tx.transactionId} status changed from ${oldStatus} to ${status}${reason ? ': ' + reason : ''}`,
+      userId: tx.userId, title: 'Transaction Updated',
+      message: `Transaction ${tx.transactionId} changed from ${oldStatus} to ${status}${reason ? ': ' + reason : ''}`,
       type: 'transaction'
     });
-
     res.json({ transaction: tx });
   } catch (err) { next(err); }
 };
@@ -163,7 +159,7 @@ exports.getAllTransactions = async (req, res, next) => {
     const { page = 1, limit = 25, status, type } = req.query;
     const query = {};
     if (status && status !== 'all') query.status = status;
-    if (type && type !== 'all') query.type = type;
+    if (type   && type   !== 'all') query.type   = type;
     const total = await Transaction.countDocuments(query);
     const transactions = await Transaction.find(query)
       .sort({ createdAt: -1 }).skip((page - 1) * limit).limit(parseInt(limit))

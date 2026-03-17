@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { api, saveToken, clearToken } from '@/lib/api'
 
-interface User {
+export interface User {
   _id: string
   firstName: string
   lastName: string
@@ -20,7 +20,29 @@ interface User {
   kyc: 'Verified' | 'Pending' | 'Rejected'
   role: 'user' | 'admin'
   notifications: { email: boolean; sms: boolean; push: boolean }
-  linkedAccounts: Array<{ type: string; label: string; lastFour: string; isDefault: boolean }>
+  linkedAccounts: Array<{
+    platform: string; label: string; accountId: string
+    balance: number; currency: string; isDefault: boolean
+  }>
+  cryptoAssets: Array<{
+    coin: string; symbol: string; quantity: number
+    avgBuyPrice: number; currentPrice: number; valueUSD: number
+    walletAddress: string; network: string; acquiredAt: string
+  }>
+  treasuryAssets: Array<{
+    category: string; name: string; description: string
+    quantity: number; unitPrice: number; totalValue: number
+    acquiredAt: string; location: string; serialNo: string; notes: string
+  }>
+  investments: Array<{
+    name: string; type: string; ticker: string
+    amount: number; currentValue: number; returnPct: number
+    startDate: string; status: string; notes: string; broker: string
+  }>
+  trust: {
+    enabled: boolean; name: string; balance: number; type: string
+    trustee: string; beneficiary: string; established: string; notes: string
+  }
   createdAt: string
 }
 
@@ -45,9 +67,9 @@ interface AuthCtx {
 const Ctx = createContext<AuthCtx | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser]       = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [toasts, setToasts] = useState<Toast[]>([])
+  const [toasts, setToasts]   = useState<Toast[]>([])
 
   const toast = useCallback((msg: string, type: Toast['type'] = 'success') => {
     const id = Math.random().toString(36).slice(2)
