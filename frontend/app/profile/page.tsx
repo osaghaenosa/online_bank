@@ -157,7 +157,7 @@ export default function ProfilePage() {
           <Card className="p-5" style={{ background: '#0F1C35' }}>
             <p className="text-xs text-white/40 mb-1">Available Balance</p>
             <p className="font-mono text-2xl font-bold text-white">{fmtUSD(user.balance)}</p>
-            <Divider className="my-3" style={{ background: 'rgba(255,255,255,.1)' }} />
+            <Divider className="my-3 bg-white/10" />
             <div className="flex justify-between text-sm">
               <span className="text-white/40 text-xs">Savings</span>
               <span className="font-mono text-white/70 text-xs">{fmtUSD(user.savingsBalance || 0)}</span>
