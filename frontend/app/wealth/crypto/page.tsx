@@ -153,7 +153,7 @@ export default function CryptoPage() {
             { label:'Total Value', value: fmt(totalUSD) },
             { label:'# of Coins',  value: String(assets.length) },
             { label:'Largest Hold',value: assets.sort((a,b)=>b.valueUSD-a.valueUSD)[0]?.symbol || '—' },
-            { label:'Networks',    value: Array.from(new Set(assets.map((a: any) => a.network))).length + ' chains'},
+            { label:'Networks',    value: [...new Set(assets.map((a:any)=>a.network))].length + ' chains' },
           ].map(({label,value}) => (
             <div key={label} className="text-center p-3 rounded-xl" style={{ background:'var(--color-bg)' }}>
               <p className="text-xs font-semibold mb-1" style={{ color:'var(--color-muted)' }}>{label}</p>

@@ -6,7 +6,7 @@ const { generateReceiptPDF } = require('../utils/receiptGenerator');
 
 const fmtUSD = (n) => '$' + Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-// ─── Deposit ─────────────────────────────────────────────────────────────────
+// ── Deposit ───────────────────────────────────────────────────────────────────
 exports.deposit = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -16,7 +16,6 @@ exports.deposit = async (req, res, next) => {
     if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
     if (numAmount > 50000) return res.status(400).json({ error: 'Maximum single deposit is $50,000' });
 
-    // Calculate fees
     let fee = 0;
     if (method === 'card') fee = parseFloat((numAmount * 0.025).toFixed(2));
     if (method === 'wire') fee = 15;
@@ -26,132 +25,116 @@ exports.deposit = async (req, res, next) => {
     const newBalance = parseFloat((user.balance + numAmount).toFixed(2));
 
     const tx = new Transaction({
-      userId: req.user._id,
-      type: 'credit',
-      category: 'deposit',
-      method: method || 'bank_transfer',
-      amount: numAmount,
-      fee,
+      userId: req.user._id, type: 'credit', category: 'deposit',
+      method: method || 'bank_transfer', amount: numAmount, fee,
       description: description || `${getMethodLabel(method)} Deposit`,
-      note: note || '',
-      status: method === 'card' ? 'completed' : 'completed',
-      balanceAfter: newBalance,
+      note: note || '', status: 'completed', balanceAfter: newBalance,
       ...(cryptoDetails && {
-        cryptoCoin: cryptoDetails.coin,
-        cryptoAmount: cryptoDetails.coinAmount,
-        cryptoNetwork: cryptoDetails.network,
-        walletAddress: cryptoDetails.walletAddress
+        cryptoCoin: cryptoDetails.coin, cryptoAmount: cryptoDetails.coinAmount,
+        cryptoNetwork: cryptoDetails.network, walletAddress: cryptoDetails.walletAddress
       })
     });
     await tx.save({ session });
-
     user.balance = newBalance;
     await user.save({ session });
     await session.commitTransaction();
 
-    // Generate receipt
-    const receipt = await generateReceiptPDF(tx, user);
-    tx.receiptGenerated = true;
-    tx.receiptUrl = receipt.url;
-    await tx.save();
+    try {
+      const receipt = await generateReceiptPDF(tx, user);
+      tx.receiptGenerated = true; tx.receiptUrl = receipt.url;
+      await tx.save();
+    } catch(e) { console.error('Receipt gen failed:', e.message); }
 
-    // Notification
     await Notification.create({
-      userId: user._id,
-      title: 'Deposit Confirmed',
+      userId: user._id, title: 'Deposit Confirmed',
       message: `Your deposit of ${fmtUSD(numAmount)} via ${getMethodLabel(method)} has been processed. New balance: ${fmtUSD(newBalance)}`,
-      type: 'transaction',
-      priority: 'medium',
-      link: `/receipts/${tx.transactionId}`
+      type: 'transaction', priority: 'medium'
     });
 
     res.status(201).json({ transaction: tx, newBalance, receiptUrl: tx.receiptUrl });
-  } catch (err) {
-    await session.abortTransaction();
-    next(err);
-  } finally {
-    session.endSession();
-  }
+  } catch (err) { await session.abortTransaction(); next(err); }
+  finally { session.endSession(); }
 };
 
-// ─── Withdraw ─────────────────────────────────────────────────────────────────
+// ── Withdraw — creates PENDING, does NOT deduct balance yet ───────────────────
 exports.withdraw = async (req, res, next) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  try {
+    // Check if withdrawals are enabled for this user
+    const userCheck = await User.findById(req.user._id);
+    if (!userCheck.withdrawalsEnabled) {
+      return res.status(403).json({
+        error: 'Withdrawals are currently blocked on this account.',
+        reason: userCheck.withdrawalsBlockReason || 'Contact support for assistance.',
+        blocked: true,
+        requirements: userCheck.withdrawalRequirements || []
+      });
+    }
+  } catch(e) { return next(e); }
+
   try {
     const { amount, method, description, note, bankDetails, cardDetails, cryptoDetails } = req.body;
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
+    if (numAmount > 10000) return res.status(400).json({ error: 'Maximum single withdrawal is $10,000' });
 
     let fee = 0;
     if (method === 'wire') fee = 25;
     if (method === 'card') fee = 1.50;
     if (method && method.startsWith('crypto')) fee = 5.00;
-
     const total = parseFloat((numAmount + fee).toFixed(2));
 
-    const user = await User.findById(req.user._id).session(session);
+    const user = await User.findById(req.user._id);
     if (user.balance < total) {
-      await session.abortTransaction();
       return res.status(400).json({ error: `Insufficient funds. Available: ${fmtUSD(user.balance)}, Required: ${fmtUSD(total)}` });
     }
-    if (numAmount > 10000) {
-      await session.abortTransaction();
-      return res.status(400).json({ error: 'Maximum single withdrawal is $10,000' });
-    }
 
-    const newBalance = parseFloat((user.balance - total).toFixed(2));
-
+    // ⚠️  Create PENDING transaction — balance is NOT touched yet
     const tx = new Transaction({
-      userId: req.user._id,
-      type: 'debit',
-      category: 'withdrawal',
-      method: method || 'ach',
-      amount: numAmount,
-      fee,
+      userId: req.user._id, type: 'debit', category: 'withdrawal',
+      method: method || 'ach', amount: numAmount, fee,
       description: description || `${getMethodLabel(method)} Withdrawal`,
       note: note || '',
-      status: 'completed',
-      balanceAfter: newBalance,
+      status: 'pending',          // ← key: stays pending until admin approves
+      balanceAfter: null,         // ← not set until approved
       metadata: { bankDetails, cardDetails, cryptoDetails }
     });
-
     if (cryptoDetails) {
-      tx.cryptoCoin = cryptoDetails.coin;
-      tx.cryptoAmount = cryptoDetails.coinAmount;
+      tx.cryptoCoin    = cryptoDetails.coin;
+      tx.cryptoAmount  = cryptoDetails.coinAmount;
       tx.cryptoNetwork = cryptoDetails.network;
       tx.walletAddress = cryptoDetails.walletAddress;
     }
-
-    await tx.save({ session });
-    user.balance = newBalance;
-    await user.save({ session });
-    await session.commitTransaction();
-
-    const receipt = await generateReceiptPDF(tx, user);
-    tx.receiptGenerated = true;
-    tx.receiptUrl = receipt.url;
     await tx.save();
 
     await Notification.create({
-      userId: user._id,
-      title: 'Withdrawal Processed',
-      message: `Withdrawal of ${fmtUSD(numAmount)} via ${getMethodLabel(method)} completed. Fee: ${fmtUSD(fee)}. New balance: ${fmtUSD(newBalance)}`,
-      type: 'transaction',
-      link: `/receipts/${tx.transactionId}`
+      userId: user._id, title: 'Withdrawal Request Submitted',
+      message: `Your withdrawal request of ${fmtUSD(numAmount)} is pending admin approval. You will be notified once it is reviewed. Your balance has NOT been deducted yet.`,
+      type: 'transaction', priority: 'medium'
     });
 
-    res.status(201).json({ transaction: tx, newBalance, receiptUrl: tx.receiptUrl });
-  } catch (err) {
-    await session.abortTransaction();
-    next(err);
-  } finally {
-    session.endSession();
-  }
+    res.status(201).json({
+      transaction: tx,
+      pending: true,
+      message: 'Withdrawal submitted for admin approval. Your balance will be deducted only upon approval.',
+      currentBalance: user.balance,
+    });
+  } catch (err) { next(err); }
 };
 
-// ─── Transfer ─────────────────────────────────────────────────────────────────
+// ── Transfer ──────────────────────────────────────────────────────────────────
 exports.transfer = async (req, res, next) => {
+  try {
+    const userCheck = await User.findById(req.user._id);
+    if (!userCheck.transfersEnabled) {
+      return res.status(403).json({
+        error: 'Transfers are currently pending review on this account.',
+        reason: userCheck.transfersBlockReason || 'Your transfer capability is under review. Contact support.',
+        blocked: true,
+        requirements: userCheck.transferRequirements || []
+      });
+    }
+  } catch(e) { return next(e); }
+
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -166,28 +149,16 @@ exports.transfer = async (req, res, next) => {
       return res.status(400).json({ error: `Insufficient funds. Available: ${fmtUSD(sender.balance)}` });
     }
 
-    // Find recipient
     let recipient = null;
-    if (recipientEmail) {
-      recipient = await User.findOne({ email: recipientEmail }).session(session);
-    } else if (recipientAccountNumber) {
-      recipient = await User.findOne({ accountNumber: recipientAccountNumber }).session(session);
-    }
+    if (recipientEmail) recipient = await User.findOne({ email: recipientEmail }).session(session);
+    else if (recipientAccountNumber) recipient = await User.findOne({ accountNumber: recipientAccountNumber }).session(session);
 
     const senderNewBalance = parseFloat((sender.balance - numAmount).toFixed(2));
-
-    // Debit sender
     const senderTx = new Transaction({
-      userId: sender._id,
-      type: 'debit',
-      category: 'transfer_out',
-      method: 'internal',
-      amount: numAmount,
-      fee: 0,
+      userId: sender._id, type: 'debit', category: 'transfer_out',
+      method: 'internal', amount: numAmount, fee: 0,
       description: description || `Transfer to ${recipient ? recipient.firstName + ' ' + recipient.lastName : recipientAccountNumber || recipientEmail}`,
-      note: note || '',
-      status: 'completed',
-      balanceAfter: senderNewBalance,
+      note: note || '', status: 'completed', balanceAfter: senderNewBalance,
       recipientId: recipient?._id,
       recipientName: recipient ? `${recipient.firstName} ${recipient.lastName}` : undefined,
       recipientAccount: recipientAccountNumber || recipient?.accountNumber
@@ -196,23 +167,14 @@ exports.transfer = async (req, res, next) => {
     sender.balance = senderNewBalance;
     await sender.save({ session });
 
-    // Credit recipient if internal
-    let recipientTx = null;
     if (recipient) {
       const recipientNewBalance = parseFloat((recipient.balance + numAmount).toFixed(2));
-      recipientTx = new Transaction({
-        userId: recipient._id,
-        type: 'credit',
-        category: 'transfer_in',
-        method: 'internal',
-        amount: numAmount,
-        fee: 0,
+      const recipientTx = new Transaction({
+        userId: recipient._id, type: 'credit', category: 'transfer_in',
+        method: 'internal', amount: numAmount, fee: 0,
         description: `Transfer from ${sender.firstName} ${sender.lastName}`,
-        note: note || '',
-        status: 'completed',
-        balanceAfter: recipientNewBalance,
-        recipientId: sender._id,
-        recipientName: `${sender.firstName} ${sender.lastName}`
+        note: note || '', status: 'completed', balanceAfter: recipientNewBalance,
+        recipientId: sender._id, recipientName: `${sender.firstName} ${sender.lastName}`
       });
       await recipientTx.save({ session });
       recipient.balance = recipientNewBalance;
@@ -221,81 +183,54 @@ exports.transfer = async (req, res, next) => {
 
     await session.commitTransaction();
 
-    // Generate receipts
-    const receiptSender = await generateReceiptPDF(senderTx, sender);
-    senderTx.receiptGenerated = true;
-    senderTx.receiptUrl = receiptSender.url;
-    await senderTx.save();
+    try {
+      const receipt = await generateReceiptPDF(senderTx, sender);
+      senderTx.receiptGenerated = true; senderTx.receiptUrl = receipt.url;
+      await senderTx.save();
+    } catch(e) { console.error('Receipt gen failed:', e.message); }
 
-    // Notifications
     await Notification.create([
-      {
-        userId: sender._id,
-        title: 'Transfer Sent',
+      { userId: sender._id, title: 'Transfer Sent',
         message: `You sent ${fmtUSD(numAmount)} to ${senderTx.recipientName || recipientAccountNumber || recipientEmail}. New balance: ${fmtUSD(senderNewBalance)}`,
-        type: 'transaction',
-        link: `/receipts/${senderTx.transactionId}`
-      },
-      ...(recipient ? [{
-        userId: recipient._id,
-        title: 'Money Received',
+        type: 'transaction' },
+      ...(recipient ? [{ userId: recipient._id, title: 'Money Received',
         message: `You received ${fmtUSD(numAmount)} from ${sender.firstName} ${sender.lastName}`,
-        type: 'transaction'
-      }] : [])
+        type: 'transaction' }] : [])
     ]);
 
     res.status(201).json({
-      transaction: senderTx,
-      newBalance: senderNewBalance,
-      recipientFound: !!recipient,
-      receiptUrl: senderTx.receiptUrl
+      transaction: senderTx, newBalance: senderNewBalance,
+      recipientFound: !!recipient, receiptUrl: senderTx.receiptUrl
     });
-  } catch (err) {
-    await session.abortTransaction();
-    next(err);
-  } finally {
-    session.endSession();
-  }
+  } catch (err) { await session.abortTransaction(); next(err); }
+  finally { session.endSession(); }
 };
 
-// ─── Get Transactions ─────────────────────────────────────────────────────────
+// ── Get Transactions ──────────────────────────────────────────────────────────
 exports.getTransactions = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, status, category, type, search, startDate, endDate } = req.query;
     const query = { userId: req.user._id };
-
     if (status && status !== 'all') query.status = status;
     if (category && category !== 'all') query.category = category;
     if (type && type !== 'all') query.type = type;
     if (startDate || endDate) {
       query.createdAt = {};
       if (startDate) query.createdAt.$gte = new Date(startDate);
-      if (endDate) query.createdAt.$lte = new Date(endDate);
+      if (endDate)   query.createdAt.$lte = new Date(endDate);
     }
-    if (search) {
-      query.$or = [
-        { description: { $regex: search, $options: 'i' } },
-        { transactionId: { $regex: search, $options: 'i' } }
-      ];
-    }
-
+    if (search) query.$or = [
+      { description: { $regex: search, $options: 'i' } },
+      { transactionId: { $regex: search, $options: 'i' } }
+    ];
     const total = await Transaction.countDocuments(query);
     const transactions = await Transaction.find(query)
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit))
+      .sort({ createdAt: -1 }).skip((page - 1) * limit).limit(parseInt(limit))
       .populate('recipientId', 'firstName lastName email');
-
-    // Summary stats
     const stats = await Transaction.aggregate([
       { $match: { userId: req.user._id, status: 'completed' } },
-      { $group: {
-        _id: '$type',
-        total: { $sum: '$amount' },
-        count: { $sum: 1 }
-      }}
+      { $group: { _id: '$type', total: { $sum: '$amount' }, count: { $sum: 1 } } }
     ]);
-
     res.json({
       transactions,
       pagination: { page: parseInt(page), limit: parseInt(limit), total, pages: Math.ceil(total / limit) },
@@ -304,20 +239,17 @@ exports.getTransactions = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-// ─── Get single transaction ────────────────────────────────────────────────────
 exports.getTransaction = async (req, res, next) => {
   try {
     const tx = await Transaction.findOne({
       $or: [{ _id: req.params.id }, { transactionId: req.params.id }],
       userId: req.user._id
     }).populate('recipientId', 'firstName lastName email');
-
     if (!tx) return res.status(404).json({ error: 'Transaction not found' });
     res.json({ transaction: tx });
   } catch (err) { next(err); }
 };
 
-// ─── Bill Payment ──────────────────────────────────────────────────────────────
 exports.payBill = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -325,49 +257,49 @@ exports.payBill = async (req, res, next) => {
     const { amount, billType, accountNumber, description } = req.body;
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
-
     const user = await User.findById(req.user._id).session(session);
-    if (user.balance < numAmount) {
-      await session.abortTransaction();
-      return res.status(400).json({ error: 'Insufficient funds' });
-    }
-
+    if (user.balance < numAmount) { await session.abortTransaction(); return res.status(400).json({ error: 'Insufficient funds' }); }
     const newBalance = parseFloat((user.balance - numAmount).toFixed(2));
     const tx = new Transaction({
       userId: user._id, type: 'debit', category: 'bill', method: 'internal',
-      amount: numAmount, fee: 0,
-      description: description || `${billType} Bill Payment`,
-      note: `Account: ${accountNumber}`,
-      status: 'completed', balanceAfter: newBalance,
+      amount: numAmount, fee: 0, description: description || `${billType} Bill Payment`,
+      note: `Account: ${accountNumber}`, status: 'completed', balanceAfter: newBalance,
       metadata: { billType, accountNumber }
     });
-    await tx.save({ session });
-    user.balance = newBalance;
-    await user.save({ session });
+    await tx.save({ session }); user.balance = newBalance; await user.save({ session });
     await session.commitTransaction();
-
-    const receipt = await generateReceiptPDF(tx, user);
-    tx.receiptUrl = receipt.url; tx.receiptGenerated = true;
-    await tx.save();
-
-    await Notification.create({
-      userId: user._id, title: 'Bill Payment Successful',
-      message: `${billType} bill payment of ${fmtUSD(numAmount)} processed.`,
-      type: 'transaction', link: `/receipts/${tx.transactionId}`
-    });
-
+    try {
+      const receipt = await generateReceiptPDF(tx, user);
+      tx.receiptUrl = receipt.url; tx.receiptGenerated = true; await tx.save();
+    } catch(e) {}
     res.status(201).json({ transaction: tx, newBalance, receiptUrl: tx.receiptUrl });
   } catch (err) { await session.abortTransaction(); next(err); }
   finally { session.endSession(); }
 };
 
+// ── Get restrictions ──────────────────────────────────────────────────────────
+exports.getRestrictions = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).select(
+      'transfersEnabled withdrawalsEnabled transfersBlockReason withdrawalsBlockReason transferRequirements withdrawalRequirements'
+    );
+    res.json({
+      transfersEnabled:    user.transfersEnabled,
+      withdrawalsEnabled:  user.withdrawalsEnabled,
+      transfersBlockReason:   user.transfersBlockReason,
+      withdrawalsBlockReason: user.withdrawalsBlockReason,
+      transferRequirements:   user.transferRequirements,
+      withdrawalRequirements: user.withdrawalRequirements,
+    });
+  } catch(err) { next(err); }
+};
+
 function getMethodLabel(method) {
   const labels = {
-    bank_transfer: 'Bank Transfer', ach: 'ACH Transfer', wire: 'Wire Transfer',
-    card: 'Card', crypto_btc: 'Bitcoin', crypto_eth: 'Ethereum',
-    crypto_usdt: 'USDT', crypto_bnb: 'BNB', crypto_sol: 'Solana',
-    paypal: 'PayPal', cashapp: 'Cash App', venmo: 'Venmo', zelle: 'Zelle',
-    apple_pay: 'Apple Pay', google_pay: 'Google Pay', internal: 'Internal'
+    bank_transfer:'Bank Transfer', ach:'ACH Transfer', wire:'Wire Transfer',
+    card:'Card', crypto_btc:'Bitcoin', crypto_eth:'Ethereum', crypto_usdt:'USDT',
+    crypto_bnb:'BNB', crypto_sol:'Solana', paypal:'PayPal', cashapp:'Cash App',
+    venmo:'Venmo', zelle:'Zelle', apple_pay:'Apple Pay', google_pay:'Google Pay', internal:'Internal'
   };
   return labels[method] || method || 'Bank Transfer';
 }

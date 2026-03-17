@@ -25,6 +25,28 @@ const userSchema = new mongoose.Schema({
   role:   { type: String, enum: ['user', 'admin'], default: 'user' },
   twoFactorEnabled: { type: Boolean, default: false },
   profilePicture:   { type: String, default: null },
+
+  // ── Transfer & Withdrawal Controls ──────────────────────────────────────
+  transfersEnabled:    { type: Boolean, default: true },
+  withdrawalsEnabled:  { type: Boolean, default: true },
+  transfersBlockReason:   { type: String, default: '' },
+  withdrawalsBlockReason: { type: String, default: '' },
+  // Requirements admin can set before re-enabling
+  transferRequirements: [{
+    type: { type: String }, // 'kyc_upgrade', 'document_upload', 'phone_verify', 'admin_review', 'custom'
+    label: { type: String },
+    fulfilled: { type: Boolean, default: false },
+    fulfilledAt: { type: Date },
+    notes: { type: String }
+  }],
+  withdrawalRequirements: [{
+    type: { type: String },
+    label: { type: String },
+    fulfilled: { type: Boolean, default: false },
+    fulfilledAt: { type: Date },
+    notes: { type: String }
+  }],
+
   notifications: {
     email: { type: Boolean, default: true },
     sms:   { type: Boolean, default: false },

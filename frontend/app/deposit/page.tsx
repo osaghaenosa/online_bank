@@ -89,8 +89,8 @@ export default function DepositPage() {
   )
 
   return (
-    <div className="max-w-5xl space-y-5 fade-up">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <div className="max-w-5xl space-y-4 sm:space-y-5 fade-up">
+      <div className="grid grid-cols-1 lg:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         <div className="lg:col-span-2 space-y-5">
 
           {/* Method picker */}

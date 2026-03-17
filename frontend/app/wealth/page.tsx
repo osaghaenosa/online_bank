@@ -75,7 +75,7 @@ export default function WealthPage() {
   const pct = (val: number) => netWorth > 0 ? ((val / netWorth) * 100).toFixed(1) : '0'
 
   return (
-    <div className="max-w-6xl space-y-6 fade-up">
+    <div className="max-w-6xl space-y-5 sm:space-y-6 fade-up">
 
       {/* ── Currency switcher ──────────────────────────────────────── */}
       <div className="flex items-center justify-between flex-wrap gap-4">

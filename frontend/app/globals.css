@@ -148,3 +148,50 @@ body {
 /* ── Stat card hover ───────────────────────────────────────────────────────── */
 .stat-card { transition: transform .2s, box-shadow .2s; }
 .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,.08); }
+
+/* ── Mobile safety ────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+html, body { overflow-x: hidden; }
+
+/* Prevent horizontal scroll on any element */
+.overflow-x-hidden { overflow-x: hidden !important; }
+
+/* Hide scrollbars on tab bars while keeping scroll */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Ensure text never bleeds outside containers */
+p, span, h1, h2, h3, h4, h5, h6, a, label {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Font mono numbers stay contained */
+.font-mono { overflow-wrap: break-word; word-break: break-all; }
+
+/* Tables on mobile scroll horizontally */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ── Chat bounce animation ───────────────────────────────────────────────── */
+@keyframes chat-bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+}
+.chat-dot { animation: chat-bounce 1.2s ease-in-out infinite; }
+.chat-dot:nth-child(2) { animation-delay: 0.2s; }
+.chat-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ── Notification popup entrance ─────────────────────────────────────────── */
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.slide-up { animation: slideUp 0.2s ease both; }
+
+/* Prevent fixed elements from causing layout shifts */
+@media (max-width: 640px) {
+  .fade-up { animation-duration: 0.25s; }
+  
+  /* Admin tab bar scrollable on mobile */
+  .admin-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}

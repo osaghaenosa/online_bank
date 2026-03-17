@@ -16,7 +16,7 @@ export default function AdminDashboardPage() {
 
   if (loading) return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">{Array.from({length:4}).map((_,i) => <div key={i} className="shimmer h-28 rounded-2xl" />)}</div>
+      <div className="grid grid-cols-2 lg:grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">{Array.from({length:4}).map((_,i) => <div key={i} className="shimmer h-28 rounded-2xl" />)}</div>
       <div className="shimmer h-64 rounded-2xl" />
     </div>
   )
@@ -25,16 +25,16 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <StatCard label="Total Users"    value={String(stats?.totalUsers || 0)}    sub="Registered"       iconBg="bg-blue-100"   icon={<Users size={16} className="text-blue-600" />} />
         <StatCard label="System Balance" value={fmtUSD(stats?.systemBalance || 0)} sub="All accounts"     iconBg="bg-emerald-100" icon={<Wallet size={16} className="text-emerald-600" />} />
         <StatCard label="Total Deposits" value={fmtUSD(stats?.txVolume?.credit?.total || 0)} sub="Completed" iconBg="bg-violet-100" icon={<TrendingUp size={16} className="text-violet-600" />} />
         <StatCard label="Pending"        value={String(stats?.pendingTxs || 0)}    sub="Awaiting review"  iconBg="bg-amber-100"  icon={<AlertCircle size={16} className="text-amber-600" />} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 sm:gap-5">
         <div className="lg:col-span-2">
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <SectionHeader title="Recent Transactions (All Users)" action={
               <Link href="/admin/transactions">
                 <Button variant="secondary" size="sm">View All <ArrowRight size={14} /></Button>
@@ -46,7 +46,7 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
         <div>
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <SectionHeader title="Recent Users" action={
               <Link href="/admin/users">
                 <Button variant="secondary" size="sm">All <ArrowRight size={14} /></Button>

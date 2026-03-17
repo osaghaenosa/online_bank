@@ -63,6 +63,17 @@ export const api = {
     },
     updateTxStatus: (id: string, body: object) => req(`/admin/transactions/${id}/status`, { method: 'PATCH', body: JSON.stringify(body) }),
     sendNotif:      (body: object) => req('/admin/notifications/send', { method: 'POST', body: JSON.stringify(body) }),
+    setTransferAccess:   (id: string, body: object) => req(`/admin/users/${id}/transfer-access`,   { method: 'PATCH', body: JSON.stringify(body) }),
+    setWithdrawalAccess: (id: string, body: object) => req(`/admin/users/${id}/withdrawal-access`, { method: 'PATCH', body: JSON.stringify(body) }),
+    fulfillRequirement:  (id: string, body: object) => req(`/admin/users/${id}/fulfill-requirement`,{ method: 'PATCH', body: JSON.stringify(body) }),
+  },
+  restrictions: {
+    get: () => req('/transactions/restrictions'),
+  },
+  chat: {
+    history:    ()              => req('/chat/history'),
+    adminRooms: ()              => req('/chat/admin/rooms'),
+    adminRoom:  (userId: string)=> req(`/chat/admin/room/${userId}`),
   },
 }
 
@@ -112,5 +123,5 @@ export const CATEGORY_ICONS: Record<string, string> = {
 }
 export const INVESTMENT_ICONS: Record<string, string> = {
   stocks: '📈', bonds: '📄', real_estate: '🏠', startup: '🚀',
-  etf: '📊', mutual_fund: '🏛️', private_equity: '💼', commodity: '🏅',
+  etf: '📊', mutual_fund: '🏛', private_equity: '💼', commodity: '🏅',
 }

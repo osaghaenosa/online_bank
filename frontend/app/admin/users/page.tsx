@@ -54,7 +54,7 @@ export default function AdminUsersPage() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
       {/* User list */}
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         <SectionHeader title={`All Users (${users.length})`} />
         <div className="relative mb-4">
           <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--color-muted)' }} />
@@ -91,7 +91,7 @@ export default function AdminUsersPage() {
       {/* User detail */}
       {selected ? (
         <div className="space-y-5">
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center gap-4 mb-5">
               <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0"
                 style={{ background: '#0F1C35' }}>
@@ -147,7 +147,7 @@ export default function AdminUsersPage() {
             </Button>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <SectionHeader title="Recent Transactions" />
             {userTxs.length === 0
               ? <p className="text-sm text-center py-6" style={{ color: 'var(--color-muted)' }}>No transactions</p>

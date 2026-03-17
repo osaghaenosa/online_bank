@@ -42,7 +42,7 @@ export default function TreasuryPage() {
   }, {})
 
   return (
-    <div className="max-w-5xl space-y-5 fade-up">
+    <div className="max-w-5xl space-y-4 sm:space-y-5 fade-up">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">

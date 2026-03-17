@@ -87,7 +87,7 @@ export default function InvestmentsPage() {
 
       {/* Stats hero */}
       <Card className="p-6" style={{ background:'#0F1C35' }}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 grid-cols-2 md:grid-cols-4 gap-6">
           <div>
             <p className="text-xs text-white/40 mb-1">Current Value</p>
             <p className="font-display text-2xl font-bold text-white">{fmt(totalCurrent)}</p>
