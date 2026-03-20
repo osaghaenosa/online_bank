@@ -176,11 +176,19 @@ export default function DepositSettingsPage() {
   const [uploadingImg, setUploadingImg] = useState<string|null>(null)
   const [uploadingFor, setUploadingFor] = useState<string | null>(null)
 
-  // Load saved settings
+  // Load saved settings — fall back to DEFAULT_METHODS if nothing saved yet
   useEffect(() => {
     api.admin.getDepositSettings()
-      .then(d => { if (d.settings) setMethods(d.settings) })
-      .catch(() => {})
+      .then(d => {
+        // Only replace defaults if we have a non-empty saved settings array
+        if (d.settings && Array.isArray(d.settings) && d.settings.length > 0) {
+          setMethods(d.settings as Method[])
+        }
+        // else: keep DEFAULT_METHODS already in state
+      })
+      .catch(() => {
+        // API error — keep DEFAULT_METHODS in state
+      })
       .finally(() => setLoading(false))
   }, [])
 

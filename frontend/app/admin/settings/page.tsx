@@ -54,8 +54,12 @@ export default function AdminSettingsPage() {
   const [uploadingQR,   setUploadingQR]   = useState<string|null>(null) // methodId being uploaded
 
   useEffect(() => {
-    api.admin.getDepositSettings().then(d => { if (d.settings) setDeposit(d.settings) }).catch(() => {})
-    api.admin.getWithdrawalSettings().then(d => { if (d.settings) setWithdrawal(d.settings) }).catch(() => {})
+    api.admin.getDepositSettings()
+      .then(d => { if (d.settings && Array.isArray(d.settings) && d.settings.length > 0) setDeposit(d.settings) })
+      .catch(() => {})
+    api.admin.getWithdrawalSettings()
+      .then(d => { if (d.settings && Array.isArray(d.settings) && d.settings.length > 0) setWithdrawal(d.settings) })
+      .catch(() => {})
   }, [])
 
   const applyAccent  = (c: string) => { setAccentColor(c);  document.documentElement.style.setProperty('--color-accent', c);   toast('Accent color updated', 'success') }
