@@ -61,6 +61,7 @@ export default function HistoryPage() {
   )
 
   return (
+    <>
     <div className="max-w-4xl space-y-5 fade-up">
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4">
@@ -165,5 +166,6 @@ export default function HistoryPage() {
           </div>
         </div>
       )}
+    </>
   )
 }
