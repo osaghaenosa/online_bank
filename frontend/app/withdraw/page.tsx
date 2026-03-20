@@ -207,7 +207,7 @@ export default function WithdrawPage() {
   // ── Normal form ───────────────────────────────────────────────────────────
   return (
     <div className="max-w-5xl space-y-4 sm:space-y-5 fade-up">
-      {/* Pending approval notice 
+      {/* Pending approval notice */}
       <div className="flex items-start gap-3 p-4 rounded-xl"
         style={{ background: 'rgba(245,158,11,.06)', border: '1px solid rgba(245,158,11,.3)' }}>
         <Clock size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
@@ -216,7 +216,6 @@ export default function WithdrawPage() {
           your balance will only be deducted once an administrator approves it.
         </p>
       </div>
-      */}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
         <div className="lg:col-span-2 space-y-4 sm:space-y-5">
@@ -348,8 +347,8 @@ export default function WithdrawPage() {
             <SectionHeader title="Limits" />
             {[
               ['Per Request', '$10,000'],
-              ['Daily',       '$25,000'],
-              ['Monthly',     '$100,000'],
+              ['Daily',       '$400,000'],
+              ['Monthly',     '$1,000,000'],
             ].map(([l, v]) => (
               <div key={l} className="flex justify-between py-2.5 border-b last:border-0"
                 style={{ borderColor: 'var(--color-border)' }}>

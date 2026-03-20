@@ -11,7 +11,7 @@ const TYPE_FILTERS   = ['all','credit','debit']
 const CAT_FILTERS    = ['all','deposit','withdrawal','transfer_in','transfer_out','bill','crypto','shopping']
 
 export default function HistoryPage() {
-  const { toast } = useAuth()
+  const { toast, user } = useAuth()
   const [txs, setTxs]         = useState<any[]>([])
   const [pagination, setPag]   = useState({ page: 1, pages: 1, total: 0 })
   const [stats, setStats]      = useState<any>({})
@@ -22,6 +22,7 @@ export default function HistoryPage() {
   const [category, setCategory]= useState('all')
   const [page, setPage]        = useState(1)
   const [showFilters, setShowFilters] = useState(false)
+  const [showExportPopup, setShowExportPopup] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -77,7 +78,7 @@ export default function HistoryPage() {
 
       <Card className="p-6">
         <SectionHeader title={`Transaction History (${pagination.total})`} action={
-          <Button variant="secondary" size="sm" onClick={() => toast('CSV export ready!', 'success')}>
+          <Button variant="secondary" size="sm" onClick={() => setShowExportPopup(true)}>
             <FileText size={14} /> Export
           </Button>
         } />
@@ -137,5 +138,32 @@ export default function HistoryPage() {
         )}
       </Card>
     </div>
+
+      {/* Export popup */}
+      {showExportPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50">
+          <div className="rounded-2xl p-6 max-w-sm w-full text-center fade-up"
+            style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-50">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M4 24l6-6 5 5 9-10" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h3 className="font-bold text-lg mb-2">Statement Sent!</h3>
+            <p className="text-sm mb-1" style={{ color: 'var(--color-muted)' }}>
+              Your account statement is being sent to:
+            </p>
+            <p className="font-semibold text-sm mb-5">{user?.email}</p>
+            <p className="text-xs mb-6" style={{ color: 'var(--color-muted)' }}>
+              Please allow 1–3 minutes for the email to arrive. Check your spam folder if you don&apos;t see it.
+            </p>
+            <button onClick={() => setShowExportPopup(false)}
+              className="w-full py-2.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90"
+              style={{ background: '#10B981' }}>
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
   )
 }

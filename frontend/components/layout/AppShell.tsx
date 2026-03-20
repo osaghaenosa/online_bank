@@ -144,10 +144,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* User footer */}
         <div className="p-4 border-t border-white/10 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-              style={{ background: '#10B981' }}>
-              {user.firstName[0]}{user.lastName[0]}
-            </div>
+            {(user as any).profilePicture ? (
+              <img src={(user as any).profilePicture} alt={user.firstName}
+                className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+            ) : (
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                style={{ background: '#10B981' }}>
+                {user.firstName[0]}{user.lastName[0]}
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <p className="text-white text-sm font-semibold truncate">{user.firstName} {user.lastName}</p>
               <p className="text-white/40 text-xs truncate">{user.email}</p>
@@ -190,10 +195,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
             {/* Avatar -> profile */}
             <Link href="/profile">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                style={{ background: '#0F1C35' }}>
-                {user.firstName[0]}{user.lastName[0]}
-              </div>
+              {(user as any).profilePicture ? (
+                <img src={(user as any).profilePicture} alt={user.firstName}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity" />
+              ) : (
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                  style={{ background: '#0F1C35' }}>
+                  {user.firstName[0]}{user.lastName[0]}
+                </div>
+              )}
             </Link>
           </div>
         </header>

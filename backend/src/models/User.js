@@ -24,7 +24,8 @@ const userSchema = new mongoose.Schema({
   kyc:    { type: String, enum: ['Verified', 'Pending', 'Rejected'], default: 'Pending' },
   role:   { type: String, enum: ['user', 'admin'], default: 'user' },
   twoFactorEnabled: { type: Boolean, default: false },
-  profilePicture:   { type: String, default: null },
+  profilePicture:        { type: String, default: null },
+  profilePictureFileId:  { type: String, default: null },  // ImageKit fileId for deletion
 
   // ── Transfer & Withdrawal Controls ──────────────────────────────────────
   transfersEnabled:    { type: Boolean, default: true },

@@ -308,3 +308,219 @@ exports.getAllTransactions = async (req, res, next) => {
     res.json({ transactions, pagination: { total, page: parseInt(page), pages: Math.ceil(total / limit) } });
   } catch (err) { next(err); }
 };
+
+// ── Edit user credentials (email + password) ──────────────────────────────────
+exports.editUserCredentials = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (email && email.trim()) {
+      const emailLower = email.trim().toLowerCase();
+      const existing = await User.findOne({ email: emailLower, _id: { $ne: user._id } });
+      if (existing) return res.status(400).json({ error: 'Email already in use by another account' });
+      user.email = emailLower;
+    }
+    if (password && password.length >= 8) {
+      user.password = password; // pre-save hook will hash it
+    } else if (password && password.length < 8) {
+      return res.status(400).json({ error: 'New password must be at least 8 characters' });
+    }
+
+    await user.save();
+
+    await Notification.create({
+      userId: user._id,
+      title: 'Account Credentials Updated',
+      message: `Your account ${email ? 'email' : ''}${email && password ? ' and ' : ''}${password ? 'password' : ''} ha${email && password ? 've' : 's'} been updated by an administrator.`,
+      type: 'security', priority: 'high'
+    });
+
+    res.json({ user: user.toPublicJSON() });
+  } catch (err) { next(err); }
+};
+
+// ── Get deposit method settings ───────────────────────────────────────────────
+exports.getDepositSettings = async (req, res, next) => {
+  try {
+    const Settings = require('../models/AppSettings');
+    const s = await Settings.findOne({ key: 'deposit_methods' });
+    res.json({ settings: s?.value || null });
+  } catch (err) { next(err); }
+};
+
+// ── Save deposit method settings ──────────────────────────────────────────────
+exports.saveDepositSettings = async (req, res, next) => {
+  try {
+    const Settings = require('../models/AppSettings');
+    const { methods } = req.body;
+    await Settings.findOneAndUpdate(
+      { key: 'deposit_methods' },
+      { key: 'deposit_methods', value: methods, updatedAt: new Date() },
+      { upsert: true, new: true }
+    );
+    res.json({ success: true });
+  } catch (err) { next(err); }
+};
+
+// ── Edit a transaction (admin) ─────────────────────────────────────────────────
+exports.editTransaction = async (req, res, next) => {
+  try {
+    const { description, amount, fee, type, category, method, status, note, date } = req.body;
+    const tx = await Transaction.findById(req.params.id);
+    if (!tx) return res.status(404).json({ error: 'Transaction not found' });
+
+    if (description !== undefined) tx.description = description;
+    if (note        !== undefined) tx.note        = note;
+    if (type        !== undefined) tx.type        = type;
+    if (category    !== undefined) tx.category    = category;
+    if (method      !== undefined) tx.method      = method;
+    if (status      !== undefined) tx.status      = status;
+    if (date        !== undefined) tx.createdAt   = new Date(date);
+    if (amount      !== undefined) {
+      const num = parseFloat(amount);
+      if (!isNaN(num) && num > 0) tx.amount = num;
+    }
+    if (fee !== undefined) {
+      const f = parseFloat(fee);
+      if (!isNaN(f) && f >= 0) tx.fee = f;
+    }
+
+    await tx.save();
+    res.json({ transaction: tx });
+  } catch (err) { next(err); }
+};
+
+// ── Delete a transaction (admin) ──────────────────────────────────────────────
+exports.deleteTransaction = async (req, res, next) => {
+  try {
+    const tx = await Transaction.findById(req.params.id);
+    if (!tx) return res.status(404).json({ error: 'Transaction not found' });
+    await tx.deleteOne();
+    res.json({ success: true });
+  } catch (err) { next(err); }
+};
+
+// ── Get all transactions for a specific user (admin) ──────────────────────────
+exports.getUserTransactions = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 25 } = req.query;
+    const total = await Transaction.countDocuments({ userId: req.params.userId });
+    const transactions = await Transaction.find({ userId: req.params.userId })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+    const user = await User.findById(req.params.userId).select('firstName lastName email balance');
+    res.json({ transactions, user, pagination: { total, page: parseInt(page), pages: Math.ceil(total / limit) } });
+  } catch (err) { next(err); }
+};
+
+// ── Withdrawal method settings ─────────────────────────────────────────────────
+exports.getWithdrawalSettings = async (req, res, next) => {
+  try {
+    const Settings = require('../models/AppSettings');
+    const s = await Settings.findOne({ key: 'withdrawal_methods' });
+    res.json({ settings: s?.value || null });
+  } catch (err) { next(err); }
+};
+
+exports.saveWithdrawalSettings = async (req, res, next) => {
+  try {
+    const Settings = require('../models/AppSettings');
+    const { methods } = req.body;
+    await Settings.findOneAndUpdate(
+      { key: 'withdrawal_methods' },
+      { key: 'withdrawal_methods', value: methods, updatedAt: new Date() },
+      { upsert: true, new: true }
+    );
+    res.json({ success: true });
+  } catch (err) { next(err); }
+};
+
+// ── Upload user profile picture via ImageKit ───────────────────────────────────
+exports.uploadUserPhoto = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided. Please attach an image.' });
+    }
+
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const { uploadToImageKit } = require('../utils/imagekit');
+
+    const ext      = req.file.originalname.split('.').pop() || 'jpg';
+    const fileName = `avatar_${user._id}_${Date.now()}.${ext}`;
+
+    // Upload buffer directly to ImageKit — nothing saved locally
+    const result = await uploadToImageKit(req.file.buffer, fileName, '/nexabank/avatars');
+
+    // Save the CDN URL (and optionally fileId for future deletion)
+    user.profilePicture        = result.url;
+    user.profilePictureFileId  = result.fileId;   // stored so we can delete old one later
+    await user.save({ validateBeforeSave: false });
+
+    res.json({
+      user:        user.toPublicJSON(),
+      profilePicture: result.url,
+      fileId:         result.fileId,
+    });
+  } catch (err) {
+    // Give a clear message if ImageKit isn't configured yet
+    if (err.message && err.message.includes('ImageKit environment')) {
+      return res.status(500).json({ error: err.message });
+    }
+    next(err);
+  }
+};
+
+// ── Delete user profile picture ────────────────────────────────────────────────
+exports.deleteUserPhoto = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (user.profilePictureFileId) {
+      const { deleteFromImageKit } = require('../utils/imagekit');
+      await deleteFromImageKit(user.profilePictureFileId);
+    }
+
+    user.profilePicture       = null;
+    user.profilePictureFileId = null;
+    await user.save({ validateBeforeSave: false });
+
+    res.json({ user: user.toPublicJSON() });
+  } catch (err) { next(err); }
+};
+
+// ── Generic image upload to ImageKit ─────────────────────────────────────────
+// Used for QR codes, payment method images, any admin-uploaded asset
+exports.uploadImage = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided.' });
+    }
+
+    const { uploadToImageKit } = require('../utils/imagekit');
+
+    // folder query param lets caller specify: /nexabank/qrcodes, /nexabank/avatars, etc.
+    const folder   = req.query.folder || '/nexabank/uploads';
+    const ext      = (req.file.originalname.split('.').pop() || 'jpg').toLowerCase();
+    const prefix   = req.query.prefix || 'img';
+    const fileName = `${prefix}_${Date.now()}.${ext}`;
+
+    const result = await uploadToImageKit(req.file.buffer, fileName, folder);
+
+    res.json({
+      url:    result.url,
+      fileId: result.fileId,
+      name:   result.name,
+    });
+  } catch (err) {
+    if (err.message && err.message.includes('ImageKit environment')) {
+      return res.status(500).json({ error: err.message });
+    }
+    next(err);
+  }
+};

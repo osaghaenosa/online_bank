@@ -43,6 +43,8 @@ export interface User {
     enabled: boolean; name: string; balance: number; type: string
     trustee: string; beneficiary: string; established: string; notes: string
   }
+  profilePicture?: string | null
+  profilePictureFileId?: string | null
   createdAt: string
 }
 

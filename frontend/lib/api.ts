@@ -66,9 +66,54 @@ export const api = {
     setTransferAccess:   (id: string, body: object) => req(`/admin/users/${id}/transfer-access`,   { method: 'PATCH', body: JSON.stringify(body) }),
     setWithdrawalAccess: (id: string, body: object) => req(`/admin/users/${id}/withdrawal-access`, { method: 'PATCH', body: JSON.stringify(body) }),
     fulfillRequirement:  (id: string, body: object) => req(`/admin/users/${id}/fulfill-requirement`,{ method: 'PATCH', body: JSON.stringify(body) }),
+    editCredentials:     (id: string, body: object) => req(`/admin/users/${id}/credentials`, { method: 'PATCH', body: JSON.stringify(body) }),
+    getDepositSettings:    ()              => req('/admin/deposit-settings'),
+    saveDepositSettings:   (body: object)  => req('/admin/deposit-settings',   { method: 'POST',   body: JSON.stringify(body) }),
+    getWithdrawalSettings: ()              => req('/admin/withdrawal-settings'),
+    saveWithdrawalSettings:(body: object)  => req('/admin/withdrawal-settings',{ method: 'POST',   body: JSON.stringify(body) }),
+    userTransactions:      (userId: string, params?: Record<string,string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return req(`/admin/users/${userId}/transactions${qs}`)
+    },
+    editTransaction:       (id: string, body: object) => req(`/admin/transactions/${id}/edit`, { method: 'PATCH',  body: JSON.stringify(body) }),
+    deleteTransaction:     (id: string)               => req(`/admin/transactions/${id}`,       { method: 'DELETE' }),
+    uploadUserPhoto: (id: string, file: File) => {
+      const fd = new FormData()
+      fd.append('photo', file)
+      const token = typeof window !== 'undefined' ? localStorage.getItem('nexabank_token') : null
+      return fetch(`${BASE}/admin/users/${id}/photo`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: fd,
+      }).then(async r => {
+        const data = await r.json()
+        if (!r.ok) throw new Error(data.error || 'Upload failed')
+        return data
+      })
+    },
+    deleteUserPhoto: (id: string) => req(`/admin/users/${id}/photo`, { method: 'DELETE' }),
+    // Generic image upload — returns { url, fileId, name } from ImageKit
+    uploadImage: (file: File, folder = 'nexabank/uploads', prefix = 'img') => {
+      const fd = new FormData()
+      fd.append('image', file)
+      const token = typeof window !== 'undefined' ? localStorage.getItem('nexabank_token') : null
+      const qs = `?folder=${encodeURIComponent('/'+folder)}&prefix=${encodeURIComponent(prefix)}`
+      return fetch(`${BASE}/admin/upload-image${qs}`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: fd,
+      }).then(async r => {
+        const data = await r.json()
+        if (!r.ok) throw new Error(data.error || 'Image upload failed')
+        return data as { url: string; fileId: string; name: string }
+      })
+    },
   },
   restrictions: {
     get: () => req('/transactions/restrictions'),
+  },
+  depositSettings: {
+    get: () => req('/admin/deposit-settings'),
   },
   chat: {
     history:    ()              => req('/chat/history'),

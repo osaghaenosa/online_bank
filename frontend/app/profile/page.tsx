@@ -58,10 +58,16 @@ export default function ProfilePage() {
           {/* Profile card */}
           <Card className="p-4 sm:p-6">
             <div className="flex items-start sm:items-center gap-3 sm:gap-4 mb-5">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-white text-lg sm:text-xl font-bold flex-shrink-0"
-                style={{ background: '#0F1C35' }}>
-                {user.firstName[0]}{user.lastName[0]}
-              </div>
+              {(user as any).profilePicture ? (
+                <img src={(user as any).profilePicture} alt={user.firstName}
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover flex-shrink-0 border-2"
+                  style={{ borderColor: 'var(--color-accent)' }} />
+              ) : (
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-white text-lg sm:text-xl font-bold flex-shrink-0"
+                  style={{ background: '#0F1C35' }}>
+                  {user.firstName[0]}{user.lastName[0]}
+                </div>
+              )}
               <div className="min-w-0">
                 <h2 className="text-lg sm:text-xl font-bold truncate">{user.firstName} {user.lastName}</h2>
                 <p className="text-xs sm:text-sm truncate" style={{ color:'var(--color-muted)' }}>{user.email}</p>
