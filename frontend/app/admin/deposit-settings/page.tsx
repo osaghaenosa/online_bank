@@ -152,11 +152,23 @@ const CATEGORY_LABELS: Record<string, string> = {
   bank: '🏦 Bank', card: '💳 Card', crypto: '₿ Crypto', digital: '📱 Digital Wallets'
 }
 
-type Method = typeof DEFAULT_METHODS[0]
+type Method = {
+  id: string
+  label: string
+  category: string
+  icon: string
+  enabled: boolean
+  fee: string
+  feeType: string
+  details: Record<string, string>
+  instructions: string
+  image: string
+  imageFileId?: string
+}
 
 export default function DepositSettingsPage() {
   const { toast } = useAuth()
-  const [methods,   setMethods]   = useState<Method[]>(DEFAULT_METHODS)
+  const [methods,   setMethods]   = useState<Method[]>(DEFAULT_METHODS as Method[])
   const [expanded,  setExpanded]  = useState<string | null>(null)
   const [saving,    setSaving]    = useState(false)
   const [loading,   setLoading]   = useState(true)
