@@ -23,6 +23,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
+  'https://www.nexabanking.com',
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
