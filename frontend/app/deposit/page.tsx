@@ -63,11 +63,11 @@ export default function DepositPage() {
   const [loading,  setLoading]  = useState(false)
   const [result,   setResult]   = useState<any>(null)
 
-  // Load admin-configured settings
+  // Load admin-configured deposit settings — public endpoint (no admin auth required)
   useEffect(() => {
-    api.admin.getDepositSettings()
-      .then(d => { if (d.settings && d.settings.length) setMethods(d.settings) })
-      .catch(() => {})
+    api.settings.depositMethods()
+      .then(d => { if (d.settings && Array.isArray(d.settings) && d.settings.length > 0) setMethods(d.settings) })
+      .catch(() => {}) // silently fall back to DEFAULT_METHODS
   }, [])
 
   const enabled = methods.filter(m => m.enabled)
@@ -108,7 +108,7 @@ export default function DepositPage() {
     <SuccessScreen
       title="Deposit Initiated!"
       subtitle={`${fmtUSD(num)} will be credited to your account`}
-      receiptUrl={result.receiptUrl ? `http://localhost:5000${result.receiptUrl}` : undefined}
+      receiptUrl={result.receiptUrl ? `http://nexabanking.com/${result.receiptUrl}` : undefined}
       txId={result.transaction?.transactionId}
       extra={
         <div className="text-sm rounded-xl p-4 space-y-2.5 text-left" style={{ background:'var(--color-bg)' }}>

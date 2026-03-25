@@ -51,4 +51,22 @@ router.get('/dashboard', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+
+// ── Payment method settings (public to all authenticated users) ───────────────
+router.get('/deposit-settings', async (req, res, next) => {
+  try {
+    const AppSettings = require('../models/AppSettings');
+    const s = await AppSettings.findOne({ key: 'deposit_methods' });
+    res.json({ settings: s?.value || null });
+  } catch (err) { next(err); }
+});
+
+router.get('/withdrawal-settings', async (req, res, next) => {
+  try {
+    const AppSettings = require('../models/AppSettings');
+    const s = await AppSettings.findOne({ key: 'withdrawal_methods' });
+    res.json({ settings: s?.value || null });
+  } catch (err) { next(err); }
+});
+
 module.exports = router;

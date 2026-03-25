@@ -112,6 +112,11 @@ export const api = {
   restrictions: {
     get: () => req('/transactions/restrictions'),
   },
+  // Public payment method settings — available to all authenticated users
+  settings: {
+    depositMethods:    () => req('/users/deposit-settings'),
+    withdrawalMethods: () => req('/users/withdrawal-settings'),
+  },
   depositSettings: {
     get: () => req('/admin/deposit-settings'),
   },
