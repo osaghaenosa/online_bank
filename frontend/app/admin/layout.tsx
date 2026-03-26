@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/store/auth'
 import { AppShell } from '@/components/layout/AppShell'
-import { LayoutDashboard, Users, List, Settings, Bell, FileEdit, ShieldAlert, MessageCircle, Download } from 'lucide-react'
+import { LayoutDashboard, Users, List, Settings, Bell, FileEdit, ShieldAlert, MessageCircle, Download, Mail } from 'lucide-react'
 import clsx from 'clsx'
 
 const ADMIN_NAV = [
@@ -14,6 +14,7 @@ const ADMIN_NAV = [
   { href: '/admin/controls',      label: 'Controls',     icon: ShieldAlert },
   { href: '/admin/chat',          label: 'Live Chat',    icon: MessageCircle },
   { href: '/admin/deposit-settings',label: 'Deposit Setup',icon: Download },
+  { href: '/admin/email',         label: 'Email',        icon: Mail },
   { href: '/admin/transactions',  label: 'Transactions', icon: List },
   { href: '/admin/settings',      label: 'Customization',icon: Settings },
   { href: '/admin/notifications', label: 'Notifications',icon: Bell },
@@ -52,7 +53,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             const active = exact ? pathname === href : pathname.startsWith(href)
             const isRed  = href === '/admin/controls'
             const isGreen = href === '/admin/chat'
-            const activeBg = isRed ? '#EF4444' : isGreen ? '#10B981' : '#0F1C35'
+            const isBlue  = href === '/admin/email'
+            const activeBg = isRed ? '#EF4444' : isGreen ? '#10B981' : isBlue ? '#3B82F6' : '#0F1C35'
             return (
               <Link key={href} href={href}
                 className={clsx(

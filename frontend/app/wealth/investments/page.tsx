@@ -54,7 +54,7 @@ export default function InvestmentsPage() {
   const oldest = investments.reduce((oldest, i) => {
     return !oldest || new Date(i.startDate) < new Date(oldest) ? i.startDate : oldest
   }, null)
-  const yearsActive = oldest ? Math.round((Date.now() - new Date(oldest).getTime()) / (365.25*24*3600*1000)) : 0
+  const yearsActive = oldest ? Math.round((new Date('2025-01-01').getTime() - new Date(oldest).getTime()) / (365.25*24*3600*1000)) : 0
 
   return (
     <div className="max-w-6xl space-y-5 fade-up">
@@ -151,7 +151,7 @@ export default function InvestmentsPage() {
           const icon    = INVESTMENT_ICONS[inv.type] || '📊'
           const ret     = inv.currentValue - inv.amount
           const isUp    = ret >= 0
-          const years   = inv.startDate ? Math.round((Date.now() - new Date(inv.startDate).getTime()) / (365.25*24*3600*1000)) : 0
+          const years   = inv.startDate ? Math.round((new Date('2025-01-01').getTime() - new Date(inv.startDate).getTime()) / (365.25*24*3600*1000)) : 0
 
           return (
             <div key={i} className="rounded-2xl p-5"

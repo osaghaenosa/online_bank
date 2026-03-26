@@ -120,6 +120,10 @@ export const api = {
   depositSettings: {
     get: () => req('/admin/deposit-settings'),
   },
+  email: {
+    send:   (body: object) => req('/email/send',  { method: 'POST', body: JSON.stringify(body) }),
+    verify: ()             => req('/email/verify'),
+  },
   chat: {
     history:    ()              => req('/chat/history'),
     adminRooms: ()              => req('/chat/admin/rooms'),

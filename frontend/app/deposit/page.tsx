@@ -108,7 +108,7 @@ export default function DepositPage() {
     <SuccessScreen
       title="Deposit Initiated!"
       subtitle={`${fmtUSD(num)} will be credited to your account`}
-      receiptUrl={result.receiptUrl ? `http://nexabanking.com/${result.receiptUrl}` : undefined}
+      receiptUrl={result.receiptUrl ? `http://localhost:5000${result.receiptUrl}` : undefined}
       txId={result.transaction?.transactionId}
       extra={
         <div className="text-sm rounded-xl p-4 space-y-2.5 text-left" style={{ background:'var(--color-bg)' }}>

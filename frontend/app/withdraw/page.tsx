@@ -347,8 +347,8 @@ export default function WithdrawPage() {
             <SectionHeader title="Limits" />
             {[
               ['Per Request', '$10,000'],
-              ['Daily',       '$400,000'],
-              ['Monthly',     '$1,000,000'],
+              ['Daily',       '$25,000'],
+              ['Monthly',     '$100,000'],
             ].map(([l, v]) => (
               <div key={l} className="flex justify-between py-2.5 border-b last:border-0"
                 style={{ borderColor: 'var(--color-border)' }}>

@@ -296,7 +296,7 @@ export default function HomePage() {
       <footer className="border-t py-10" style={{ borderColor: 'rgba(255,255,255,.08)' }}>
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-4">
           <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBank</p>
-          <p className="text-xs text-white/30">© {new Date().getFullYear()} NexaBank. Simulated banking application for demonstration purposes.</p>
+          <p className="text-xs text-white/30">© 2025 NexaBank. Simulated banking application for demonstration purposes.</p>
           <div className="flex gap-5">
             {['Privacy', 'Terms', 'Security'].map(l => (
               <Link key={l} href="#" className="text-xs text-white/40 hover:text-white/70 transition-colors">{l}</Link>

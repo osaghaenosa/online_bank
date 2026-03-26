@@ -51,7 +51,7 @@ export default function TrustPage() {
 
   const typeLabel = TRUST_TYPE_LABELS[trust.type] || trust.type
   const established = trust.established ? new Date(trust.established) : null
-  const yearsActive = established ? Math.round((Date.now() - established.getTime()) / (365.25*24*3600*1000)) : 0
+  const yearsActive = established ? Math.round((new Date('2025-01-01').getTime() - established.getTime()) / (365.25*24*3600*1000)) : 0
 
   return (
     <div className="max-w-4xl space-y-5 fade-up">
@@ -109,7 +109,7 @@ export default function TrustPage() {
             { icon: Shield,    label: 'Trust Type',    value: typeLabel },
             { icon: Calendar,  label: 'Established',   value: established?.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) || 'N/A' },
             { icon: Users,     label: 'Trustee(s)',    value: trust.trustee },
-            { icon: Users,     label: 'Next of Kins',   value: trust.beneficiary },
+            { icon: Users,     label: 'Beneficiary',   value: trust.beneficiary },
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} className="flex items-start gap-3 py-3.5 border-b last:border-0"
               style={{ borderColor:'var(--color-border)' }}>

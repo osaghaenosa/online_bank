@@ -204,7 +204,7 @@ export default function AboutPage() {
       <footer className="border-t py-10 px-6" style={{ borderColor: 'rgba(255,255,255,.08)' }}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-4">
           <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBank</p>
-          <p className="text-xs text-white/30">© {new Date().getFullYear()} NexaBank. Simulated banking application.</p>
+          <p className="text-xs text-white/30">© 2025 NexaBank. Simulated banking application.</p>
         </div>
       </footer>
     </div>

@@ -1,40 +1,15 @@
 {
   "pages": {
-    "/admin/settings/page": [
+    "/auth/login/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/settings/page.js"
-    ],
-    "/admin/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/layout.js"
+      "static/chunks/app/auth/login/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
-    ],
-    "/transfer/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/transfer/page.js"
-    ],
-    "/transfer/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/transfer/layout.js"
-    ],
-    "/admin/accounts/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/accounts/page.js"
-    ],
-    "/admin/accounts/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/accounts/layout.js"
     ],
     "/dashboard/page": [
       "static/chunks/webpack.js",
@@ -51,30 +26,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/page.js"
     ],
-    "/admin/transactions/page": [
+    "/admin/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/transactions/page.js"
+      "static/chunks/app/admin/layout.js"
     ],
-    "/page": [
+    "/admin/email/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/admin/email/page.js"
     ],
-    "/home/page": [
+    "/admin/email/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/home/page.js"
-    ],
-    "/admin/deposit-settings/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/deposit-settings/page.js"
-    ],
-    "/admin/deposit-settings/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/deposit-settings/layout.js"
+      "static/chunks/app/admin/email/layout.js"
     ]
   }
 }

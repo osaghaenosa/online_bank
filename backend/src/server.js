@@ -12,6 +12,7 @@ const transactionRoutes = require('./routes/transactions');
 const adminRoutes       = require('./routes/admin');
 const receiptRoutes     = require('./routes/receipts');
 const chatRoutes        = require('./routes/chat');
+const emailRoutes       = require('./routes/email');
 
 const ChatMessage = require('./models/ChatMessage');
 const User        = require('./models/User');
@@ -23,7 +24,6 @@ const server = http.createServer(app);
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://www.nexabanking.com',
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
@@ -125,6 +125,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/admin',        adminRoutes);
 app.use('/api/receipts',     receiptRoutes);
 app.use('/api/chat',         chatRoutes);
+app.use('/api/email',        emailRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 

@@ -7,6 +7,7 @@ import { useAuth } from '@/store/auth'
 import { Send, MessageCircle, Search, Circle, Users } from 'lucide-react'
 
 function getToken() {
+  // Safe - only call this inside useEffect or event handlers, never at render
   if (typeof window === 'undefined') return null
   return localStorage.getItem('nexabank_token')
 }
@@ -19,7 +20,8 @@ interface Room {
 
 export default function AdminChatPage() {
   const { toast, user: adminUser } = useAuth()
-  const token = getToken()
+  const [token, setToken] = useState<string|null>(null)
+  const [mounted, setMounted] = useState(false)
   const [rooms,       setRooms]       = useState<Room[]>([])
   const [activeRoom,  setActiveRoom]  = useState<Room | null>(null)
   const [roomMsgs,    setRoomMsgs]    = useState<ChatMsg[]>([])
