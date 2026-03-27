@@ -11,7 +11,6 @@ const FEATURES = [
   { icon: Zap,        title: 'Instant Transfers',     desc: 'Move money in seconds between any accounts, anywhere in the world with zero fees.' },
   { icon: Shield,     title: 'Bank-Grade Security',   desc: '256-bit encryption, 2FA, and 24/7 fraud monitoring protect every transaction.' },
   { icon: Bitcoin,    title: 'Crypto Integration',    desc: 'Buy, sell, and hold BTC, ETH, USDT, BNB, and SOL directly from your account.' },
-  { icon: Globe,      title: 'Global Payments',       desc: 'Pay bills, send wire transfers, ACH, PayPal, Zelle, CashApp, and more.' },
   { icon: PiggyBank,  title: 'Smart Savings',         desc: 'Set goals, automate savings, and watch your wealth grow with competitive rates.' },
   { icon: CreditCard, title: 'Virtual Cards',         desc: 'Instant virtual debit cards for secure online shopping with spending controls.' },
 ]
@@ -21,12 +20,6 @@ const PAYMENT_METHODS = [
   { name: 'ACH / Wire',    color: '#8B5CF6' },
   { name: 'Bitcoin',       color: '#F59E0B' },
   { name: 'Ethereum',      color: '#6366F1' },
-  { name: 'PayPal',        color: '#0070E0' },
-  { name: 'Zelle',         color: '#6B21A8' },
-  { name: 'Cash App',      color: '#00D632' },
-  { name: 'Venmo',         color: '#3D95CE' },
-  { name: 'Apple Pay',     color: '#1D1D1F' },
-  { name: 'Google Pay',    color: '#4285F4' },
   { name: 'USDT',          color: '#26A17B' },
   { name: 'Solana',        color: '#9945FF' },
 ]
