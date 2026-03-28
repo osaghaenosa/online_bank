@@ -52,7 +52,7 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
   };
 
   const t = TYPE_MAP[type] || TYPE_MAP.custom;
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const frontendUrl = process.env.FRONTEND_URL || 'https://nexabanking.com';
   const year = new Date().getFullYear();
 
   const amtBox = (type === 'credit' || type === 'debit') && amount ? `
