@@ -6,12 +6,6 @@ import { useChat, ChatMsg } from '@/hooks/useChat'
 import { useAuth } from '@/store/auth'
 import { Send, MessageCircle, Search, Circle, Users } from 'lucide-react'
 
-function getToken() {
-  // Safe - only call this inside useEffect or event handlers, never at render
-  if (typeof window === 'undefined') return null
-  return localStorage.getItem('nexabank_token')
-}
-
 interface Room {
   user: { _id: string; firstName: string; lastName: string; email: string }
   lastMessage: ChatMsg | null
@@ -19,42 +13,55 @@ interface Room {
 }
 
 export default function AdminChatPage() {
-  const { toast, user: adminUser } = useAuth()
-  const [token, setToken] = useState<string|null>(null)
-  const [mounted, setMounted] = useState(false)
-  const [rooms,       setRooms]       = useState<Room[]>([])
-  const [activeRoom,  setActiveRoom]  = useState<Room | null>(null)
-  const [roomMsgs,    setRoomMsgs]    = useState<ChatMsg[]>([])
-  const [input,       setInput]       = useState('')
-  const [search,      setSearch]      = useState('')
-  const [loadingRooms, setLoadingRooms] = useState(true)
-  const [onlineSet,   setOnlineSet]   = useState<Set<string>>(new Set())
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const inputRef  = useRef<HTMLInputElement>(null)
+  const { toast } = useAuth()
 
+  // ── Token: read client-side only ─────────────────────────────────────────
+  const [token,   setToken]   = useState<string | null>(null)
+  useEffect(() => {
+    // This is the ONLY place getToken() should be called — inside useEffect
+    const t = typeof window !== 'undefined' ? localStorage.getItem('nexabank_token') : null
+    setToken(t)
+  }, [])
+
+  // ── Room / chat state ─────────────────────────────────────────────────────
+  const [rooms,        setRooms]       = useState<Room[]>([])
+  const [activeRoom,   setActiveRoom]  = useState<Room | null>(null)
+  const [roomMsgs,     setRoomMsgs]    = useState<ChatMsg[]>([])
+  const [input,        setInput]       = useState('')
+  const [search,       setSearch]      = useState('')
+  const [loadingRooms, setLoadingRooms]= useState(true)
+  const bottomRef  = useRef<HTMLDivElement>(null)
+  const inputRef   = useRef<HTMLInputElement>(null)
+
+  // ── Use a REF for activeRoom inside the message handler ───────────────────
+  // This prevents the stale closure problem: handler always sees the latest
+  // activeRoom without needing to re-register the socket listener
+  const activeRoomRef = useRef<Room | null>(null)
+  useEffect(() => { activeRoomRef.current = activeRoom }, [activeRoom])
+
+  // ── Stable message handler — never recreated, uses ref ───────────────────
   const handleNewMessage = useCallback((msg: ChatMsg) => {
-    // Update room list unread + last message
+    // Update room sidebar: last message + unread badge
     setRooms(prev => prev.map(r => {
-      if (r.user._id === msg.roomId) {
-        const isActive = activeRoom?.user._id === msg.roomId
-        return {
-          ...r,
-          lastMessage: msg,
-          unreadCount: isActive ? 0 : r.unreadCount + (msg.senderRole === 'user' ? 1 : 0),
-        }
+      if (r.user._id !== msg.roomId) return r
+      const isActive = activeRoomRef.current?.user._id === msg.roomId
+      return {
+        ...r,
+        lastMessage: msg,
+        unreadCount: isActive ? 0 : r.unreadCount + (msg.senderRole === 'user' ? 1 : 0),
       }
-      return r
     }))
-    // If the incoming msg belongs to the active room, append it
-    if (activeRoom?.user._id === msg.roomId) {
+
+    // Append to thread if this message belongs to the open room
+    if (activeRoomRef.current?.user._id === msg.roomId) {
       setRoomMsgs(prev => {
-        if (prev.find(m => m._id === msg._id)) return prev
+        if (prev.some(m => m._id === msg._id)) return prev // deduplicate
         return [...prev, msg]
       })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeRoom?.user._id])
+  }, []) // ← empty deps: handler is stable forever, reads room via ref
 
+  // ── Socket connection ─────────────────────────────────────────────────────
   const { connected, typingInfo, sendMessage, sendTyping } = useChat({
     token,
     role: 'admin',
@@ -62,7 +69,7 @@ export default function AdminChatPage() {
     onNewMessage: handleNewMessage,
   })
 
-  // Load rooms
+  // ── Load room list ────────────────────────────────────────────────────────
   const loadRooms = useCallback(async () => {
     setLoadingRooms(true)
     try {
@@ -74,30 +81,31 @@ export default function AdminChatPage() {
 
   useEffect(() => { loadRooms() }, [loadRooms])
 
-  // Open a room
+  // ── Open a room ───────────────────────────────────────────────────────────
   const openRoom = async (room: Room) => {
     setActiveRoom(room)
     setInput('')
+    setRoomMsgs([])
     try {
       const d = await api.chat.adminRoom(room.user._id)
       setRoomMsgs(d.messages || [])
-      // Clear unread in state
       setRooms(prev => prev.map(r =>
         r.user._id === room.user._id ? { ...r, unreadCount: 0 } : r
       ))
     } catch (err: any) { toast(err.message, 'error') }
   }
 
-  // Scroll to bottom when messages change
+  // ── Auto-scroll ───────────────────────────────────────────────────────────
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
   }, [roomMsgs])
 
-  // Focus input when room opens
+  // ── Focus input on room open ──────────────────────────────────────────────
   useEffect(() => {
     if (activeRoom) setTimeout(() => inputRef.current?.focus(), 100)
   }, [activeRoom])
 
+  // ── Send ──────────────────────────────────────────────────────────────────
   const handleSend = () => {
     if (!input.trim() || !activeRoom) return
     sendMessage(input.trim(), activeRoom.user._id)
@@ -109,18 +117,17 @@ export default function AdminChatPage() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
-  const filtered = rooms.filter(r =>
+  const filtered    = rooms.filter(r =>
     (r.user.firstName + ' ' + r.user.lastName + ' ' + r.user.email)
       .toLowerCase().includes(search.toLowerCase())
   )
-
   const totalUnread = rooms.reduce((s, r) => s + r.unreadCount, 0)
 
   return (
     <div className="flex gap-0 h-[calc(100vh-180px)] min-h-[500px] rounded-2xl overflow-hidden border"
       style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface)' }}>
 
-      {/* ── Sidebar: room list ───────────────────────────────────────────── */}
+      {/* ── Sidebar ─────────────────────────────────────────────────────── */}
       <div className={`flex flex-col border-r flex-shrink-0 ${activeRoom ? 'hidden sm:flex' : 'flex'} w-full sm:w-72`}
         style={{ borderColor: 'var(--color-border)' }}>
 
@@ -136,9 +143,11 @@ export default function AdminChatPage() {
                 </span>
               )}
             </div>
-            <div className={`flex items-center gap-1 text-[10px] font-semibold ${connected ? 'text-emerald-500' : 'text-slate-400'}`}>
-              <Circle size={6} className={connected ? 'fill-emerald-500' : 'fill-slate-400'} />
-              {connected ? 'Live' : 'Off'}
+            {/* Connection indicator */}
+            <div className={`flex items-center gap-1.5 text-[10px] font-semibold ${connected ? 'text-emerald-500' : 'text-slate-400'}`}>
+              <div className={`w-2 h-2 rounded-full ${connected ? 'bg-emerald-500' : 'bg-slate-400'}`}
+                style={connected ? { boxShadow: '0 0 0 3px rgba(16,185,129,.25)' } : {}} />
+              {token ? (connected ? 'Live' : 'Connecting…') : 'Loading…'}
             </div>
           </div>
           <div className="relative">
@@ -164,7 +173,6 @@ export default function AdminChatPage() {
             </div>
           ) : filtered.map(room => {
             const isActive = activeRoom?.user._id === room.user._id
-            const online   = onlineSet.has(room.user._id)
             return (
               <button key={room.user._id} onClick={() => openRoom(room)}
                 className="w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors border-b"
@@ -177,8 +185,6 @@ export default function AdminChatPage() {
                     style={{ background: '#0F1C35' }}>
                     {room.user.firstName[0]}{room.user.lastName[0]}
                   </div>
-                  <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 ${online ? 'bg-emerald-400' : 'bg-slate-400'}`}
-                    style={{ borderColor: 'var(--color-surface)' }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
@@ -206,7 +212,7 @@ export default function AdminChatPage() {
         </div>
       </div>
 
-      {/* ── Chat area ────────────────────────────────────────────────────── */}
+      {/* ── Chat panel ──────────────────────────────────────────────────── */}
       <div className={`flex-1 flex flex-col min-w-0 ${activeRoom ? 'flex' : 'hidden sm:flex'}`}>
         {!activeRoom ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-4"
@@ -225,16 +231,13 @@ export default function AdminChatPage() {
             {/* Chat header */}
             <div className="flex items-center gap-3 px-4 py-3 border-b flex-shrink-0"
               style={{ background: '#0F1C35', borderColor: '#1E2D47' }}>
-              {/* Back button mobile */}
               <button className="sm:hidden text-white/60 hover:text-white p-1"
                 onClick={() => setActiveRoom(null)}>
-                ← 
+                ←
               </button>
-              <div className="relative">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                  style={{ background: '#10B981' }}>
-                  {activeRoom.user.firstName[0]}{activeRoom.user.lastName[0]}
-                </div>
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                style={{ background: '#10B981' }}>
+                {activeRoom.user.firstName[0]}{activeRoom.user.lastName[0]}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white text-sm font-semibold">
@@ -242,8 +245,10 @@ export default function AdminChatPage() {
                 </p>
                 <p className="text-white/40 text-[10px] truncate">{activeRoom.user.email}</p>
               </div>
-              <div className={`text-[10px] font-semibold px-2 py-1 rounded-full ${connected ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400'}`}>
-                {connected ? '● Live' : '○ Off'}
+              <div className={`text-[10px] font-semibold px-2.5 py-1 rounded-full ${
+                connected ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700/50 text-slate-400'
+              }`}>
+                {connected ? '● Live' : '◌ Connecting'}
               </div>
             </div>
 
@@ -257,24 +262,20 @@ export default function AdminChatPage() {
                 </div>
               ) : roomMsgs.map((msg, i) => {
                 const isAdmin = msg.senderRole === 'admin'
-                const showName = isAdmin && (i === 0 || roomMsgs[i-1]?.senderRole !== 'admin')
                 return (
                   <div key={msg._id || i} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[75%] rounded-2xl px-3.5 py-2.5 text-sm ${isAdmin ? 'rounded-tr-sm' : 'rounded-tl-sm'}`}
                       style={{
                         background: isAdmin ? '#10B981' : 'var(--color-bg)',
-                        color: isAdmin ? '#fff' : 'var(--color-text)',
+                        color:      isAdmin ? '#fff'    : 'var(--color-text)',
                       }}>
-                      {showName && isAdmin && (
-                        <p className="text-[10px] font-semibold mb-1 text-white/70">
-                          {msg.senderName} (Admin)
+                      {/* Show sender label on first message or role change */}
+                      {(i === 0 || roomMsgs[i-1]?.senderRole !== msg.senderRole) && (
+                        <p className={`text-[10px] font-semibold mb-1 ${isAdmin ? 'text-white/70' : ''}`}
+                          style={{ color: isAdmin ? undefined : 'var(--color-accent)' }}>
+                          {isAdmin ? `${msg.senderName} (Admin)` : activeRoom.user.firstName}
                         </p>
                       )}
-                      {!isAdmin && i === 0 || roomMsgs[i-1]?.senderRole !== msg.senderRole ? (
-                        <p className="text-[10px] font-semibold mb-1" style={{ color: 'var(--color-accent)' }}>
-                          {activeRoom.user.firstName}
-                        </p>
-                      ) : null}
                       <p className="leading-relaxed break-words">{msg.message}</p>
                       <p className={`text-[10px] mt-1 ${isAdmin ? 'text-white/60' : ''}`}
                         style={{ color: isAdmin ? undefined : 'var(--color-muted)' }}>
@@ -291,8 +292,7 @@ export default function AdminChatPage() {
                   <div className="rounded-2xl rounded-tl-sm px-4 py-3" style={{ background: 'var(--color-bg)' }}>
                     <div className="flex items-center gap-1">
                       {[0,1,2].map(i => (
-                        <div key={i} className="w-1.5 h-1.5 rounded-full bg-emerald-500"
-                          style={{ animation: `bounce2 1.2s ease-in-out ${i*0.2}s infinite` }} />
+                        <div key={i} className="w-1.5 h-1.5 rounded-full bg-emerald-500 chat-dot" />
                       ))}
                     </div>
                   </div>
@@ -301,13 +301,16 @@ export default function AdminChatPage() {
               <div ref={bottomRef} />
             </div>
 
-            {/* Input */}
+            {/* Input bar */}
             <div className="px-3 py-3 border-t flex-shrink-0 flex items-center gap-2"
               style={{ borderColor: 'var(--color-border)' }}>
               <input ref={inputRef} value={input}
-                onChange={e => { setInput(e.target.value); sendTyping(e.target.value.length > 0, activeRoom.user._id) }}
+                onChange={e => {
+                  setInput(e.target.value)
+                  sendTyping(e.target.value.length > 0, activeRoom.user._id)
+                }}
                 onKeyDown={handleKey}
-                placeholder={`Reply to ${activeRoom.user.firstName}…`}
+                placeholder={connected ? `Reply to ${activeRoom.user.firstName}…` : 'Connecting…'}
                 className="flex-1 rounded-xl border px-3.5 py-2 text-sm font-sans outline-none min-w-0"
                 style={{ background: 'var(--color-bg)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
                 disabled={!connected}
@@ -321,13 +324,6 @@ export default function AdminChatPage() {
           </>
         )}
       </div>
-
-      <style jsx>{`
-        @keyframes bounce2 {
-          0%, 60%, 100% { transform: translateY(0); }
-          30% { transform: translateY(-4px); }
-        }
-      `}</style>
     </div>
   )
 }
