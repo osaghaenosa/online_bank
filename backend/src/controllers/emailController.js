@@ -9,13 +9,16 @@ exports.sendAdminEmail = async (req, res, next) => {
     if (!subject?.trim())  return res.status(400).json({ error: 'Subject is required' });
     if (!bodyHTML?.trim()) return res.status(400).json({ error: 'Email body is required' });
 
+    // ── Resolve recipients ────────────────────────────────────────────────────
     let recipients = [];
     if (target === 'all') {
       const users = await User.find({ role: 'user' }).select('firstName email');
       recipients  = users.map(u => ({ email: u.email, name: u.firstName }));
     } else if (target === 'custom' || (!target && customEmail)) {
       const email = (customEmail || '').trim();
-      if (!email || !email.includes('@')) return res.status(400).json({ error: 'Enter a valid email address' });
+      if (!email || !email.includes('@')) {
+        return res.status(400).json({ error: 'Enter a valid email address' });
+      }
       recipients = [{ email, name: '' }];
     } else {
       const user = await User.findById(target).select('firstName email');
@@ -24,17 +27,19 @@ exports.sendAdminEmail = async (req, res, next) => {
     }
     if (!recipients.length) return res.status(400).json({ error: 'No recipients found' });
 
-    // Convert plain text → HTML paragraphs
+    // Convert plain text body → HTML paragraphs
     const safeHTML = bodyHTML
       .split('\n\n').map(p => p.trim()).filter(Boolean)
       .map(p => `<p style="margin-bottom:16px;">${p.replace(/\n/g, '<br/>')}</p>`)
       .join('');
 
     const opts = {
-      subject: subject.trim(), type: type || 'custom',
+      subject:  subject.trim(),
+      type:     type || 'custom',
       bodyHTML: safeHTML,
       bodyText: bodyText || bodyHTML.replace(/<[^>]+>/g, ''),
-      amount, accountNumber,
+      amount,
+      accountNumber,
     };
 
     let results;
@@ -51,49 +56,46 @@ exports.sendAdminEmail = async (req, res, next) => {
 
   } catch (err) {
     const msg = err.message || '';
-    if (msg.includes('Email not configured') || msg.includes('SMTP not configured')) {
+    if (msg.includes('RESEND_API_KEY')) {
       return res.status(500).json({ error: msg });
     }
     next(err);
   }
 };
 
-// ── Verify email connection ───────────────────────────────────────────────────
+// ── Verify Resend connection ──────────────────────────────────────────────────
+// Uses Resend's REST API directly — no SMTP, no ports, works on Render free tier
 exports.verifySmtp = async (req, res) => {
+  const apiKey = process.env.RESEND_API_KEY;
+
+  if (!apiKey) {
+    return res.json({
+      connected: false,
+      error: 'RESEND_API_KEY is not set in your environment variables. Get your key at https://resend.com/api-keys',
+    });
+  }
+
   try {
-    const nodemailer = require('nodemailer');
-    const apiKey  = process.env.RESEND_API_KEY;
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
+    // Ping Resend API — list domains endpoint, lightweight auth check
+    const response = await fetch('https://api.resend.com/domains', {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
-    let provider = 'unknown';
-    let transporter;
-
-    if (apiKey) {
-      provider = 'Resend';
-      transporter = nodemailer.createTransport({
-        host: 'smtp.resend.com', port: 465, secure: true,
-        auth: { user: 'resend', pass: apiKey },
-      });
-    } else if (smtpUser && smtpPass) {
-      provider = 'SMTP';
-      transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: { user: smtpUser, pass: smtpPass },
-        tls: { rejectUnauthorized: false },
-      });
-    } else {
-      return res.json({
-        connected: false,
-        error: 'No email credentials found. Add RESEND_API_KEY (recommended) or SMTP_USER + SMTP_PASS to .env',
-      });
+    if (response.ok) {
+      const from = process.env.SMTP_FROM_EMAIL || 'onboarding@resend.dev';
+      return res.json({ connected: true, provider: 'Resend', from });
     }
 
-    await transporter.verify();
-    res.json({ connected: true, provider, from: process.env.SMTP_FROM_EMAIL || smtpUser });
+    const body = await response.json().catch(() => ({}));
+    return res.json({
+      connected: false,
+      error: `Resend API error ${response.status}: ${body.message || body.name || 'Invalid API key'}`,
+    });
+
   } catch (err) {
-    res.json({ connected: false, error: err.message });
+    res.json({ connected: false, error: `Network error: ${err.message}` });
   }
 };
