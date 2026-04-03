@@ -31,7 +31,7 @@ export default function AccountPage() {
   if (!user) return null
 
   const DETAILS = [
-    { label: 'Account Type',         value: 'Standard Checking Account' },
+    { label: 'Account Type',         value: 'Standard Business Account' },
     { label: 'Account Status',        value: <StatusBadge status={user.status} /> },
     { label: 'Account Number',        value: <span className="font-mono">{reveal ? user.accountNumber : '•••• •••• ' + String(user.accountNumber || '').slice(-4)}</span> },
     { label: 'Routing Number',        value: <span className="font-mono">{user.routingNumber || '021000021'}</span> },
@@ -51,7 +51,7 @@ export default function AccountPage() {
     <div className="max-w-5xl space-y-6 fade-up">
       {/* Summary stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatCard label="Available Balance" value={fmtUSD(user.balance)} sub="Checking Account"
+        <StatCard label="Available Balance" value={fmtUSD(user.balance)} sub="Business Account"
           iconBg="bg-emerald-100" icon={<TrendingUp size={16} className="text-emerald-600" />} />
         <StatCard label="Total Deposited" value={fmtUSD(totalIn)} sub="All time completed"
           iconBg="bg-blue-100" icon={<TrendingUp size={16} className="text-blue-600" />} />

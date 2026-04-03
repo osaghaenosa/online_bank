@@ -109,7 +109,7 @@ export default function TrustPage() {
             { icon: Shield,    label: 'Trust Type',    value: typeLabel },
             { icon: Calendar,  label: 'Established',   value: established?.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) || 'N/A' },
             { icon: Users,     label: 'Trustee(s)',    value: trust.trustee },
-            { icon: Users,     label: 'Beneficiary',   value: trust.beneficiary },
+            { icon: Users,     label: 'Next of Kin(s)',   value: trust.beneficiary },
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} className="flex items-start gap-3 py-3.5 border-b last:border-0"
               style={{ borderColor:'var(--color-border)' }}>

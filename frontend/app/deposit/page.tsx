@@ -15,7 +15,7 @@ const DEFAULT_METHODS = [
     details:{ bankName:'NexaBank Federal', accountNumber:'0012349876', routingNumber:'021000021', swiftCode:'NEXAUS33', reference:'Use your account number as reference' },
     instructions:'Transfer funds directly from your bank. Allow 1-3 business days.', image:'' },
   { id:'ach',           label:'ACH Transfer',      icon:'building', fee:'0',    feeType:'fixed',   category:'bank',    enabled:true,
-    details:{ routingNumber:'021000021', accountNumber:'0012349876', accountType:'Checking' },
+    details:{ routingNumber:'021000021', accountNumber:'0012349876', accountType:'Business' },
     instructions:'ACH transfers settle in 1-2 business days.', image:'' },
   { id:'wire',          label:'Wire Transfer',     icon:'building', fee:'15',   feeType:'fixed',   category:'bank',    enabled:true,
     details:{ bankName:'NexaBank Federal', routingNumber:'021000021', accountNumber:'0012349876', swiftCode:'NEXAUS33', address:'100 NexaBank Plaza, New York, NY 10001' },

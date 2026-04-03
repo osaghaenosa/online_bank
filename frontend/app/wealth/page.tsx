@@ -37,7 +37,7 @@ export default function WealthPage() {
     {
       href: '/deposit',
       icon: Wallet, color: '#10B981', bg: 'rgba(16,185,129,.12)',
-      label: 'Checking Account', value: u.balance,
+      label: 'Business Account', value: u.balance,
       sub: 'Main balance',
     },
     {

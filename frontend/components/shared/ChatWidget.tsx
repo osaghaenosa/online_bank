@@ -98,6 +98,8 @@ export function ChatWidget() {
                   style={{ background: 'var(--color-bg)' }}>
                   <p className="font-semibold text-xs mb-1" style={{ color: 'var(--color-accent)' }}>NexaBank Support</p>
                   <p style={{ color: 'var(--color-text)' }}>Hi {user.firstName}! 👋 How can we help you today?</p>
+                  <p style={{ color: 'var(--color-text)' }}>Send us a message on whatsapp <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline"><i className='whatsapp-icon'></i> here</a></p>
+
                   <p className="text-[10px] mt-1" style={{ color: 'var(--color-muted)' }}>NexaBank</p>
                 </div>
               </div>
