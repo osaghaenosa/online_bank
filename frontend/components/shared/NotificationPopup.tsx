@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { api, fmtDateTime } from '@/lib/api'
-import { Bell, X, Check, CheckCheck, AlertCircle, Info, DollarSign, Shield } from 'lucide-react'
+import { Bell, X, Check, CheckCheck, AlertCircle, Info, DollarSign, Shield, Trash2 } from 'lucide-react'
 import { useAuth } from '@/store/auth'
 
 interface Notif {
@@ -84,6 +84,19 @@ export function NotificationPopup({ unread, onUnreadChange }: Props) {
     setNotifs(p => p.map(n => n._id === id ? { ...n, read: true } : n))
     const newCount = notifs.filter(n => !n.read && n._id !== id).length
     onUnreadChange(newCount)
+  }
+
+  const deleteNotif = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    try {
+      await api.user.deleteNotif(id)
+      setNotifs(p => p.filter(n => n._id !== id))
+      const newCount = notifs.filter(n => !n.read && n._id !== id).length
+      onUnreadChange(newCount)
+      toast('Notification deleted', 'success')
+    } catch (err: any) {
+      toast(err.message || 'Failed to delete notification', 'error')
+    }
   }
 
   return (
@@ -179,9 +192,18 @@ export function NotificationPopup({ unread, onUnreadChange }: Props) {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <p className="text-xs font-bold leading-tight">{n.title}</p>
-                          {!n.read && (
-                            <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0 mt-1" />
-                          )}
+                          <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">
+                            {!n.read && (
+                              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                            )}
+                            <button
+                              onClick={(e) => deleteNotif(e, n._id)}
+                              className="text-red-400 hover:text-red-600 transition-colors"
+                              title="Delete notification"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
                         </div>
                         <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--color-muted)' }}>
                           {n.message}

@@ -31,6 +31,15 @@ router.patch('/notifications/:id/read', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// Delete one notification
+router.delete('/notifications/:id', async (req, res, next) => {
+  try {
+    const notif = await Notification.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
+    if (!notif) return res.status(404).json({ error: 'Notification not found' });
+    res.json({ success: true });
+  } catch (err) { next(err); }
+});
+
 // Get dashboard summary
 router.get('/dashboard', async (req, res, next) => {
   try {

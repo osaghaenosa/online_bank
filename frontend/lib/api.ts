@@ -31,6 +31,7 @@ export const api = {
     notifications: ()             => req('/users/notifications'),
     markAllRead:   ()             => req('/users/notifications/read-all', { method: 'PATCH' }),
     markOneRead:   (id: string)   => req(`/users/notifications/${id}/read`, { method: 'PATCH' }),
+    deleteNotif:   (id: string)   => req(`/users/notifications/${id}`, { method: 'DELETE' }),
   },
   tx: {
     list:     (params?: Record<string, string>) => {
