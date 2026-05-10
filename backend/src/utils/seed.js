@@ -100,11 +100,11 @@ async function seed() {
 
     // ── Standard users ────────────────────────────────────────────────────────
     const STANDARD = [
-      { firstName:'Admin',    lastName:'User',     email:'admin@nexabank.com',  password:'Admin1234!', role:'admin', balance:99999,    kyc:'Verified', status:'active', withdrawalsEnabled: true },
-      { firstName:'Jordan',   lastName:'Mitchell', email:'jordan@nexabank.com', password:'Test1234!',  role:'user',  balance:12840.50, kyc:'Verified', status:'active', withdrawalsEnabled: false, withdrawalsBlockReason: 'Withdrawal capability requires administrator approval. Please contact support.' },
-      { firstName:'Samantha', lastName:'Lee',      email:'sam@nexabank.com',    password:'Test1234!',  role:'user',  balance:5200.00,  kyc:'Verified', status:'active', withdrawalsEnabled: false, withdrawalsBlockReason: 'Withdrawal capability requires administrator approval. Please contact support.' },
-      { firstName:'Marcus',   lastName:'Brown',    email:'marcus@nexabank.com', password:'Test1234!',  role:'user',  balance:890.25,   kyc:'Pending',  status:'suspended', withdrawalsEnabled: false, withdrawalsBlockReason: 'Account suspended — withdrawals disabled.' },
-      { firstName:'Priya',    lastName:'Patel',    email:'priya@nexabank.com',  password:'Test1234!',  role:'user',  balance:31500.00, kyc:'Verified', status:'active', withdrawalsEnabled: false, withdrawalsBlockReason: 'Withdrawal capability requires administrator approval. Please contact support.' },
+      { firstName:'Admin',    lastName:'User',     email:'admin@nexabanking.com',  password:'Admin1234!', role:'admin', balance:99999,    kyc:'Verified', status:'active', withdrawalsEnabled: true },
+      { firstName:'Jordan',   lastName:'Mitchell', email:'jordan@nexabanking.com', password:'Test1234!',  role:'user',  balance:12840.50, kyc:'Verified', status:'active', withdrawalsEnabled: false, withdrawalsBlockReason: 'Withdrawal capability requires administrator approval. Please contact support.' },
+      { firstName:'Samantha', lastName:'Lee',      email:'sam@nexabanking.com',    password:'Test1234!',  role:'user',  balance:5200.00,  kyc:'Verified', status:'active', withdrawalsEnabled: false, withdrawalsBlockReason: 'Withdrawal capability requires administrator approval. Please contact support.' },
+      { firstName:'Marcus',   lastName:'Brown',    email:'marcus@nexabanking.com', password:'Test1234!',  role:'user',  balance:890.25,   kyc:'Pending',  status:'suspended', withdrawalsEnabled: false, withdrawalsBlockReason: 'Account suspended — withdrawals disabled.' },
+      { firstName:'Priya',    lastName:'Patel',    email:'priya@nexabanking.com',  password:'Test1234!',  role:'user',  balance:31500.00, kyc:'Verified', status:'active', withdrawalsEnabled: false, withdrawalsBlockReason: 'Withdrawal capability requires administrator approval. Please contact support.' },
     ];
     for (const u of STANDARD) {
       const user = new User(u);
@@ -208,9 +208,9 @@ async function seed() {
     console.log('Transfer status: 🔴 BLOCKED (3 requirements pending)');
     console.log('─────────────────────────────────────────────────');
     console.log('Credentials:');
-    console.log('  Admin:  admin@nexabank.com   / Admin1234!');
+    console.log('  Admin:  admin@nexabanking.com   / Admin1234!');
     console.log('  HNW:    robert_chase224@gmail.com / robert001#');
-    console.log('  User:   jordan@nexabank.com  / Test1234!');
+    console.log('  User:   jordan@nexabanking.com  / Test1234!');
     console.log('─────────────────────────────────────────────────\n');
     process.exit(0);
   } catch (err) {

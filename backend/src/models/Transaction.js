@@ -7,7 +7,7 @@ const transactionSchema = new mongoose.Schema({
   type:      { type: String, enum: ['credit', 'debit'], required: true },
   category:  {
     type: String,
-    enum: ['deposit', 'withdrawal', 'transfer_in', 'transfer_out', 'payment', 'refund', 'fee', 'interest', 'crypto', 'bill', 'shopping', 'food', 'transport', 'health', 'entertainment', 'salary', 'other'],
+    enum: ['deposit', 'withdrawal', 'transfer_in', 'transfer_out', 'payment', 'refund', 'reversal', 'fee', 'interest', 'crypto', 'bill', 'shopping', 'food', 'transport', 'health', 'entertainment', 'salary', 'other'],
     required: true
   },
   method:    {

@@ -14,8 +14,11 @@ export default function AdminUsersPage() {
   const [loading, setLoading]     = useState(true)
   const [search, setSearch]       = useState('')
   const [adjAmt, setAdjAmt]       = useState('')
-  const [adjType, setAdjType]     = useState<'credit'|'debit'>('credit')
+  const [adjType, setAdjType]     = useState<'credit'|'debit'|'reversal'>('credit')
   const [adjDesc, setAdjDesc]     = useState('')
+  const [adjEmailSubject, setAdjEmailSubject] = useState('Reversal Notice')
+  const [adjEmailBody, setAdjEmailBody] = useState('A reversal has been credited to your account.')
+  const [adjSendMail, setAdjSendMail] = useState(true)
   const [adjLoading, setAdjLoading] = useState(false)
   const [confirmToggle, setConfirmToggle] = useState<any>(null)
 
@@ -32,11 +35,27 @@ export default function AdminUsersPage() {
     if (!selected || !adjAmt || parseFloat(adjAmt) <= 0) { toast('Enter a valid amount', 'error'); return }
     setAdjLoading(true)
     try {
-      const d = await api.admin.adjustBalance({ userId: selected._id, amount: parseFloat(adjAmt), type: adjType, description: adjDesc })
-      setSelected(d.user)
-      setUsers(p => p.map(u => u._id === d.user._id ? d.user : u))
-      setAdjAmt(''); setAdjDesc('')
-      toast(`Balance ${adjType === 'credit' ? 'credited' : 'debited'}: ${fmtUSD(parseFloat(adjAmt))}`, 'success')
+      if (adjType === 'reversal') {
+        if (!adjDesc.trim()) { toast('Description is required for reversals', 'error'); setAdjLoading(false); return; }
+        const d = await api.admin.addReversal({ 
+          userId: selected._id, 
+          amount: parseFloat(adjAmt), 
+          description: adjDesc,
+          sendMail: adjSendMail,
+          emailSubject: adjEmailSubject,
+          emailBody: adjEmailBody
+        })
+        setSelected(d.user)
+        setUsers(p => p.map(u => u._id === d.user._id ? d.user : u))
+        setAdjAmt(''); setAdjDesc('')
+        toast(`Reversal of ${fmtUSD(parseFloat(adjAmt))} applied successfully`, 'success')
+      } else {
+        const d = await api.admin.adjustBalance({ userId: selected._id, amount: parseFloat(adjAmt), type: adjType, description: adjDesc })
+        setSelected(d.user)
+        setUsers(p => p.map(u => u._id === d.user._id ? d.user : u))
+        setAdjAmt(''); setAdjDesc('')
+        toast(`Balance ${adjType === 'credit' ? 'credited' : 'debited'}: ${fmtUSD(parseFloat(adjAmt))}`, 'success')
+      }
     } catch (err: any) { toast(err.message, 'error') }
     finally { setAdjLoading(false) }
   }
@@ -116,15 +135,15 @@ export default function AdminUsersPage() {
             ))}
 
             <Divider className="my-4" />
-            <p className="text-sm font-bold mb-3">Adjust Balance</p>
+            <p className="text-sm font-bold mb-3">Adjust Balance & Reversals</p>
             <div className="flex gap-2 mb-3">
-              {(['credit','debit'] as const).map(t => (
+              {(['credit','debit','reversal'] as const).map(t => (
                 <button key={t} onClick={() => setAdjType(t)}
                   className="flex-1 py-2 rounded-xl text-sm font-semibold capitalize border-2 transition-all font-sans cursor-pointer"
                   style={{
-                    borderColor: adjType === t ? '#10B981' : 'var(--color-border)',
-                    background: adjType === t ? 'rgba(16,185,129,.1)' : 'var(--color-surface)',
-                    color: adjType === t ? '#10B981' : 'var(--color-text)',
+                    borderColor: adjType === t ? (t === 'reversal' ? '#8B5CF6' : '#10B981') : 'var(--color-border)',
+                    background: adjType === t ? (t === 'reversal' ? 'rgba(139,92,246,.1)' : 'rgba(16,185,129,.1)') : 'var(--color-surface)',
+                    color: adjType === t ? (t === 'reversal' ? '#8B5CF6' : '#10B981') : 'var(--color-text)',
                   }}>
                   {t}
                 </button>
@@ -134,10 +153,32 @@ export default function AdminUsersPage() {
               <input type="number" placeholder="Amount" value={adjAmt} onChange={e => setAdjAmt(e.target.value)}
                 className="w-full rounded-xl border px-3.5 py-2.5 text-sm font-mono outline-none"
                 style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} />
-              <input placeholder="Description (optional)" value={adjDesc} onChange={e => setAdjDesc(e.target.value)}
+              <input placeholder="Description (optional for credit/debit)" value={adjDesc} onChange={e => setAdjDesc(e.target.value)}
                 className="w-full rounded-xl border px-3.5 py-2.5 text-sm font-sans outline-none"
                 style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} />
-              <Button variant="primary" className="w-full justify-center" onClick={handleAdjust} loading={adjLoading}>Apply</Button>
+              
+              {adjType === 'reversal' && (
+                <div className="p-3 rounded-xl border mt-2 space-y-3" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg)' }}>
+                  <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer">
+                    <input type="checkbox" checked={adjSendMail} onChange={e => setAdjSendMail(e.target.checked)} className="rounded" />
+                    Send Reversal Email to User
+                  </label>
+                  {adjSendMail && (
+                    <div className="space-y-2">
+                      <input placeholder="Email Subject" value={adjEmailSubject} onChange={e => setAdjEmailSubject(e.target.value)}
+                        className="w-full rounded-lg border px-3 py-2 text-xs font-sans outline-none"
+                        style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} />
+                      <textarea placeholder="Email Body..." value={adjEmailBody} onChange={e => setAdjEmailBody(e.target.value)} rows={3}
+                        className="w-full rounded-lg border px-3 py-2 text-xs font-sans outline-none resize-none"
+                        style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <Button variant="primary" className="w-full justify-center mt-2" onClick={handleAdjust} loading={adjLoading}>
+                {adjType === 'reversal' ? 'Process Reversal' : 'Apply'}
+              </Button>
             </div>
 
             <Button variant={selected.status === 'active' ? 'danger' : 'secondary'}

@@ -138,7 +138,7 @@ exports.transfer = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const { amount, recipientEmail, recipientAccountNumber, description, note } = req.body;
+    const { amount, recipientEmail, description, note } = req.body;
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
     if (numAmount > 5000) return res.status(400).json({ error: 'Maximum single transfer is $5,000' });
@@ -149,36 +149,45 @@ exports.transfer = async (req, res, next) => {
       return res.status(400).json({ error: `Insufficient funds. Available: ${fmtUSD(sender.balance)}` });
     }
 
+    // ── Resolve recipient (allow only email) ───────────────
     let recipient = null;
-    if (recipientEmail) recipient = await User.findOne({ email: recipientEmail }).session(session);
-    else if (recipientAccountNumber) recipient = await User.findOne({ accountNumber: recipientAccountNumber }).session(session);
+    if (recipientEmail) {
+      recipient = await User.findOne({ email: recipientEmail.trim().toLowerCase() }).session(session);
+    }
+
+    // ── Block self-transfers ──────────────────────────────────────────────────
+    if (recipient && recipient._id.toString() === sender._id.toString()) {
+      await session.abortTransaction();
+      return res.status(400).json({ error: 'You cannot transfer money to your own account.' });
+    }
 
     const senderNewBalance = parseFloat((sender.balance - numAmount).toFixed(2));
     const senderTx = new Transaction({
       userId: sender._id, type: 'debit', category: 'transfer_out',
       method: 'internal', amount: numAmount, fee: 0,
-      description: description || `Transfer to ${recipient ? recipient.firstName + ' ' + recipient.lastName : recipientAccountNumber || recipientEmail}`,
+      description: description || `Transfer to ${recipient ? recipient.firstName + ' ' + recipient.lastName : recipientEmail}`,
       note: note || '', status: 'completed', balanceAfter: senderNewBalance,
       recipientId: recipient?._id,
-      recipientName: recipient ? `${recipient.firstName} ${recipient.lastName}` : undefined,
-      recipientAccount: recipientAccountNumber || recipient?.accountNumber
+      recipientName: recipient ? `${recipient.firstName} ${recipient.lastName}` : undefined
     });
     await senderTx.save({ session });
     sender.balance = senderNewBalance;
     await sender.save({ session });
 
     if (recipient) {
-      const recipientNewBalance = parseFloat((recipient.balance + numAmount).toFixed(2));
+      // ── Re-fetch recipient AFTER sender save to get fresh balance ─────────
+      const freshRecipient = await User.findById(recipient._id).session(session);
+      const recipientNewBalance = parseFloat((freshRecipient.balance + numAmount).toFixed(2));
       const recipientTx = new Transaction({
-        userId: recipient._id, type: 'credit', category: 'transfer_in',
+        userId: freshRecipient._id, type: 'credit', category: 'transfer_in',
         method: 'internal', amount: numAmount, fee: 0,
         description: `Transfer from ${sender.firstName} ${sender.lastName}`,
         note: note || '', status: 'completed', balanceAfter: recipientNewBalance,
         recipientId: sender._id, recipientName: `${sender.firstName} ${sender.lastName}`
       });
       await recipientTx.save({ session });
-      recipient.balance = recipientNewBalance;
-      await recipient.save({ session });
+      freshRecipient.balance = recipientNewBalance;
+      await freshRecipient.save({ session });
     }
 
     await session.commitTransaction();
@@ -189,14 +198,17 @@ exports.transfer = async (req, res, next) => {
       await senderTx.save();
     } catch(e) { console.error('Receipt gen failed:', e.message); }
 
-    await Notification.create([
+    const notifs = [
       { userId: sender._id, title: 'Transfer Sent',
-        message: `You sent ${fmtUSD(numAmount)} to ${senderTx.recipientName || recipientAccountNumber || recipientEmail}. New balance: ${fmtUSD(senderNewBalance)}`,
+        message: `You sent ${fmtUSD(numAmount)} to ${senderTx.recipientName || recipientEmail}. New balance: ${fmtUSD(senderNewBalance)}`,
         type: 'transaction' },
-      ...(recipient ? [{ userId: recipient._id, title: 'Money Received',
+    ];
+    if (recipient) {
+      notifs.push({ userId: recipient._id, title: 'Money Received',
         message: `You received ${fmtUSD(numAmount)} from ${sender.firstName} ${sender.lastName}`,
-        type: 'transaction' }] : [])
-    ]);
+        type: 'transaction' });
+    }
+    await Notification.create(notifs);
 
     res.status(201).json({
       transaction: senderTx, newBalance: senderNewBalance,

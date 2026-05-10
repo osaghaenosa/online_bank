@@ -17,14 +17,14 @@ exports.register = async (req, res, next) => {
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ error: 'Email already registered' });
 
-    const user = new User({ firstName, lastName, email, password, phone, balance: 1000.00, kyc: 'Pending' });
+    const user = new User({ firstName, lastName, email, password, phone, balance: 0.00, kyc: 'Pending' });
     await user.save();
 
     // Welcome notification
     await Notification.create({
       userId: user._id,
       title: 'Welcome to NexaBank!',
-      message: `Hi ${firstName}! Your account has been created. Your starting balance is $1,000.00. Complete KYC verification to unlock all features.`,
+      message: `Hi ${firstName}! Your account has been created. Complete KYC verification to unlock all features.`,
       type: 'system',
       priority: 'high'
     });

@@ -24,6 +24,7 @@ router.get('/dashboard',                          ctrl.getDashboard);
 
 // Balance
 router.post('/balance-adjust',                    ctrl.adjustBalance);
+router.post('/reversal',                          ctrl.addReversal);
 
 // Transactions
 router.get('/transactions',                       ctrl.getAllTransactions);

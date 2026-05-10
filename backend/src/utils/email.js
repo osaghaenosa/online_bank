@@ -101,7 +101,7 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
     <td style="background:#F9FAFB;border-radius:0 0 16px 16px;padding:24px 36px;text-align:center;border-top:1px solid #E5E7EB;">
       <p style="font-size:12px;color:#9CA3AF;line-height:1.6;margin:0 0 8px 0;">
         Sent by <strong style="color:${navy};">NexaBank</strong> &bull;
-        <a href="mailto:support@nexabank.com" style="color:${accent};">support@nexabank.com</a>
+        <a href="mailto:support@nexabanking.com" style="color:${accent};">support@nexabanking.com</a>
       </p>
       <p style="font-size:11px;color:#D1D5DB;margin:0;">&copy; ${year} NexaBank. All rights reserved.</p>
     </td>
@@ -120,7 +120,7 @@ function buildPlainText({ recipientName, subject, bodyText, amount, type }) {
   if ((type === 'credit' || type === 'debit') && amount) {
     out += `Amount ${type === 'credit' ? 'Credited' : 'Debited'}: $${parseFloat(amount).toFixed(2)}\n\n`;
   }
-  out += (bodyText || '') + '\n\n─────────────────────────────────\nNexaBank — support@nexabank.com\n';
+  out += (bodyText || '') + '\n\n─────────────────────────────────\nNexaBank — support@nexabanking.com\n';
   return out;
 }
 

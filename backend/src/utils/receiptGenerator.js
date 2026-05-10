@@ -48,7 +48,7 @@ exports.generateReceiptPDF = async (transaction, user) => {
     doc.font('Helvetica-Bold').fontSize(28).fillColor('#ffffff').text('exaBank');
 
     doc.font('Helvetica').fontSize(11).fillColor('rgba(255,255,255,0.6)').text('Personal Banking', 50, 70);
-    doc.font('Helvetica').fontSize(10).fillColor('rgba(255,255,255,0.5)').text('www.nexabank.com | support@nexabank.com', 50, 88);
+    doc.font('Helvetica').fontSize(10).fillColor('rgba(255,255,255,0.5)').text('www.nexabanking.com | support@nexabanking.com', 50, 88);
 
     // Receipt label top right
     doc.font('Helvetica-Bold').fontSize(18).fillColor('#10B981').text('TRANSACTION RECEIPT', 350, 42);

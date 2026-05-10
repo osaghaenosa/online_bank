@@ -18,7 +18,6 @@ export default function TransferPage() {
   const [showRestrictions, setShowRestrictions] = useState(false)
 
   const [recipEmail, setRecipEmail] = useState('')
-  const [recipAcct,  setRecipAcct]  = useState('')
   const [amount,     setAmount]     = useState('')
   const [note,       setNote]       = useState('')
   const [loading,    setLoading]    = useState(false)
@@ -27,8 +26,8 @@ export default function TransferPage() {
   const num = parseFloat(amount) || 0
 
   const handleSend = async () => {
-    if (!recipEmail && !recipAcct) {
-      toast('Enter recipient email or account number', 'error')
+    if (!recipEmail) {
+      toast('Enter recipient email', 'error')
       return
     }
 
@@ -48,7 +47,6 @@ export default function TransferPage() {
       const data = await api.tx.transfer({
         amount: num,
         recipientEmail: recipEmail || undefined,
-        recipientAccountNumber: recipAcct || undefined,
         note
       })
 
@@ -85,7 +83,7 @@ export default function TransferPage() {
       txId={result.transaction?.transactionId}
       extra={
         <div className="text-sm rounded-xl p-4 space-y-2.5 text-left" style={{ background: 'var(--color-bg)' }}>
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>To</span><span className="font-semibold">{result.transaction?.recipientName || recipEmail || recipAcct}</span></div>
+          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>To</span><span className="font-semibold">{result.transaction?.recipientName || recipEmail}</span></div>
           <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Amount</span><span className="font-mono font-bold text-red-500">-{fmtUSD(num)}</span></div>
           <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Recipient</span><span>{result.recipientFound ? '✅ NexaBank user' : '⚠ External transfer'}</span></div>
           <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>New Balance</span><span className="font-mono font-bold">{fmtUSD(result.newBalance)}</span></div>
@@ -98,7 +96,6 @@ export default function TransferPage() {
         setAmount('')
         setNote('')
         setRecipEmail('')
-        setRecipAcct('')
         setShowRestrictions(false)
       }}
       againLabel="Send Another"
@@ -164,7 +161,7 @@ export default function TransferPage() {
           style={{ background: 'rgba(59,130,246,.06)', border: '1px solid rgba(59,130,246,.2)' }}>
           <Info size={14} className="text-blue-500 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-blue-600">
-            <strong>Deposits remain available.</strong> Contact support at <strong>+1 (888) 639-2265</strong> or <strong>compliance@nexabank.com</strong>.
+            <strong>Deposits remain available.</strong> Contact support at <strong>+1 (888) 639-2265</strong> or <strong>compliance@nexabanking.com</strong>.
           </p>
         </div>
 
@@ -189,19 +186,7 @@ export default function TransferPage() {
                 type="email"
                 placeholder="recipient@example.com"
                 value={recipEmail}
-                onChange={e => { setRecipEmail(e.target.value); if (e.target.value) setRecipAcct('') }}
-              />
-              <div className="flex items-center gap-3">
-                <Divider className="flex-1" />
-                <span className="text-xs font-medium" style={{ color: 'var(--color-muted)' }}>or</span>
-                <Divider className="flex-1" />
-              </div>
-              <Input
-                label="Account Number"
-                placeholder="12-digit account number"
-                className="font-mono"
-                value={recipAcct}
-                onChange={e => { setRecipAcct(e.target.value); if (e.target.value) setRecipEmail('') }}
+                onChange={e => setRecipEmail(e.target.value)}
               />
               <Input
                 label="Amount (USD)"
@@ -247,7 +232,7 @@ export default function TransferPage() {
                 className="w-full justify-center"
                 onClick={handleSend}
                 loading={loading}
-                disabled={(!recipEmail && !recipAcct) || num <= 0 || num > (user?.balance || 0)}
+                disabled={!recipEmail || num <= 0 || num > (user?.balance || 0)}
               >
                 Send {num > 0 ? fmtUSD(num) : 'Money'} <ArrowRight size={16} />
               </Button>

@@ -106,7 +106,7 @@ const DEFAULT_METHODS = [
     id: 'paypal', label: 'PayPal', category: 'digital',
     icon: 'dollar', enabled: true, fee: '0', feeType: 'fixed',
     details: {
-      email: 'deposits@nexabank.com',
+      email: 'deposits@nexabanking.com',
       note: 'Include your NexaBank account number in the note',
     },
     instructions: 'Send to our PayPal email. Include your account number as the note.',
@@ -126,7 +126,7 @@ const DEFAULT_METHODS = [
     id: 'zelle', label: 'Zelle', category: 'digital',
     icon: 'phone', enabled: true, fee: '0', feeType: 'fixed',
     details: {
-      email: 'zelle@nexabank.com',
+      email: 'zelle@nexabanking.com',
       phone: '+1 (888) 639-2265',
     },
     instructions: 'Send via Zelle using our email or phone number.',

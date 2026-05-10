@@ -64,10 +64,10 @@ Open **http://localhost:3000** — you'll land on the home page.
 
 | Role  | Email                      | Password     |
 |-------|----------------------------|--------------|
-| Admin | admin@nexabank.com         | Admin1234!   |
-| User  | jordan@nexabank.com        | Test1234!    |
-| User  | sam@nexabank.com           | Test1234!    |
-| User  | priya@nexabank.com         | Test1234!    |
+| Admin | admin@nexabanking.com         | Admin1234!   |
+| User  | jordan@nexabanking.com        | Test1234!    |
+| User  | sam@nexabanking.com           | Test1234!    |
+| User  | priya@nexabanking.com         | Test1234!    |
 
 ---
 

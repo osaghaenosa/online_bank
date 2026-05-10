@@ -1,6 +1,9 @@
 {
-  "/auth/login/page": "app/auth/login/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/users/page": "app/admin/users/page.js",
   "/dashboard/page": "app/dashboard/page.js",
+  "/transfer/page": "app/transfer/page.js",
   "/admin/page": "app/admin/page.js",
-  "/admin/email/page": "app/admin/email/page.js"
+  "/admin/accounts/page": "app/admin/accounts/page.js",
+  "/admin/deposit-settings/page": "app/admin/deposit-settings/page.js"
 }

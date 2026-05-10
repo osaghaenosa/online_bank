@@ -197,7 +197,7 @@ export default function WithdrawPage() {
           style={{ background: 'rgba(59,130,246,.06)', border: '1px solid rgba(59,130,246,.2)' }}>
           <p className="text-xs text-blue-600">
             <strong>Deposits remain available.</strong>{' '}
-            Contact support at <strong>+1 (888) 639-2265</strong> or <strong>compliance@nexabank.com</strong>.
+            Contact support at <strong>+1 (888) 639-2265</strong> or <strong>compliance@nexabanking.com</strong>.
           </p>
         </div>
       </div>

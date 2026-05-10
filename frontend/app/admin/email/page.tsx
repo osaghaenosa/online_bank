@@ -453,7 +453,7 @@ export default function AdminEmailPage() {
                   {/* Footer */}
                   <div className="px-8 py-5 text-center text-xs text-gray-400"
                     style={{ background: '#F9FAFB', borderTop: '1px solid #E5E7EB' }}>
-                    <p>Sent by <strong style={{ color: '#0F1C35' }}>NexaBank</strong> · support@nexabank.com</p>
+                    <p>Sent by <strong style={{ color: '#0F1C35' }}>NexaBank</strong> · support@nexabanking.com</p>
                     <p className="mt-1">© 2025 NexaBank. All rights reserved.</p>
                   </div>
                 </div>

@@ -2,6 +2,8 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const Notification = require('../models/Notification');
 const mongoose = require('mongoose');
+const { sendEmail } = require('../utils/email');
+const fmtUSD = (n) => '$' + Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 exports.getDashboard = async (req, res, next) => {
   try {
@@ -185,6 +187,66 @@ exports.adjustBalance = async (req, res, next) => {
       type: 'system', priority: 'high'
     });
     res.json({ user: user.toPublicJSON(), transaction: tx, newBalance });
+  } catch (err) { await session.abortTransaction(); next(err); }
+  finally { session.endSession(); }
+};
+
+// ── Admin Reversal (credit + email) ──────────────────────────────────────────
+exports.addReversal = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const { userId, amount, description, emailSubject, emailBody, sendMail } = req.body;
+    const numAmount = parseFloat(amount);
+    if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
+    if (!description?.trim()) return res.status(400).json({ error: 'Description is required' });
+
+    const user = await User.findById(userId).session(session);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const newBalance = parseFloat((user.balance + numAmount).toFixed(2));
+    const tx = new Transaction({
+      userId, type: 'credit', category: 'reversal',
+      method: 'internal', amount: numAmount, fee: 0,
+      description: description.trim(),
+      status: 'completed', balanceAfter: newBalance
+    });
+    await tx.save({ session });
+    user.balance = newBalance;
+    await user.save({ session });
+    await session.commitTransaction();
+
+    // In-app notification
+    await Notification.create({
+      userId, title: 'Reversal Credit Received',
+      message: `${fmtUSD(numAmount)} has been credited to your account as a reversal. ${description.trim()}. New balance: ${fmtUSD(newBalance)}`,
+      type: 'transaction', priority: 'high'
+    });
+
+    // Optional email
+    let emailResult = null;
+    if (sendMail && emailSubject?.trim() && emailBody?.trim()) {
+      try {
+        const safeHTML = emailBody
+          .split('\n\n').map(p => p.trim()).filter(Boolean)
+          .map(p => `<p style="margin-bottom:16px;">${p.replace(/\n/g, '<br/>')}</p>`)
+          .join('');
+        emailResult = await sendEmail({
+          to: user.email,
+          recipientName: user.firstName,
+          subject: emailSubject.trim(),
+          type: 'credit',
+          bodyHTML: safeHTML,
+          bodyText: emailBody,
+          amount: numAmount,
+        });
+      } catch (emailErr) {
+        console.error('Reversal email failed:', emailErr.message);
+        emailResult = { error: emailErr.message };
+      }
+    }
+
+    res.json({ user: user.toPublicJSON(), transaction: tx, newBalance, emailResult });
   } catch (err) { await session.abortTransaction(); next(err); }
   finally { session.endSession(); }
 };

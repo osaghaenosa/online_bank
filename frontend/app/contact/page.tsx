@@ -30,7 +30,7 @@ export default function ContactPage() {
           {/* Info */}
           <div className="md:col-span-2 space-y-5">
             {[
-              { icon: Mail,  label: 'Email Support',   val: 'support@nexabank.com',  sub: 'Response within 2 hours' },
+              { icon: Mail,  label: 'Email Support',   val: 'support@nexabanking.com',  sub: 'Response within 2 hours' },
               { icon: Phone, label: 'Phone Support',    val: '+1 (248) 834-6313',     sub: '24/7 Available' },
               { icon: MapPin,label: 'Headquarters',     val: '100 NexaBank Plaza',    sub: 'San Francisco, CA 94105' },
               { icon: Clock, label: 'Business Hours',   val: '24 hours, 7 days',      sub: 'Including holidays' },
