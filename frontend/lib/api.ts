@@ -110,6 +110,7 @@ export const api = {
         return data as { url: string; fileId: string; name: string }
       })
     },
+    updateUserWealth: (id: string, body: object) => req(`/admin/users/${id}/wealth`, { method: 'POST', body: JSON.stringify(body) }),
   },
   restrictions: {
     get: () => req('/transactions/restrictions'),

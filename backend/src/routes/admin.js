@@ -18,6 +18,8 @@ router.patch('/users/:id/fulfill-requirement',    ctrl.fulfillRequirement);
 router.post('/users/:id/photo',                   upload.single('photo'), ctrl.uploadUserPhoto);
 router.delete('/users/:id/photo',                 ctrl.deleteUserPhoto);
 router.get('/users/:userId/transactions',         ctrl.getUserTransactions);
+router.post('/users/:id/wealth',                  ctrl.updateUserWealth);
+
 
 // Dashboard
 router.get('/dashboard',                          ctrl.getDashboard);

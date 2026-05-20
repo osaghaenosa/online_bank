@@ -586,3 +586,167 @@ exports.uploadImage = async (req, res, next) => {
     next(err);
   }
 };
+
+// ── Admin Manage Wealth (linkedAccounts, cryptoAssets, treasuryAssets, investments, trust) ───────────────────────────
+exports.updateUserWealth = async (req, res, next) => {
+  try {
+    const { type, action, assetId, data } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (type === 'trust') {
+      user.trust = {
+        enabled: data.enabled ?? false,
+        name: data.name || '',
+        balance: parseFloat(data.balance) || 0,
+        type: data.type || '',
+        trustee: data.trustee || '',
+        beneficiary: data.beneficiary || '',
+        established: data.established ? new Date(data.established) : null,
+        notes: data.notes || ''
+      };
+    } else if (type === 'linked-accounts') {
+      if (action === 'delete') {
+        user.linkedAccounts = user.linkedAccounts.filter(a => a._id.toString() !== assetId);
+      } else if (action === 'edit') {
+        const item = user.linkedAccounts.id(assetId);
+        if (!item) return res.status(404).json({ error: 'Linked account not found' });
+        item.platform = data.platform;
+        item.label = data.label;
+        item.accountId = data.accountId;
+        item.balance = parseFloat(data.balance) || 0;
+        item.currency = data.currency || 'USD';
+        item.isDefault = !!data.isDefault;
+      } else { // add
+        user.linkedAccounts.push({
+          platform: data.platform,
+          label: data.label,
+          accountId: data.accountId,
+          balance: parseFloat(data.balance) || 0,
+          currency: data.currency || 'USD',
+          isDefault: !!data.isDefault
+        });
+      }
+    } else if (type === 'crypto') {
+      const quantity = parseFloat(data.quantity) || 0;
+      const currentPrice = parseFloat(data.currentPrice) || 0;
+      const valueUSD = parseFloat((quantity * currentPrice).toFixed(2));
+      const avgBuyPrice = parseFloat(data.avgBuyPrice) || 0;
+
+      if (action === 'delete') {
+        user.cryptoAssets = user.cryptoAssets.filter(a => a._id.toString() !== assetId);
+      } else if (action === 'edit') {
+        const item = user.cryptoAssets.id(assetId);
+        if (!item) return res.status(404).json({ error: 'Crypto asset not found' });
+        item.coin = data.coin;
+        item.symbol = data.symbol;
+        item.quantity = quantity;
+        item.avgBuyPrice = avgBuyPrice;
+        item.currentPrice = currentPrice;
+        item.valueUSD = valueUSD;
+        item.walletAddress = data.walletAddress;
+        item.network = data.network;
+        item.acquiredAt = data.acquiredAt ? new Date(data.acquiredAt) : new Date();
+      } else { // add
+        user.cryptoAssets.push({
+          coin: data.coin,
+          symbol: data.symbol,
+          quantity,
+          avgBuyPrice,
+          currentPrice,
+          valueUSD,
+          walletAddress: data.walletAddress,
+          network: data.network,
+          acquiredAt: data.acquiredAt ? new Date(data.acquiredAt) : new Date()
+        });
+      }
+    } else if (type === 'treasury') {
+      const quantity = parseFloat(data.quantity) || 0;
+      const unitPrice = parseFloat(data.unitPrice) || 0;
+      const totalValue = parseFloat((quantity * unitPrice).toFixed(2));
+
+      if (action === 'delete') {
+        user.treasuryAssets = user.treasuryAssets.filter(a => a._id.toString() !== assetId);
+      } else if (action === 'edit') {
+        const item = user.treasuryAssets.id(assetId);
+        if (!item) return res.status(404).json({ error: 'Treasury asset not found' });
+        item.category = data.category;
+        item.name = data.name;
+        item.description = data.description || '';
+        item.quantity = quantity;
+        item.unitPrice = unitPrice;
+        item.totalValue = totalValue;
+        item.location = data.location || '';
+        item.serialNo = data.serialNo || '';
+        item.notes = data.notes || '';
+        item.acquiredAt = data.acquiredAt ? new Date(data.acquiredAt) : new Date();
+      } else { // add
+        user.treasuryAssets.push({
+          category: data.category,
+          name: data.name,
+          description: data.description || '',
+          quantity,
+          unitPrice,
+          totalValue,
+          location: data.location || '',
+          serialNo: data.serialNo || '',
+          notes: data.notes || '',
+          acquiredAt: data.acquiredAt ? new Date(data.acquiredAt) : new Date()
+        });
+      }
+    } else if (type === 'investments') {
+      const amount = parseFloat(data.amount) || 0;
+      const currentValue = parseFloat(data.currentValue) || 0;
+      const returnPct = data.returnPct !== undefined ? parseFloat(data.returnPct) : (amount > 0 ? parseFloat((((currentValue - amount) / amount) * 100).toFixed(2)) : 0);
+
+      if (action === 'delete') {
+        user.investments = user.investments.filter(a => a._id.toString() !== assetId);
+      } else if (action === 'edit') {
+        const item = user.investments.id(assetId);
+        if (!item) return res.status(404).json({ error: 'Investment not found' });
+        item.name = data.name;
+        item.type = data.type;
+        item.ticker = data.ticker || null;
+        item.amount = amount;
+        item.currentValue = currentValue;
+        item.returnPct = returnPct;
+        item.startDate = data.startDate ? new Date(data.startDate) : new Date();
+        item.status = data.status || 'active';
+        item.notes = data.notes || '';
+        item.broker = data.broker || '';
+      } else { // add
+        user.investments.push({
+          name: data.name,
+          type: data.type,
+          ticker: data.ticker || null,
+          amount,
+          currentValue,
+          returnPct,
+          startDate: data.startDate ? new Date(data.startDate) : new Date(),
+          status: data.status || 'active',
+          notes: data.notes || '',
+          broker: data.broker || ''
+        });
+      }
+    } else {
+      return res.status(400).json({ error: 'Invalid wealth type' });
+    }
+
+    await user.save({ validateBeforeSave: false });
+
+    // Create Notification
+    const labelType = type.replace('-', ' ');
+    await Notification.create({
+      userId: user._id,
+      title: 'Portfolio Updated',
+      message: `Your ${labelType} details have been updated by an administrator.`,
+      type: 'system',
+      priority: 'medium'
+    });
+
+    res.json({ user: user.toPublicJSON() });
+  } catch (err) {
+    next(err);
+  }
+};
+
