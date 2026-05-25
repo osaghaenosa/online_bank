@@ -56,6 +56,7 @@ export const api = {
     },
     userDetail:     (id: string)   => req(`/admin/users/${id}`),
     toggleStatus:   (id: string)   => req(`/admin/users/${id}/toggle-status`, { method: 'PATCH' }),
+    verifyKyc:      (id: string)   => req(`/admin/users/${id}/kyc`, { method: 'PATCH' }),
     editName:       (id: string, body: object) => req(`/admin/users/${id}/name`, { method: 'PATCH', body: JSON.stringify(body) }),
     adjustBalance:  (body: object) => req('/admin/balance-adjust',             { method: 'POST',  body: JSON.stringify(body) }),
     addReversal:    (body: object) => req('/admin/reversal',                   { method: 'POST',  body: JSON.stringify(body) }),

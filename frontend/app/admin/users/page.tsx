@@ -82,6 +82,15 @@ export default function AdminUsersPage() {
     finally { setConfirmToggle(null) }
   }
 
+  const handleKycVerify = async (u: any) => {
+    try {
+      const d = await api.admin.verifyKyc(u._id)
+      setUsers(p => p.map(x => x._id === d.user._id ? d.user : x))
+      if (selected?._id === d.user._id) setSelected(d.user)
+      toast(`KYC for ${d.user.firstName} verified`, 'success')
+    } catch (err: any) { toast(err.message, 'error') }
+  }
+
   // Wealth Update handler
   const handleWealthUpdate = async (type: string, action: string, assetId?: string, data?: any) => {
     if (!selected) return
@@ -198,7 +207,14 @@ export default function AdminUsersPage() {
                 {[
                   ['Balance',  fmtUSD(selected.balance)],
                   ['Account',  '****' + String(selected.accountNumber || '').slice(-4)],
-                  ['KYC',      <StatusBadge key="k" status={selected.kyc} />],
+                  ['KYC',      <div key="k" className="flex items-center gap-2">
+                                 <StatusBadge status={selected.kyc} />
+                                 {selected.kyc === 'pending' && (
+                                   <button onClick={() => handleKycVerify(selected)} className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-bold hover:bg-emerald-200 transition-all cursor-pointer">
+                                     Verify
+                                   </button>
+                                 )}
+                               </div>],
                   ['Status',   <StatusBadge key="s" status={selected.status} />],
                   ['Role',     selected.role],
                 ].map(([l, v], i) => (

@@ -10,6 +10,7 @@ router.use(protect, adminOnly);
 router.get('/users',                              ctrl.getUsers);
 router.get('/users/:id',                          ctrl.getUserDetail);
 router.patch('/users/:id/toggle-status',          ctrl.toggleUserStatus);
+router.patch('/users/:id/kyc',                    ctrl.updateUserKyc);
 router.patch('/users/:id/name',                   ctrl.editUserName);
 router.patch('/users/:id/credentials',            ctrl.editUserCredentials);
 router.patch('/users/:id/transfer-access',        ctrl.setTransferAccess);

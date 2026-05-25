@@ -268,6 +268,24 @@ exports.toggleUserStatus = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+exports.updateUserKyc = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (user.kyc === 'pending') {
+      user.kyc = 'verified';
+      await user.save({ validateBeforeSave: false });
+      await Notification.create({
+        userId: user._id,
+        title: 'KYC Verified',
+        message: 'Your identity verification (KYC) has been successfully approved by an administrator.',
+        type: 'system', priority: 'high'
+      });
+    }
+    res.json({ user: user.toPublicJSON() });
+  } catch (err) { next(err); }
+};
+
 exports.updateTransactionStatus = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
