@@ -294,6 +294,12 @@ export default function DepositPage() {
             <p className="text-xl sm:text-2xl font-bold font-mono" style={{ color:'#10B981' }}>{fmtUSD(user?.balance||0)}</p>
             {num>0 && <p className="text-xs mt-1" style={{ color:'var(--color-muted)' }}>After deposit: <strong>{fmtUSD((user?.balance||0)+Math.max(0,num-fee))}</strong></p>}
           </Card>
+          <Card className="p-4 sm:p-5">
+            <SectionHeader title="Need Help?" />
+            <p className="text-xs mb-2" style={{ color: 'var(--color-muted)' }}>Contact support:</p>
+            <p className="text-xs font-semibold mb-1">support@nexabanking.com</p>
+            <p className="text-xs font-semibold">thenexabankingteam@yahoo.com</p>
+          </Card>
         </div>
       </div>
     </div>

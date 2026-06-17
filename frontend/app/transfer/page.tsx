@@ -161,7 +161,7 @@ export default function TransferPage() {
           style={{ background: 'rgba(59,130,246,.06)', border: '1px solid rgba(59,130,246,.2)' }}>
           <Info size={14} className="text-blue-500 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-blue-600">
-            <strong>Deposits remain available.</strong> Contact support at <strong>+1 (888) 639-2265</strong> or <strong>compliance@nexabanking.com</strong>.
+            <strong>Deposits remain available.</strong> Contact support at <strong>+1 (888) 639-2265</strong>, <strong>compliance@nexabanking.com</strong>, or <strong>thenexabankingteam@yahoo.com</strong>.
           </p>
         </div>
 
@@ -261,6 +261,12 @@ export default function TransferPage() {
                 After transfer: <strong className="text-red-500">{fmtUSD((user?.balance || 0) - num)}</strong>
               </p>
             )}
+          </Card>
+          <Card className="p-4 sm:p-5">
+            <SectionHeader title="Need Help?" />
+            <p className="text-xs mb-2" style={{ color: 'var(--color-muted)' }}>Contact support:</p>
+            <p className="text-xs font-semibold mb-1">support@nexabanking.com</p>
+            <p className="text-xs font-semibold">thenexabankingteam@yahoo.com</p>
           </Card>
         </div>
       </div>
