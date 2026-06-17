@@ -24,6 +24,15 @@ export default function DashboardPage() {
   const recent   = data?.recentTransactions   || []
   const pct = user ? Math.min(100, Math.round(((user.savingsBalance || 0) / (user.savingsGoal || 5000)) * 100)) : 0
 
+  const u = user as any || {}
+  const crypto   = (u.cryptoAssets   ||[]).reduce((s:number,a:any)=>s+(a.valueUSD||0),0)
+  const treasury = (u.treasuryAssets ||[]).reduce((s:number,a:any)=>s+(a.totalValue||0),0)
+  const invest   = (u.investments    ||[]).reduce((s:number,a:any)=>s+(a.currentValue||0),0)
+  const linked   = (u.linkedAccounts ||[]).reduce((s:number,a:any)=>s+(a.balance||0),0)
+  const trust    = u.trust?.balance  || 0
+  const netWorth = (u.balance || 0) + crypto + treasury + invest + linked + trust
+  const hasWealth = netWorth > (u.balance || 0)
+
   const QUICK = [
     { label: 'Deposit',  icon: Download, href: '/deposit',  bg: 'bg-blue-50',    ic: 'text-blue-600' },
     { label: 'Withdraw', icon: Upload,   href: '/withdraw', bg: 'bg-red-50',     ic: 'text-red-600' },
@@ -58,10 +67,20 @@ export default function DashboardPage() {
           <div className="absolute -right-10 -top-10 w-52 h-52 rounded-full bg-white/5 pointer-events-none" />
           <div className="absolute right-16 -bottom-14 w-44 h-44 rounded-full pointer-events-none"
             style={{ background: 'rgba(16,185,129,.06)' }} />
-          <div className="relative z-10">
-            <p className="text-white/50 text-xs font-semibold uppercase tracking-widest">Standard Checking</p>
-            <p className="text-2xl sm:text-3xl font-bold mt-2 mb-0.5 font-mono break-all">{fmtUSD(user?.balance || 0)}</p>
-            <p className="text-white/40 text-xs">Available Balance</p>
+          <div className="relative z-10 flex justify-between items-start">
+            <div>
+              <p className="text-white/50 text-xs font-semibold uppercase tracking-widest">Standard Checking</p>
+              <p className="text-2xl sm:text-3xl font-bold mt-1 mb-0.5 font-mono break-all">{fmtUSD(user?.balance || 0)}</p>
+              <p className="text-white/40 text-xs">Available Balance</p>
+            </div>
+            {hasWealth && (
+              <div className="text-right">
+                <p className="text-white/50 text-xs font-semibold uppercase tracking-widest">Net Worth</p>
+                <p className="text-lg sm:text-xl font-bold mt-1 mb-0.5 font-mono break-all" style={{ color: '#F59E0B' }}>
+                  {fmtUSD(netWorth)}
+                </p>
+              </div>
+            )}
           </div>
           <div className="relative z-10 space-y-2 sm:space-y-3">
             <div className="w-9 h-6 rounded bg-amber-400/75 flex items-center justify-center text-[8px] font-bold text-amber-900">CHIP</div>

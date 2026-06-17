@@ -90,6 +90,8 @@ const userSchema = new mongoose.Schema({
     type:         { type: String },
     ticker:       { type: String },
     amount:       { type: Number, default: 0 },
+    quantity:     { type: Number, default: 0 },
+    currentPrice: { type: Number, default: 0 },
     currentValue: { type: Number, default: 0 },
     returnPct:    { type: Number, default: 0 },
     startDate:    { type: Date },

@@ -138,6 +138,10 @@ app.use((err, req, res, next) => {
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('Connected to MongoDB');
+    // Start background price updater
+    const { startPriceUpdater } = require('./utils/assetPricer');
+    startPriceUpdater();
+    
     const PORT = process.env.PORT || 5000;
     server.listen(PORT, () => console.log('NexaBank API + Socket.io on port ' + PORT));
   })
