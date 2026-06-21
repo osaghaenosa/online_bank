@@ -158,7 +158,7 @@ export default function ProfilePage() {
               ['Routing Number',  user.routingNumber||'021000021'],
               ['Card Number',     maskCard(user.cardNumber||'0000000000000000')],
               ['Card Expiry',     user.cardExpiry||'N/A'],
-              ['Daily Limit',     '$10,000'],
+              ['Withdrawal Limit', fmtUSD(user?.withdrawalLimit || 10000)],
               ['FDIC Insured',    'Up to $250,000'],
             ].map(([l,v]) => (
               <div key={l} className="flex justify-between py-2.5 sm:py-3 border-b last:border-0 gap-3"

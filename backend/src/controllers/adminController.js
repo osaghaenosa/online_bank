@@ -129,6 +129,20 @@ exports.setWithdrawalAccess = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// ── Set Withdrawal Limit ──────────────────────────────────────────────────────
+exports.setWithdrawalLimit = async (req, res, next) => {
+  try {
+    const { limit } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.withdrawalLimit = Number(limit);
+    await user.save({ validateBeforeSave: false });
+
+    res.json({ user: user.toPublicJSON() });
+  } catch (err) { next(err); }
+};
+
 // ── Fulfill a requirement ─────────────────────────────────────────────────────
 exports.fulfillRequirement = async (req, res, next) => {
   try {

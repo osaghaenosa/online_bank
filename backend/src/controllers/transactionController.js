@@ -75,7 +75,8 @@ exports.withdraw = async (req, res, next) => {
     const { amount, method, description, note, bankDetails, cardDetails, cryptoDetails } = req.body;
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
-    if (numAmount > 10000) return res.status(400).json({ error: 'Maximum single withdrawal is $10,000' });
+    const limit = userCheck.withdrawalLimit || 10000;
+    if (numAmount > limit) return res.status(400).json({ error: `Maximum single withdrawal is $${limit.toLocaleString()}` });
 
     let fee = 0;
     if (method === 'wire') fee = 25;

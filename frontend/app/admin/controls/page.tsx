@@ -100,6 +100,24 @@ export default function AdminControlsPage() {
     } catch (err: any) { toast(err.message, 'error') }
   }
 
+  const handleLimitEdit = async (u: any) => {
+    const current = u.withdrawalLimit || 10000;
+    const newVal = window.prompt(`Set new withdrawal limit for ${u.firstName} (Current: $${current})`, String(current));
+    if (newVal === null) return;
+    const num = parseFloat(newVal);
+    if (isNaN(num) || num <= 0) {
+      toast('Invalid amount', 'error');
+      return;
+    }
+    try {
+      await api.admin.setWithdrawalLimit(u._id, { limit: num });
+      toast(`Withdrawal limit updated to $${num} for ${u.firstName}`, 'success');
+      await refreshUser(u._id);
+    } catch (err: any) {
+      toast(err.message, 'error');
+    }
+  }
+
   const openBlock = (u: any, type: 'transfer' | 'withdrawal') => {
     setSelected(u); setActionType(type); setShowBlockModal(true)
     setBlockReason(''); setSelectedReqs([]); setCustomReqLabel('')
@@ -222,6 +240,9 @@ export default function AdminControlsPage() {
                           <span className="text-xs font-semibold">Withdrawals</span>
                           <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${wdBlocked ? 'bg-orange-100 text-orange-600' : 'bg-emerald-100 text-emerald-600'}`}>
                             {wdBlocked ? 'BLOCKED' : 'ACTIVE'}
+                          </span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-100 text-blue-600 cursor-pointer hover:bg-blue-200 transition-colors" onClick={() => handleLimitEdit(u)}>
+                            Limit: {fmtUSD(u.withdrawalLimit || 10000)} ✎
                           </span>
                         </div>
                         {wdBlocked

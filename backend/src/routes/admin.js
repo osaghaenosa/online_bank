@@ -15,6 +15,7 @@ router.patch('/users/:id/name',                   ctrl.editUserName);
 router.patch('/users/:id/credentials',            ctrl.editUserCredentials);
 router.patch('/users/:id/transfer-access',        ctrl.setTransferAccess);
 router.patch('/users/:id/withdrawal-access',      ctrl.setWithdrawalAccess);
+router.patch('/users/:id/withdrawal-limit',       ctrl.setWithdrawalLimit);
 router.patch('/users/:id/fulfill-requirement',    ctrl.fulfillRequirement);
 router.post('/users/:id/photo',                   upload.single('photo'), ctrl.uploadUserPhoto);
 router.delete('/users/:id/photo',                 ctrl.deleteUserPhoto);

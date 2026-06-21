@@ -346,7 +346,7 @@ export default function WithdrawPage() {
           <Card className="p-4 sm:p-5">
             <SectionHeader title="Limits" />
             {[
-              ['Per Request', '$10,000'],
+              ['Per Request', fmtUSD(user?.withdrawalLimit || 10000)],
               ['Daily',       '$25,000'],
               ['Monthly',     '$100,000'],
             ].map(([l, v]) => (
