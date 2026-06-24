@@ -4,7 +4,7 @@ import { api, fmtDateTime } from '@/lib/api'
 import { Card, SectionHeader } from '@/components/ui'
 import { useChat, ChatMsg } from '@/hooks/useChat'
 import { useAuth } from '@/store/auth'
-import { Send, MessageCircle, Search, Circle, Users } from 'lucide-react'
+import { Send, MessageCircle, Search, Circle, Users, Trash2 } from 'lucide-react'
 
 interface Room {
   user: { _id: string; firstName: string; lastName: string; email: string }
@@ -115,6 +115,15 @@ export default function AdminChatPage() {
 
   const handleKey = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
+  }
+
+  const handleDeleteMessage = async (msgId: string) => {
+    if (!confirm('Delete this message? This cannot be undone.')) return
+    try {
+      await api.chat.deleteMessage(msgId)
+      setRoomMsgs(prev => prev.map(m => m._id === msgId ? { ...m, message: '[Message deleted]', deleted: true } : m))
+      toast('Message deleted', 'success')
+    } catch (err: any) { toast(err.message, 'error') }
   }
 
   const filtered    = rooms.filter(r =>
@@ -262,9 +271,20 @@ export default function AdminChatPage() {
                 </div>
               ) : roomMsgs.map((msg, i) => {
                 const isAdmin = msg.senderRole === 'admin'
+                const isDeleted = (msg as any).deleted
                 return (
-                  <div key={msg._id || i} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[75%] rounded-2xl px-3.5 py-2.5 text-sm ${isAdmin ? 'rounded-tr-sm' : 'rounded-tl-sm'}`}
+                  <div key={msg._id || i} className={`flex items-end gap-1.5 group ${isAdmin ? 'justify-end' : 'justify-start'}`}>
+                    {/* Delete button — appears on hover, on left side for admin msgs, right side for user msgs */}
+                    {!isAdmin && !isDeleted && (
+                      <button
+                        onClick={() => handleDeleteMessage(msg._id!)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-100 text-red-400 hover:text-red-600 flex-shrink-0 mb-1"
+                        title="Delete message"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    )}
+                    <div className={`max-w-[75%] rounded-2xl px-3.5 py-2.5 text-sm ${isAdmin ? 'rounded-tr-sm' : 'rounded-tl-sm'} ${isDeleted ? 'opacity-50 italic' : ''}`}
                       style={{
                         background: isAdmin ? '#10B981' : 'var(--color-bg)',
                         color:      isAdmin ? '#fff'    : 'var(--color-text)',
@@ -282,6 +302,16 @@ export default function AdminChatPage() {
                         {new Date(msg.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
+                    {/* Delete button on right side for admin's own messages */}
+                    {isAdmin && !isDeleted && (
+                      <button
+                        onClick={() => handleDeleteMessage(msg._id!)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-100 text-red-400 hover:text-red-600 flex-shrink-0 mb-1"
+                        title="Delete message"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    )}
                   </div>
                 )
               })}

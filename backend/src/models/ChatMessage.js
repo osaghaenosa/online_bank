@@ -8,6 +8,8 @@ const chatMessageSchema = new mongoose.Schema({
   message:   { type: String, required: true, trim: true, maxlength: 2000 },
   read:      { type: Boolean, default: false },
   readAt:    { type: Date },
+  deleted:   { type: Boolean, default: false },
+  deletedAt: { type: Date },
 }, { timestamps: true });
 
 chatMessageSchema.index({ roomId: 1, createdAt: -1 });

@@ -9,7 +9,8 @@ router.use(protect);
 router.get('/history', ctrl.getUserHistory);
 
 // Admin routes
-router.get('/admin/rooms',           adminOnly, ctrl.getAdminRooms);
-router.get('/admin/room/:userId',    adminOnly, ctrl.getAdminRoomHistory);
+router.get('/admin/rooms',                    adminOnly, ctrl.getAdminRooms);
+router.get('/admin/room/:userId',             adminOnly, ctrl.getAdminRoomHistory);
+router.delete('/admin/message/:id',           adminOnly, ctrl.deleteMessage);
 
 module.exports = router;

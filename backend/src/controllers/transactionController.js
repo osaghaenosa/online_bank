@@ -69,9 +69,7 @@ exports.withdraw = async (req, res, next) => {
         requirements: userCheck.withdrawalRequirements || []
       });
     }
-  } catch(e) { return next(e); }
 
-  try {
     const { amount, method, description, note, bankDetails, cardDetails, cryptoDetails } = req.body;
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
@@ -84,7 +82,7 @@ exports.withdraw = async (req, res, next) => {
     if (method && method.startsWith('crypto')) fee = 5.00;
     const total = parseFloat((numAmount + fee).toFixed(2));
 
-    const user = await User.findById(req.user._id);
+    const user = userCheck; // reuse the same document
     if (user.balance < total) {
       return res.status(400).json({ error: `Insufficient funds. Available: ${fmtUSD(user.balance)}, Required: ${fmtUSD(total)}` });
     }

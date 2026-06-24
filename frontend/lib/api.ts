@@ -130,9 +130,10 @@ export const api = {
     verify: ()             => req('/email/verify'),
   },
   chat: {
-    history:    ()              => req('/chat/history'),
-    adminRooms: ()              => req('/chat/admin/rooms'),
-    adminRoom:  (userId: string)=> req(`/chat/admin/room/${userId}`),
+    history:       ()              => req('/chat/history'),
+    adminRooms:    ()              => req('/chat/admin/rooms'),
+    adminRoom:     (userId: string)=> req(`/chat/admin/room/${userId}`),
+    deleteMessage: (id: string)    => req(`/chat/admin/message/${id}`, { method: 'DELETE' }),
   },
 }
 
