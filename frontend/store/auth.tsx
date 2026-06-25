@@ -43,6 +43,13 @@ export interface User {
     enabled: boolean; name: string; balance: number; type: string
     trustee: string; beneficiary: string; established: string; notes: string
   }
+  withdrawalLimit?: number
+  withdrawalsEnabled?: boolean
+  withdrawalsBlockReason?: string
+  withdrawalRequirements?: Array<{ _id?: string; type: string; label: string; fulfilled: boolean; notes?: string }>
+  transfersEnabled?: boolean
+  transfersBlockReason?: string
+  transferRequirements?: Array<{ _id?: string; type: string; label: string; fulfilled: boolean; notes?: string }>
   profilePicture?: string | null
   profilePictureFileId?: string | null
   createdAt: string
