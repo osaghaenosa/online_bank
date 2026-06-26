@@ -62,15 +62,11 @@ exports.getAdminRoomHistory = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-// DELETE /api/chat/admin/message/:id  — admin deletes any message (soft-delete)
+// DELETE /api/chat/admin/message/:id  — admin permanently removes any message
 exports.deleteMessage = async (req, res, next) => {
   try {
-    const msg = await ChatMessage.findById(req.params.id);
-    if (!msg) return res.status(404).json({ error: 'Message not found' });
-    msg.deleted  = true;
-    msg.deletedAt = new Date();
-    msg.message  = '[Message deleted]';
-    await msg.save();
-    res.json({ success: true, message: msg });
+    const deleted = await ChatMessage.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Message not found' });
+    res.json({ success: true, deletedId: req.params.id });
   } catch (err) { next(err); }
 };

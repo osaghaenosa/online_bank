@@ -62,12 +62,29 @@ Open **http://localhost:3000** — you'll land on the home page.
 
 ## 🔑 Demo Credentials
 
+### Admin
 | Role  | Email                      | Password     |
-|-------|----------------------------|--------------|
-| Admin | admin@nexabanking.com         | Admin1234!   |
-| User  | jordan@nexabanking.com        | Test1234!    |
-| User  | sam@nexabanking.com           | Test1234!    |
-| User  | priya@nexabanking.com         | Test1234!    |
+|-------|----------------------------|--------------| 
+| Admin | admin@nexabanking.com      | Admin1234!   |
+
+### Standard Users
+| Name            | Email                      | Password     |
+|-----------------|----------------------------|--------------| 
+| Jordan Mitchell | jordan@nexabanking.com     | Test1234!    |
+| Samantha Lee    | sam@nexabanking.com        | Test1234!    |
+| Priya Patel     | priya@nexabanking.com      | Test1234!    |
+
+### High-Net-Worth (HNW) Users — Transfers Blocked, Full Wealth Data
+| Name                 | Email                               | Password        | Balance       |
+|----------------------|-------------------------------------|-----------------|---------------|
+| Robert Chase         | robert_chase224@gmail.com           | robert001#      | $1,430,000    |
+| James Whitfield      | james.whitfield@nexabanking.com     | James2024!      | $1,850,000    |
+| Victoria Osei-Mensah | victoria.osei@nexabanking.com       | Victoria2024!   | $2,100,000    |
+| Daniel Hartmann      | daniel.hartmann@nexabanking.com     | Daniel2024!     | $3,200,000    |
+| Sophia Ramirez       | sophia.ramirez@nexabanking.com      | Sophia2024!     | $1,650,000    |
+| Nathaniel Bowers     | nathaniel.bowers@nexabanking.com    | Nathaniel2024!  | $2,750,000    |
+
+> **Note:** All HNW accounts have transfers **blocked** by default (pending compliance review). Withdrawals are enabled. Use the admin panel → Controls to manage per-account access.
 
 ---
 
