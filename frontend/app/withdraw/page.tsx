@@ -3,21 +3,55 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/store/auth'
 import { api, fmtUSD, COIN_PRICES } from '@/lib/api'
 import { Card, Button, Input, Select, SectionHeader, Divider } from '@/components/ui'
-import { Building, CreditCard, Bitcoin, AlertTriangle, ShieldAlert, Clock, CheckCircle, ArrowRight } from 'lucide-react'
+import { Building, CreditCard, Bitcoin, AlertTriangle, ShieldAlert, Clock, CheckCircle, ArrowRight, Globe } from 'lucide-react'
 import Link from 'next/link'
 
 const METHODS = [
-  { id: 'ach',         label: 'ACH Transfer',   icon: Building,   fee: 0,    feeLabel: 'Free'  },
-  { id: 'wire',        label: 'Wire Transfer',   icon: Building,   fee: 25,   feeLabel: '$25'   },
-  { id: 'card',        label: 'Debit Card',      icon: CreditCard, fee: 1.50, feeLabel: '$1.50' },
-  { id: 'crypto_btc',  label: 'Bitcoin (BTC)',   icon: Bitcoin,    fee: 5,    feeLabel: '$5.00' },
-  { id: 'crypto_eth',  label: 'Ethereum (ETH)',  icon: Bitcoin,    fee: 5,    feeLabel: '$5.00' },
-  { id: 'crypto_usdt', label: 'USDT',            icon: Bitcoin,    fee: 5,    feeLabel: '$5.00' },
-  { id: 'crypto_sol',  label: 'Solana (SOL)',    icon: Bitcoin,    fee: 5,    feeLabel: '$5.00' },
+  { id: 'ach',           label: 'ACH Transfer',        icon: Building,  fee: 0,    feeLabel: 'Free'  },
+  { id: 'wire',          label: 'Wire Transfer',        icon: Building,  fee: 25,   feeLabel: '$25'   },
+  { id: 'iban',          label: 'IBAN / Int\'l Wire',   icon: Globe,     fee: 30,   feeLabel: '$30'   },
+  { id: 'card',          label: 'Debit Card',           icon: CreditCard,fee: 1.50, feeLabel: '$1.50' },
+  { id: 'crypto_btc',    label: 'Bitcoin (BTC)',        icon: Bitcoin,   fee: 5,    feeLabel: '$5.00' },
+  { id: 'crypto_eth',    label: 'Ethereum (ETH)',       icon: Bitcoin,   fee: 5,    feeLabel: '$5.00' },
+  { id: 'crypto_usdt',   label: 'USDT',                 icon: Bitcoin,   fee: 5,    feeLabel: '$5.00' },
+  { id: 'crypto_sol',    label: 'Solana (SOL)',         icon: Bitcoin,   fee: 5,    feeLabel: '$5.00' },
 ]
 
 const COINS    = ['BTC','ETH','USDT','BNB','SOL']
 const NETWORKS = ['ERC-20','TRC-20','BEP-20','Native']
+
+// Common EU/EEA country prefixes for IBAN
+const IBAN_COUNTRIES = [
+  { code: 'NO', label: 'Norway (NO)',         digits: 15 },
+  { code: 'GB', label: 'United Kingdom (GB)', digits: 22 },
+  { code: 'DE', label: 'Germany (DE)',         digits: 22 },
+  { code: 'FR', label: 'France (FR)',          digits: 27 },
+  { code: 'ES', label: 'Spain (ES)',           digits: 24 },
+  { code: 'IT', label: 'Italy (IT)',           digits: 27 },
+  { code: 'NL', label: 'Netherlands (NL)',     digits: 18 },
+  { code: 'SE', label: 'Sweden (SE)',          digits: 24 },
+  { code: 'DK', label: 'Denmark (DK)',         digits: 18 },
+  { code: 'FI', label: 'Finland (FI)',         digits: 18 },
+  { code: 'BE', label: 'Belgium (BE)',         digits: 16 },
+  { code: 'AT', label: 'Austria (AT)',         digits: 20 },
+  { code: 'CH', label: 'Switzerland (CH)',     digits: 21 },
+  { code: 'PL', label: 'Poland (PL)',          digits: 28 },
+  { code: 'PT', label: 'Portugal (PT)',        digits: 25 },
+  { code: 'IE', label: 'Ireland (IE)',         digits: 22 },
+  { code: 'OTHER', label: 'Other country',    digits: 0  },
+]
+
+function formatIBAN(raw: string) {
+  // Remove spaces, uppercase, keep only alphanumeric
+  const clean = raw.replace(/\s/g, '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+  // Insert space every 4 chars for readability
+  return clean.replace(/(.{4})/g, '$1 ').trim()
+}
+
+function validateSWIFT(swift: string) {
+  // SWIFT/BIC is 8 or 11 chars: AAAABBCCXXX
+  return /^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/.test(swift.replace(/\s/g,'').toUpperCase())
+}
 
 export default function WithdrawPage() {
   const { user, toast } = useAuth()
@@ -29,6 +63,14 @@ export default function WithdrawPage() {
   const [network, setNetwork] = useState('ERC-20')
   const [loading, setLoading] = useState(false)
   const [result,  setResult]  = useState<any>(null)
+
+  // IBAN fields
+  const [ibanCountry,  setIbanCountry]  = useState('NO')
+  const [ibanNumber,   setIbanNumber]   = useState('')
+  const [swiftBic,     setSwiftBic]     = useState('')
+  const [beneficiary,  setBeneficiary]  = useState('')
+  const [bankName,     setBankName]     = useState('')
+  const [bankAddress,  setBankAddress]  = useState('')
 
   const [restrictions,        setRestrictions]        = useState<any>(null)
   const [loadingRestrictions, setLoadingRestrictions] = useState(true)
@@ -43,23 +85,49 @@ export default function WithdrawPage() {
   const num      = parseFloat(amount) || 0
   const sel      = METHODS.find(m => m.id === method)!
   const isCrypto = method.startsWith('crypto_')
+  const isIBAN   = method === 'iban'
   const fee      = sel.fee
   const total    = num + fee
   const coinAmt  = num > 0
     ? (num / COIN_PRICES[coin as keyof typeof COIN_PRICES]).toFixed(6)
     : '0'
 
+  const selectedCountry = IBAN_COUNTRIES.find(c => c.code === ibanCountry)!
+  const ibanRaw = ibanNumber.replace(/\s/g, '')
+  const expectedLen = ibanCountry !== 'OTHER' ? selectedCountry.digits : ibanRaw.length
+
+  // IBAN validation: correct prefix + correct length
+  const ibanValid = ibanCountry === 'OTHER'
+    ? ibanRaw.length >= 15
+    : ibanRaw.toUpperCase().startsWith(ibanCountry) && ibanRaw.length === expectedLen
+
+  const swiftValid = swiftBic.length > 0 ? validateSWIFT(swiftBic) : false
+
   const handleWithdraw = async () => {
     if (!num || num <= 0)             { toast('Enter a valid amount', 'error'); return }
     if (total > (user?.balance || 0)) { toast(`Insufficient funds. You need ${fmtUSD(total)}`, 'error'); return }
     if (isCrypto && !wallet)          { toast('Enter recipient wallet address', 'error'); return }
+
+    if (isIBAN) {
+      if (!ibanValid)   { toast('Please enter a valid IBAN number', 'error'); return }
+      if (!swiftValid)  { toast('Please enter a valid SWIFT/BIC code (8 or 11 characters)', 'error'); return }
+      if (!beneficiary) { toast('Enter the beneficiary name', 'error'); return }
+    }
+
     setLoading(true)
     try {
       const body: any = { amount: num, method }
       if (isCrypto) body.cryptoDetails = { coin, coinAmount: parseFloat(coinAmt), network, walletAddress: wallet }
+      if (isIBAN) body.bankDetails = {
+        iban: ibanRaw.toUpperCase(),
+        swiftBic: swiftBic.replace(/\s/g,'').toUpperCase(),
+        beneficiaryName: beneficiary,
+        bankName,
+        bankAddress,
+        country: ibanCountry,
+      }
       const data = await api.tx.withdraw(body)
       setResult(data)
-      // ⚠️  Do NOT call refreshUser — balance hasn't changed yet
     } catch (err: any) {
       toast(err.message || 'Withdrawal failed', 'error')
     } finally {
@@ -86,6 +154,27 @@ export default function WithdrawPage() {
         {/* Summary */}
         <div className="rounded-xl p-4 space-y-2.5 text-left mb-6"
           style={{ background: 'var(--color-bg)' }}>
+          {isIBAN && (
+            <>
+              <div className="flex justify-between gap-3">
+                <span className="text-xs" style={{ color: 'var(--color-muted)' }}>Method</span>
+                <span className="text-xs font-semibold">IBAN / International Wire</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-xs" style={{ color: 'var(--color-muted)' }}>IBAN</span>
+                <span className="font-mono text-xs">{formatIBAN(ibanRaw)}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-xs" style={{ color: 'var(--color-muted)' }}>SWIFT/BIC</span>
+                <span className="font-mono text-xs">{swiftBic.toUpperCase()}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-xs" style={{ color: 'var(--color-muted)' }}>Beneficiary</span>
+                <span className="text-xs font-semibold truncate max-w-[180px]">{beneficiary}</span>
+              </div>
+              <Divider />
+            </>
+          )}
           <div className="flex justify-between gap-3">
             <span className="text-xs" style={{ color: 'var(--color-muted)' }}>Amount Requested</span>
             <span className="font-mono font-bold text-sm">{fmtUSD(num)}</span>
@@ -124,6 +213,7 @@ export default function WithdrawPage() {
           <p className="text-xs text-blue-600">
             You will receive a notification once your withdrawal is approved or rejected by an administrator.
             <strong> No funds have been deducted</strong> from your account yet.
+            {isIBAN && <> International IBAN transfers typically settle in <strong>1–3 business days</strong> after approval.</>}
           </p>
         </div>
 
@@ -134,7 +224,11 @@ export default function WithdrawPage() {
             </Button>
           </Link>
           <Button variant="primary" className="flex-1 justify-center"
-            onClick={() => { setResult(null); setAmount(''); setWallet('') }}>
+            onClick={() => {
+              setResult(null); setAmount(''); setWallet('')
+              setIbanNumber(''); setSwiftBic(''); setBeneficiary('')
+              setBankName(''); setBankAddress('')
+            }}>
             New Withdrawal <ArrowRight size={14} />
           </Button>
         </div>
@@ -223,7 +317,7 @@ export default function WithdrawPage() {
           {/* Method picker */}
           <Card className="p-4 sm:p-6">
             <SectionHeader title="Withdrawal Method" />
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
               {METHODS.map(m => (
                 <button key={m.id} onClick={() => setMethod(m.id)}
                   className="flex items-center gap-2 sm:gap-2.5 p-2.5 sm:p-3 rounded-xl border-2 text-xs font-semibold transition-all font-sans cursor-pointer"
@@ -246,6 +340,7 @@ export default function WithdrawPage() {
           <Card className="p-4 sm:p-6">
             <SectionHeader title="Withdrawal Details" />
 
+            {/* ACH / Domestic Wire */}
             {(method === 'ach' || method === 'wire') && (
               <div className="space-y-4 mb-5">
                 <Input label="Bank Name" placeholder="Recipient bank" />
@@ -256,6 +351,127 @@ export default function WithdrawPage() {
               </div>
             )}
 
+            {/* ── IBAN / International Wire ── */}
+            {isIBAN && (
+              <div className="space-y-4 mb-5">
+
+                {/* Info banner */}
+                <div className="flex gap-2.5 p-3.5 rounded-xl"
+                  style={{ background: 'rgba(16,185,129,.06)', border: '1px solid rgba(16,185,129,.25)' }}>
+                  <Globe size={14} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-semibold text-emerald-700">International Bank Transfer (IBAN)</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--color-muted)' }}>
+                      For international transfers using IBAN and SWIFT/BIC. Required for Norway (NO) and other European banks. Fee: $30. Settles in 1–3 business days.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Country select */}
+                <Select label="Recipient Country" value={ibanCountry}
+                  onChange={e => { setIbanCountry(e.target.value); setIbanNumber('') }}>
+                  {IBAN_COUNTRIES.map(c => (
+                    <option key={c.code} value={c.code}>{c.label}</option>
+                  ))}
+                </Select>
+
+                {/* IBAN input */}
+                <div>
+                  <Input
+                    label={`IBAN Number${ibanCountry !== 'OTHER' ? ` (${ibanCountry} · ${expectedLen} chars)` : ''}`}
+                    placeholder={ibanCountry === 'NO' ? 'NO93 8601 1117 947' : 'e.g. GB29 NWBK 6016 1331 9268 19'}
+                    value={ibanNumber}
+                    onChange={e => setIbanNumber(formatIBAN(e.target.value))}
+                    className="font-mono tracking-widest"
+                    hint={
+                      ibanNumber.length > 0
+                        ? ibanValid
+                          ? '✓ Valid IBAN format'
+                          : ibanCountry !== 'OTHER'
+                            ? `Must start with ${ibanCountry} and be ${expectedLen} characters (currently ${ibanRaw.length})`
+                            : 'Enter full IBAN including country prefix'
+                        : undefined
+                    }
+                  />
+                  {ibanNumber.length > 0 && (
+                    <div className={`mt-1.5 flex items-center gap-1.5 text-xs font-medium ${ibanValid ? 'text-emerald-600' : 'text-red-500'}`}>
+                      <div className={`w-1.5 h-1.5 rounded-full ${ibanValid ? 'bg-emerald-500' : 'bg-red-400'}`} />
+                      {ibanValid ? 'IBAN format looks correct' : 'IBAN format is invalid'}
+                    </div>
+                  )}
+                </div>
+
+                {/* SWIFT/BIC */}
+                <div>
+                  <Input
+                    label="SWIFT / BIC Code"
+                    placeholder="e.g. DNBANOKK or DNBANOKK030"
+                    value={swiftBic}
+                    onChange={e => setSwiftBic(e.target.value.toUpperCase())}
+                    className="font-mono tracking-widest"
+                    hint="8 or 11 characters — find on your bank statement or online banking"
+                  />
+                  {swiftBic.length > 0 && (
+                    <div className={`mt-1.5 flex items-center gap-1.5 text-xs font-medium ${swiftValid ? 'text-emerald-600' : 'text-red-500'}`}>
+                      <div className={`w-1.5 h-1.5 rounded-full ${swiftValid ? 'bg-emerald-500' : 'bg-red-400'}`} />
+                      {swiftValid ? 'SWIFT/BIC format looks correct' : 'SWIFT/BIC must be 8 or 11 characters (letters/digits)'}
+                    </div>
+                  )}
+                </div>
+
+                {/* Beneficiary */}
+                <Input
+                  label="Beneficiary Full Name"
+                  placeholder="Full legal name as registered at the bank"
+                  value={beneficiary}
+                  onChange={e => setBeneficiary(e.target.value)}
+                />
+
+                {/* Bank details */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Input
+                    label="Recipient Bank Name"
+                    placeholder="e.g. DNB Bank ASA"
+                    value={bankName}
+                    onChange={e => setBankName(e.target.value)}
+                  />
+                  <Input
+                    label="Bank Address (optional)"
+                    placeholder="e.g. Dronning Eufemias gate 30, Oslo"
+                    value={bankAddress}
+                    onChange={e => setBankAddress(e.target.value)}
+                  />
+                </div>
+
+                {/* Quick reference for Norway */}
+                {ibanCountry === 'NO' && (
+                  <div className="rounded-xl p-3.5 space-y-1.5"
+                    style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
+                    <p className="text-xs font-bold" style={{ color: 'var(--color-accent)' }}>🇳🇴 Norway IBAN Guide</p>
+                    <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                      • Norwegian IBANs are <strong>15 characters</strong>: <code className="font-mono bg-opacity-10 px-1 rounded">NO + 2 check digits + 11-digit account number</code>
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                      • Example: <code className="font-mono">NO93 8601 1117 947</code>
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                      • Common SWIFT/BIC codes: <strong>DNBANOKK</strong> (DNB), <strong>SPSONO22</strong> (SpareBank), <strong>NDEANOKK</strong> (Nordea NO)
+                    </p>
+                  </div>
+                )}
+
+                {/* Warning */}
+                <div className="flex gap-2.5 p-3 rounded-xl"
+                  style={{ background: 'rgba(245,158,11,.06)', border: '1px solid rgba(245,158,11,.3)' }}>
+                  <AlertTriangle size={14} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-700">
+                    Double-check the IBAN and SWIFT/BIC before submitting. Incorrect details may result in <strong>failed or misdirected transfers</strong>.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Debit Card */}
             {method === 'card' && (
               <div className="space-y-4 mb-5">
                 <Input label="Card Number" placeholder="1234 5678 9012 3456" className="font-mono" />
@@ -266,6 +482,7 @@ export default function WithdrawPage() {
               </div>
             )}
 
+            {/* Crypto */}
             {isCrypto && (
               <div className="space-y-4 mb-5">
                 <div className="grid grid-cols-2 gap-3">
@@ -298,7 +515,9 @@ export default function WithdrawPage() {
                 <span className="font-mono">{fmtUSD(num)}</span>
               </div>
               <div className="flex justify-between">
-                <span style={{ color: 'var(--color-muted)' }}>Network Fee</span>
+                <span style={{ color: 'var(--color-muted)' }}>
+                  {isIBAN ? 'International Wire Fee' : 'Network Fee'}
+                </span>
                 <span className="font-mono">{fmtUSD(fee)}</span>
               </div>
               <Divider />
@@ -313,7 +532,7 @@ export default function WithdrawPage() {
 
             <Button variant="primary" size="lg" className="w-full mt-4"
               onClick={handleWithdraw} loading={loading}
-              disabled={total > (user?.balance || 0) || num <= 0}>
+              disabled={total > (user?.balance || 0) || num <= 0 || (isIBAN && (!ibanValid || !swiftValid || !beneficiary))}>
               Submit Withdrawal Request
             </Button>
           </Card>
@@ -357,6 +576,27 @@ export default function WithdrawPage() {
               </div>
             ))}
           </Card>
+
+          {/* IBAN info card (only when IBAN is selected) */}
+          {isIBAN && (
+            <Card className="p-4 sm:p-5">
+              <SectionHeader title="IBAN Transfer Info" />
+              <div className="space-y-2.5">
+                {[
+                  ['Settlement', '1–3 business days'],
+                  ['Fee', '$30 flat'],
+                  ['Currency', 'USD sent, auto-converted'],
+                  ['Supported', 'EU/EEA + international'],
+                ].map(([l, v]) => (
+                  <div key={l} className="flex justify-between py-1.5 border-b last:border-0"
+                    style={{ borderColor: 'var(--color-border)' }}>
+                    <span className="text-xs" style={{ color: 'var(--color-muted)' }}>{l}</span>
+                    <span className="text-xs font-semibold">{v}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
           <Card className="p-4 sm:p-5" style={{ background: 'var(--color-bg)' }}>
             <p className="text-xs font-semibold mb-1" style={{ color: 'var(--color-muted)' }}>
