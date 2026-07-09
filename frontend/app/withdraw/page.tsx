@@ -65,7 +65,7 @@ export default function WithdrawPage() {
   const [result,  setResult]  = useState<any>(null)
 
   // IBAN fields
-  const [ibanCountry,  setIbanCountry]  = useState('NO')
+  const [ibanCountry,  setIbanCountry]  = useState('')
   const [ibanNumber,   setIbanNumber]   = useState('')
   const [swiftBic,     setSwiftBic]     = useState('')
   const [beneficiary,  setBeneficiary]  = useState('')
@@ -92,14 +92,16 @@ export default function WithdrawPage() {
     ? (num / COIN_PRICES[coin as keyof typeof COIN_PRICES]).toFixed(6)
     : '0'
 
-  const selectedCountry = IBAN_COUNTRIES.find(c => c.code === ibanCountry)!
+  const selectedCountry = IBAN_COUNTRIES.find(c => c.code === ibanCountry)
   const ibanRaw = ibanNumber.replace(/\s/g, '')
-  const expectedLen = ibanCountry !== 'OTHER' ? selectedCountry.digits : ibanRaw.length
+  const expectedLen = (ibanCountry && ibanCountry !== 'OTHER' && selectedCountry) ? selectedCountry.digits : ibanRaw.length
 
   // IBAN validation: correct prefix + correct length
-  const ibanValid = ibanCountry === 'OTHER'
-    ? ibanRaw.length >= 15
-    : ibanRaw.toUpperCase().startsWith(ibanCountry) && ibanRaw.length === expectedLen
+  const ibanValid = !ibanCountry
+    ? false
+    : ibanCountry === 'OTHER'
+      ? ibanRaw.length >= 15
+      : ibanRaw.toUpperCase().startsWith(ibanCountry) && ibanRaw.length === expectedLen
 
   const swiftValid = swiftBic.length > 0 ? validateSWIFT(swiftBic) : false
 
@@ -109,6 +111,7 @@ export default function WithdrawPage() {
     if (isCrypto && !wallet)          { toast('Enter recipient wallet address', 'error'); return }
 
     if (isIBAN) {
+      if (!ibanCountry) { toast('Please select the recipient country', 'error'); return }
       if (!ibanValid)   { toast('Please enter a valid IBAN number', 'error'); return }
       if (!swiftValid)  { toast('Please enter a valid SWIFT/BIC code (8 or 11 characters)', 'error'); return }
       if (!beneficiary) { toast('Enter the beneficiary name', 'error'); return }
@@ -370,6 +373,7 @@ export default function WithdrawPage() {
                 {/* Country select */}
                 <Select label="Recipient Country" value={ibanCountry}
                   onChange={e => { setIbanCountry(e.target.value); setIbanNumber('') }}>
+                  <option value="" disabled>— Select country —</option>
                   {IBAN_COUNTRIES.map(c => (
                     <option key={c.code} value={c.code}>{c.label}</option>
                   ))}
@@ -378,8 +382,8 @@ export default function WithdrawPage() {
                 {/* IBAN input */}
                 <div>
                   <Input
-                    label={`IBAN Number${ibanCountry !== 'OTHER' ? ` (${ibanCountry} · ${expectedLen} chars)` : ''}`}
-                    placeholder={ibanCountry === 'NO' ? 'NO93 8601 1117 947' : 'e.g. GB29 NWBK 6016 1331 9268 19'}
+                    label={`IBAN Number${ibanCountry && ibanCountry !== 'OTHER' ? ` (${ibanCountry} · ${expectedLen} chars)` : ''}`}
+                    placeholder={ibanCountry === 'NO' ? 'NO93 8601 1117 947' : ibanCountry === 'GB' ? 'GB29 NWBK 6016 1331 9268 19' : 'Enter IBAN number…'}
                     value={ibanNumber}
                     onChange={e => setIbanNumber(formatIBAN(e.target.value))}
                     className="font-mono tracking-widest"

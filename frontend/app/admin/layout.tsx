@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/store/auth'
 import { AppShell } from '@/components/layout/AppShell'
-import { LayoutDashboard, Users, List, Settings, Bell, FileEdit, ShieldAlert, MessageCircle, Download, Mail } from 'lucide-react'
+import { LayoutDashboard, Users, List, Settings, Bell, FileEdit, ShieldAlert, MessageCircle, Download, Mail, ArrowUpRight } from 'lucide-react'
 import clsx from 'clsx'
 
 const ADMIN_NAV = [
@@ -16,6 +16,7 @@ const ADMIN_NAV = [
   { href: '/admin/deposit-settings',label: 'Deposit Setup',icon: Download },
   { href: '/admin/email',         label: 'Email',        icon: Mail },
   { href: '/admin/transactions',  label: 'Transactions', icon: List },
+  { href: '/admin/transfers',      label: 'Transfers',    icon: ArrowUpRight },
   { href: '/admin/settings',      label: 'Customization',icon: Settings },
   { href: '/admin/notifications', label: 'Notifications',icon: Bell },
 ]

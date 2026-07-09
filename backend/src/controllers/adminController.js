@@ -391,10 +391,14 @@ exports.sendNotification = async (req, res, next) => {
 
 exports.getAllTransactions = async (req, res, next) => {
   try {
-    const { page = 1, limit = 25, status, type } = req.query;
+    const { page = 1, limit = 25, status, type, category, categories } = req.query;
     const query = {};
-    if (status && status !== 'all') query.status = status;
-    if (type   && type   !== 'all') query.type   = type;
+    if (status     && status     !== 'all') query.status   = status;
+    if (type       && type       !== 'all') query.type     = type;
+    if (category   && category   !== 'all') query.category = category;
+    // comma-separated list: e.g. "withdrawal,transfer_out,transfer_in"
+    if (categories && !category) query.category = { $in: categories.split(',').map(c => c.trim()) };
+
     const total = await Transaction.countDocuments(query);
     const transactions = await Transaction.find(query)
       .sort({ createdAt: -1 }).skip((page - 1) * limit).limit(parseInt(limit))
