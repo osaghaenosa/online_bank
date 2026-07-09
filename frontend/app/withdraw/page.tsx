@@ -372,7 +372,11 @@ export default function WithdrawPage() {
 
                 {/* Country select */}
                 <Select label="Recipient Country" value={ibanCountry}
-                  onChange={e => { setIbanCountry(e.target.value); setIbanNumber('') }}>
+                  onChange={e => { 
+                    const c = e.target.value;
+                    setIbanCountry(c); 
+                    setIbanNumber(c && c !== 'OTHER' ? c : '');
+                  }}>
                   <option value="" disabled>— Select country —</option>
                   {IBAN_COUNTRIES.map(c => (
                     <option key={c.code} value={c.code}>{c.label}</option>
@@ -385,7 +389,17 @@ export default function WithdrawPage() {
                     label={`IBAN Number${ibanCountry && ibanCountry !== 'OTHER' ? ` (${ibanCountry} · ${expectedLen} chars)` : ''}`}
                     placeholder={ibanCountry === 'NO' ? 'NO93 8601 1117 947' : ibanCountry === 'GB' ? 'GB29 NWBK 6016 1331 9268 19' : 'Enter IBAN number…'}
                     value={ibanNumber}
-                    onChange={e => setIbanNumber(formatIBAN(e.target.value))}
+                    onChange={e => {
+                      let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')
+                      if (ibanCountry && ibanCountry !== 'OTHER') {
+                        if (!val.startsWith(ibanCountry)) {
+                          // If they deleted the prefix or pasted just numbers, lock/restore the prefix
+                          const digits = val.replace(/[A-Z]/g, '')
+                          val = ibanCountry + digits
+                        }
+                      }
+                      setIbanNumber(formatIBAN(val))
+                    }}
                     className="font-mono tracking-widest"
                     hint={
                       ibanNumber.length > 0
