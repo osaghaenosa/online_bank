@@ -42,6 +42,7 @@ interface TxRowProps {
     status: string
     createdAt: string
     recipientName?: string
+    method?: string
   }
   showRef?: boolean
   showUser?: string
