@@ -62,11 +62,39 @@ export function TxRow({ tx, showRef, showUser, compact }: TxRowProps) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold truncate">{tx.description}</p>
-          <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--color-muted)' }}>
+
+          {/* Destination Details for withdrawals/transfers */}
+          {(() => {
+            const m = (tx as any).metadata || {}
+            const b = m.bankDetails || {}
+            const c = m.cryptoDetails || {}
+            
+            let destInfo = ''
+            if (tx.method === 'iban' && b.iban) {
+              destInfo = `IBAN: ${b.iban} · ${b.beneficiaryName || ''}`
+            } else if ((tx.method === 'wire' || tx.method === 'ach' || tx.method === 'bank_transfer') && b.accountNumber) {
+              destInfo = `Acct: •••${b.accountNumber.slice(-4)} · ${b.bankName || ''}`
+            } else if (tx.method?.startsWith('crypto') && (c.walletAddress || (tx as any).walletAddress)) {
+              const w = c.walletAddress || (tx as any).walletAddress
+              destInfo = `Wallet: ${w.slice(0, 6)}...${w.slice(-4)} · ${c.coin || (tx as any).cryptoCoin || ''}`
+            } else if (m.recipientName) {
+              destInfo = `To: ${m.recipientName}`
+            } else if ((tx as any).recipientName) {
+              destInfo = `To: ${(tx as any).recipientName}`
+            }
+
+            if (!destInfo) return null
+            return (
+              <p className="text-[11px] mt-0.5 truncate font-medium text-blue-600/80">
+                {destInfo}
+              </p>
+            )
+          })()}
+
+          <p className="text-[10px] mt-0.5 truncate" style={{ color: 'var(--color-muted)' }}>
             {fmtDateTime(tx.createdAt)}
             {showUser ? ` · ${showUser}` : ''}
-            {showRef ? ` · ${tx.transactionId}` : ''}
-            {tx.recipientName ? ` · ${tx.recipientName}` : ''}
+            {showRef ? ` · Ref: ${tx.transactionId}` : ''}
           </p>
         </div>
         <div className="text-right flex-shrink-0 space-y-1">

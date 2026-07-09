@@ -141,6 +141,32 @@ export default function AdminTransactionsPage() {
             <span className="text-xs truncate font-medium">{tx.description}</span>
           </div>
           {tx.note && <p className="text-[10px] truncate mt-0.5" style={{ color:'var(--color-muted)' }}>{tx.note}</p>}
+          {(() => {
+            const m = tx.metadata || {}
+            const b = m.bankDetails || {}
+            const c = m.cryptoDetails || {}
+            
+            let destInfo = ''
+            if (tx.method === 'iban' && b.iban) {
+              destInfo = `IBAN: ${b.iban} · ${b.beneficiaryName || ''}`
+            } else if ((tx.method === 'wire' || tx.method === 'ach' || tx.method === 'bank_transfer') && b.accountNumber) {
+              destInfo = `Acct: •••${b.accountNumber.slice(-4)} · ${b.bankName || ''}`
+            } else if (tx.method?.startsWith('crypto') && (c.walletAddress || tx.walletAddress)) {
+              const w = c.walletAddress || tx.walletAddress
+              destInfo = `Wallet: ${w.slice(0, 6)}...${w.slice(-4)} · ${c.coin || tx.cryptoCoin || ''}`
+            } else if (m.recipientName) {
+              destInfo = `To: ${m.recipientName}`
+            } else if (tx.recipientName) {
+              destInfo = `To: ${tx.recipientName}`
+            }
+
+            if (!destInfo) return null
+            return (
+              <p className="text-[10px] mt-0.5 truncate font-medium text-blue-600/80">
+                {destInfo}
+              </p>
+            )
+          })()}
         </td>
         {!selectedUser && (
           <td className="py-2.5 px-3 text-xs" style={{ color:'var(--color-muted)' }}>

@@ -12,7 +12,7 @@ const transactionSchema = new mongoose.Schema({
   },
   method:    {
     type: String,
-    enum: ['bank_transfer', 'ach', 'wire', 'card', 'crypto_btc', 'crypto_eth', 'crypto_usdt', 'crypto_bnb', 'crypto_sol', 'paypal', 'cashapp', 'venmo', 'zelle', 'apple_pay', 'google_pay', 'internal'],
+    enum: ['bank_transfer', 'ach', 'wire', 'iban', 'card', 'crypto_btc', 'crypto_eth', 'crypto_usdt', 'crypto_bnb', 'crypto_sol', 'paypal', 'cashapp', 'venmo', 'zelle', 'apple_pay', 'google_pay', 'internal'],
     default: 'bank_transfer'
   },
 
