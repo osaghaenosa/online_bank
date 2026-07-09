@@ -308,10 +308,7 @@ export default function WithdrawPage() {
       <div className="flex items-start gap-3 p-4 rounded-xl"
         style={{ background: 'rgba(245,158,11,.06)', border: '1px solid rgba(245,158,11,.3)' }}>
         <Clock size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
-        <p className="text-xs sm:text-sm text-amber-700 font-medium leading-relaxed">
-          <strong>Withdrawals require admin approval.</strong> Your request will be submitted as pending — 
-          your balance will only be deducted once an administrator approves it.
-        </p>
+        
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
