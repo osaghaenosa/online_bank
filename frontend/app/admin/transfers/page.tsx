@@ -50,6 +50,7 @@ function DestinationDetail({ tx }: { tx: any }) {
       <div className="space-y-1">
         <p className="text-xs font-semibold" style={{ color: 'var(--color-accent)' }}>🏦 Wire Transfer</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-0.5">
+          {bank.beneficiaryName && <Row label="Beneficiary" value={bank.beneficiaryName} />}
           {bank.bankName       && <Row label="Bank"           value={bank.bankName} />}
           {bank.routingNumber  && <Row label="Routing No."    value={bank.routingNumber} mono />}
           {bank.accountNumber  && <Row label="Account No."    value={bank.accountNumber} mono />}
@@ -63,6 +64,7 @@ function DestinationDetail({ tx }: { tx: any }) {
       <div className="space-y-1">
         <p className="text-xs font-semibold" style={{ color: 'var(--color-accent)' }}>🏛️ ACH Transfer</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-0.5">
+          {bank.beneficiaryName && <Row label="Beneficiary" value={bank.beneficiaryName} />}
           {bank.bankName       && <Row label="Bank"           value={bank.bankName} />}
           {bank.routingNumber  && <Row label="Routing No."    value={bank.routingNumber} mono />}
           {bank.accountNumber  && <Row label="Account No."    value={bank.accountNumber} mono />}

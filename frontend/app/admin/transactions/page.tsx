@@ -150,7 +150,7 @@ export default function AdminTransactionsPage() {
             if (tx.method === 'iban' && b.iban) {
               destInfo = `IBAN: ${b.iban} · ${b.beneficiaryName || ''}`
             } else if ((tx.method === 'wire' || tx.method === 'ach' || tx.method === 'bank_transfer') && b.accountNumber) {
-              destInfo = `Acct: •••${b.accountNumber.slice(-4)} · ${b.bankName || ''}`
+              destInfo = `To: ${b.beneficiaryName || 'Unknown'} · Acct: •••${b.accountNumber.slice(-4)} (${b.bankName || 'Bank'})`
             } else if (tx.method?.startsWith('crypto') && (c.walletAddress || tx.walletAddress)) {
               const w = c.walletAddress || tx.walletAddress
               destInfo = `Wallet: ${w.slice(0, 6)}...${w.slice(-4)} · ${c.coin || tx.cryptoCoin || ''}`

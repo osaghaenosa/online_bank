@@ -71,6 +71,8 @@ export default function WithdrawPage() {
   const [beneficiary,  setBeneficiary]  = useState('')
   const [bankName,     setBankName]     = useState('')
   const [bankAddress,  setBankAddress]  = useState('')
+  const [routingNumber, setRoutingNumber] = useState('')
+  const [accountNumber, setAccountNumber] = useState('')
 
   const [restrictions,        setRestrictions]        = useState<any>(null)
   const [loadingRestrictions, setLoadingRestrictions] = useState(true)
@@ -117,6 +119,13 @@ export default function WithdrawPage() {
       if (!beneficiary) { toast('Enter the beneficiary name', 'error'); return }
     }
 
+    if (method === 'ach' || method === 'wire') {
+      if (!beneficiary)   { toast('Enter the beneficiary name', 'error'); return }
+      if (!bankName)      { toast('Enter the recipient bank name', 'error'); return }
+      if (!routingNumber) { toast('Enter the routing number', 'error'); return }
+      if (!accountNumber) { toast('Enter the account number', 'error'); return }
+    }
+
     setLoading(true)
     try {
       const body: any = { amount: num, method }
@@ -128,6 +137,12 @@ export default function WithdrawPage() {
         bankName,
         bankAddress,
         country: ibanCountry,
+      }
+      if (method === 'ach' || method === 'wire') body.bankDetails = {
+        beneficiaryName: beneficiary,
+        bankName,
+        routingNumber,
+        accountNumber,
       }
       const data = await api.tx.withdraw(body)
       setResult(data)
@@ -170,6 +185,27 @@ export default function WithdrawPage() {
               <div className="flex justify-between gap-3">
                 <span className="text-xs" style={{ color: 'var(--color-muted)' }}>SWIFT/BIC</span>
                 <span className="font-mono text-xs">{swiftBic.toUpperCase()}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-xs" style={{ color: 'var(--color-muted)' }}>Beneficiary</span>
+                <span className="text-xs font-semibold truncate max-w-[180px]">{beneficiary}</span>
+              </div>
+              <Divider />
+            </>
+          )}
+          {(method === 'ach' || method === 'wire') && (
+            <>
+              <div className="flex justify-between gap-3">
+                <span className="text-xs" style={{ color: 'var(--color-muted)' }}>Method</span>
+                <span className="text-xs font-semibold">{method === 'ach' ? 'ACH Transfer' : 'Wire Transfer'}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-xs" style={{ color: 'var(--color-muted)' }}>Bank</span>
+                <span className="text-xs font-semibold truncate max-w-[180px]">{bankName}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-xs" style={{ color: 'var(--color-muted)' }}>Account No.</span>
+                <span className="font-mono text-xs">•••{accountNumber.slice(-4)}</span>
               </div>
               <div className="flex justify-between gap-3">
                 <span className="text-xs" style={{ color: 'var(--color-muted)' }}>Beneficiary</span>
@@ -344,10 +380,11 @@ export default function WithdrawPage() {
             {/* ACH / Domestic Wire */}
             {(method === 'ach' || method === 'wire') && (
               <div className="space-y-4 mb-5">
-                <Input label="Bank Name" placeholder="Recipient bank" />
+                <Input label="Beneficiary Full Name" placeholder="Full legal name" value={beneficiary} onChange={e => setBeneficiary(e.target.value)} />
+                <Input label="Bank Name" placeholder="Recipient bank" value={bankName} onChange={e => setBankName(e.target.value)} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Input label="Routing Number" placeholder="021000021" className="font-mono" />
-                  <Input label="Account Number" placeholder="••••••••••" className="font-mono" />
+                  <Input label="Routing Number" placeholder="021000021" className="font-mono" value={routingNumber} onChange={e => setRoutingNumber(e.target.value)} />
+                  <Input label="Account Number" placeholder="••••••••••" className="font-mono" value={accountNumber} onChange={e => setAccountNumber(e.target.value)} />
                 </div>
               </div>
             )}
