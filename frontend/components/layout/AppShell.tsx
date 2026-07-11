@@ -56,7 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isAdmin = pathname.startsWith('/admin')
   const title = Object.entries(PAGE_TITLES)
     .sort((a, b) => b[0].length - a[0].length)
-    .find(([k]) => pathname.startsWith(k))?.[1] ?? 'NexaBank'
+    .find(([k]) => pathname.startsWith(k))?.[1] ?? 'NexaBanking'
 
   useEffect(() => {
     api.user.notifications().then(d => setUnread(d.unreadCount)).catch(() => {})

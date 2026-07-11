@@ -100,10 +100,10 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
   <tr>
     <td style="background:#F9FAFB;border-radius:0 0 16px 16px;padding:24px 36px;text-align:center;border-top:1px solid #E5E7EB;">
       <p style="font-size:12px;color:#9CA3AF;line-height:1.6;margin:0 0 8px 0;">
-        Sent by <strong style="color:${navy};">NexaBank</strong> &bull;
+        Sent by <strong style="color:${navy};">NexaBanking</strong> &bull;
         <a href="mailto:support@nexabanking.com" style="color:${accent};">support@nexabanking.com</a>
       </p>
-      <p style="font-size:11px;color:#D1D5DB;margin:0;">&copy; ${year} NexaBank. All rights reserved.</p>
+      <p style="font-size:11px;color:#D1D5DB;margin:0;">&copy; ${year} NexaBanking. All rights reserved.</p>
     </td>
   </tr>
 
@@ -115,19 +115,19 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
 }
 
 function buildPlainText({ recipientName, subject, bodyText, amount, type }) {
-  let out = `NexaBank — ${subject}\n${'─'.repeat(50)}\n\n`;
+  let out = `NexaBanking — ${subject}\n${'─'.repeat(50)}\n\n`;
   if (recipientName) out += `Hello ${recipientName},\n\n`;
   if ((type === 'credit' || type === 'debit') && amount) {
     out += `Amount ${type === 'credit' ? 'Credited' : 'Debited'}: $${parseFloat(amount).toFixed(2)}\n\n`;
   }
-  out += (bodyText || '') + '\n\n─────────────────────────────────\nNexaBank — support@nexabanking.com\n';
+  out += (bodyText || '') + '\n\n─────────────────────────────────\nNexaBanking — support@nexabanking.com\n';
   return out;
 }
 
 // ── Send a single email via Resend HTTP API ───────────────────────────────────
 async function sendEmail(opts) {
   const resend    = getResend();
-  const fromName  = process.env.SMTP_FROM_NAME  || 'NexaBank';
+  const fromName  = process.env.SMTP_FROM_NAME  || 'NexaBanking';
   const fromEmail = process.env.SMTP_FROM_EMAIL || 'onboarding@resend.dev'; // resend test address
 
   const { data, error } = await resend.emails.send({

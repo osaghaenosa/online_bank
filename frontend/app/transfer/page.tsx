@@ -85,7 +85,7 @@ export default function TransferPage() {
         <div className="text-sm rounded-xl p-4 space-y-2.5 text-left" style={{ background: 'var(--color-bg)' }}>
           <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>To</span><span className="font-semibold">{result.transaction?.recipientName || recipEmail}</span></div>
           <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Amount</span><span className="font-mono font-bold text-red-500">-{fmtUSD(num)}</span></div>
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Recipient</span><span>{result.recipientFound ? '✅ NexaBank user' : '⚠ External transfer'}</span></div>
+          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Recipient</span><span>{result.recipientFound ? '✅ NexaBanking user' : '⚠ External transfer'}</span></div>
           <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>New Balance</span><span className="font-mono font-bold">{fmtUSD(result.newBalance)}</span></div>
           {note && <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Note</span><span>{note}</span></div>}
           <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Ref</span><span className="font-mono text-xs">{result.transaction?.transactionId}</span></div>

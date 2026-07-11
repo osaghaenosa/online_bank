@@ -24,7 +24,7 @@ export default function RegisterPage() {
     setLoading(true)
     try {
       await register({ firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone, password: form.password })
-      toast('Account created! Welcome to NexaBank 🎉', 'success')
+      toast('Account created! Welcome to NexaBanking 🎉', 'success')
       router.push('/dashboard')
     } catch (err: any) {
       setError(err.message || 'Registration failed')

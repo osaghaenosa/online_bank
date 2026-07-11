@@ -32,7 +32,7 @@ const STATS = [
 ]
 
 const TESTIMONIALS = [
-  { name: 'Sarah M.', role: 'Freelance Designer', text: 'NexaBank transformed how I handle international payments. The crypto integration alone saved me thousands in fees.', stars: 5 },
+  { name: 'Sarah M.', role: 'Freelance Designer', text: 'NexaBanking transformed how I handle international payments. The crypto integration alone saved me thousands in fees.', stars: 5 },
   { name: 'James K.', role: 'Small Business Owner', text: 'The admin controls and real-time notifications give me complete visibility over every dollar that moves.', stars: 5 },
   { name: 'Priya S.', role: 'Software Engineer', text: 'I love that I can send money via Zelle, PayPal, or crypto all from one dashboard. The receipts are perfect for expense tracking.', stars: 5 },
 ]
@@ -165,7 +165,7 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#10B981' }}>Everything you need</p>
             <h2 className="font-display text-4xl font-bold text-white mb-4">Banking Without Limits</h2>
-            <p className="text-white/50 max-w-xl mx-auto">From everyday spending to international crypto transfers, NexaBank handles it all in one seamless platform.</p>
+            <p className="text-white/50 max-w-xl mx-auto">From everyday spending to international crypto transfers, NexaBanking handles it all in one seamless platform.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {FEATURES.map(({ icon: Icon, title, desc }) => (
@@ -247,7 +247,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl font-bold text-white mb-3">Loved by Thousands</h2>
-            <p className="text-white/50">Real stories from real NexaBank customers</p>
+            <p className="text-white/50">Real stories from real NexaBanking customers</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {TESTIMONIALS.map(({ name, role, text, stars }) => (
@@ -288,8 +288,8 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t py-10" style={{ borderColor: 'rgba(255,255,255,.08)' }}>
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-4">
-          <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBank</p>
-          <p className="text-xs text-white/30">© 2026 NexaBank.</p>
+          <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBanking</p>
+          <p className="text-xs text-white/30">© 2026 NexaBanking. All rights reserved.</p>
           <div className="flex gap-5">
             {['Privacy', 'Terms', 'Security'].map(l => (
               <Link key={l} href="#" className="text-xs text-white/40 hover:text-white/70 transition-colors">{l}</Link>

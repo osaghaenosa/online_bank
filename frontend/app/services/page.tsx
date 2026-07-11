@@ -16,7 +16,7 @@ const SERVICES = [
   },
   {
     icon: Send, color: '#3B82F6', title: 'Transfers',
-    desc: 'Send money to any NexaBank user instantly with zero fees by email or account number.',
+    desc: 'Send money to any NexaBanking user instantly with zero fees by email or account number.',,
     features: ['Instant internal transfers', 'Send by email or account #', 'Zero transfer fees', 'Add a memo/note'],
   },
   {
@@ -26,7 +26,7 @@ const SERVICES = [
   },
   {
     icon: Building, color: '#8B5CF6', title: 'Bill Payments',
-    desc: 'Pay utility bills, rent, subscriptions, and more directly from your NexaBank balance.',
+    desc: 'Pay utility bills, rent, subscriptions, and more directly from your NexaBanking balance.',
     features: ['Electricity, water, gas', 'Internet & phone', 'Rent payments', 'Subscription management'],
   },
   {
@@ -164,8 +164,8 @@ export default function ServicesPage() {
 
       <footer className="border-t py-10 px-6" style={{ borderColor: 'rgba(255,255,255,.08)' }}>
         <div className="max-w-7xl mx-auto flex justify-between">
-          <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBank</p>
-          <p className="text-xs text-white/30">© 2026 NexaBank.</p>
+          <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBanking</p>
+          <p className="text-xs text-white/30">© 2026 NexaBanking. All rights reserved.</p>
         </div>
       </footer>
     </div>

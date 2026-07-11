@@ -4,7 +4,7 @@ import { PublicNav } from '@/components/layout/PublicNav'
 import { Shield, Users, Globe, Award, ArrowRight, CheckCircle, TrendingUp, Lock, Zap } from 'lucide-react'
 
 const TIMELINE = [
-  { year: '2020', title: 'Founded', desc: 'NexaBank was born from a simple idea: banking should work for everyone, not just the privileged few.' },
+  { year: '2020', title: 'Founded', desc: 'NexaBanking was born from a simple idea: banking should work for everyone, not just the privileged few.' },
   { year: '2021', title: 'First 10K Users', desc: 'Launched our core checking accounts with instant transfers and reached 10,000 customers in our first year.' },
   { year: '2022', title: 'Crypto Integration', desc: 'Became one of the first digital banks to offer native crypto holdings alongside traditional USD accounts.' },
   { year: '2023', title: 'Global Expansion', desc: 'Expanded to support international wire transfers, 12+ payment methods, and 180+ countries.' },
@@ -42,7 +42,7 @@ export default function AboutPage() {
           We believe banking<br /><span style={{ color: '#10B981' }}>should be human.</span>
         </h1>
         <p className="text-lg text-white/55 max-w-2xl mx-auto leading-relaxed">
-          NexaBank was built by a team of engineers and designers who were tired of outdated, opaque, 
+          NexaBanking was built by a team of engineers and designers who were tired of outdated, opaque, 
           and fee-heavy banking. We set out to build the bank we wished existed.
         </p>
       </section>
@@ -60,7 +60,7 @@ export default function AboutPage() {
             </h2>
             <p className="text-white/50 leading-relaxed">
               From the freelancer receiving international payments to the small business owner managing payroll, 
-              NexaBank is engineered to handle every financial need with the speed, transparency, and security 
+              NexaBanking is engineered to handle every financial need with the speed, transparency, and security 
               that modern life demands.
             </p>
           </div>
@@ -127,7 +127,7 @@ export default function AboutPage() {
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="font-display text-3xl font-bold text-white mb-3">The Team Behind NexaBank</h2>
+            <h2 className="font-display text-3xl font-bold text-white mb-3">The Team Behind NexaBanking</h2>
             <p className="text-white/50">Passionate builders, engineers, and dreamers</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
@@ -203,8 +203,8 @@ export default function AboutPage() {
 
       <footer className="border-t py-10 px-6" style={{ borderColor: 'rgba(255,255,255,.08)' }}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-4">
-          <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBank</p>
-          <p className="text-xs text-white/30">© 2025 NexaBank. Simulated banking application.</p>
+          <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBanking</p>
+          <p className="text-xs text-white/30">© 2026 NexaBanking. All rights reserved.</p>
         </div>
       </footer>
     </div>

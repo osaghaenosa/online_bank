@@ -83,7 +83,7 @@ export function ChatWidget() {
               <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[#0F1C35] ${connected ? 'bg-emerald-400' : 'bg-slate-500'}`} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-semibold">NexaBank Support</p>
+              <p className="text-white text-sm font-semibold">NexaBanking Support</p>
               <p className="text-white/40 text-[10px]">{connected ? 'Online' : 'Connecting…'}</p>
             </div>
             <button onClick={() => setOpen(false)} className="text-white/50 hover:text-white transition-colors p-1">
@@ -96,11 +96,11 @@ export function ChatWidget() {
               <div className="flex justify-start">
                 <div className="max-w-[80%] rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-sm"
                   style={{ background: 'var(--color-bg)' }}>
-                  <p className="font-semibold text-xs mb-1" style={{ color: 'var(--color-accent)' }}>NexaBank Support</p>
+                  <p className="font-semibold text-xs mb-1" style={{ color: 'var(--color-accent)' }}>NexaBanking Support</p>
                   <p style={{ color: 'var(--color-text)' }}>Hi {user.firstName}! 👋 How can we help you today?</p>
                   <p style={{ color: 'var(--color-text)' }}>Send us a message on whatsapp <a href="https://wa.me/12488346313" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline"><i className='whatsapp-icon'></i> here</a></p>
 
-                  <p className="text-[10px] mt-1" style={{ color: 'var(--color-muted)' }}>NexaBank</p>
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--color-muted)' }}>NexaBanking</p>
                 </div>
               </div>
             )}

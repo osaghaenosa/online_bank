@@ -119,11 +119,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Demo hint */}
-          <div className="mt-6 p-4 rounded-xl" style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)' }}>
-            <p className="text-xs font-semibold text-white/50 mb-2">🧪 Demo — create an account to get started</p>
-            <p className="text-xs text-white/30">Registration is instant. You'll receive $1,000 starting balance.</p>
-          </div>
+
 
           <p className="text-xs text-center mt-6 text-white/25">
             By signing in you agree to our{' '}

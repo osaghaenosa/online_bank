@@ -155,9 +155,10 @@ exports.generateReceiptPDF = async (transaction, user) => {
     // ── Footer ────────────────────────────────────────────────────────────────
     doc.rect(0, 760, 595, 82).fill('#1A2B4A');
     doc.font('Helvetica').fontSize(9).fillColor('rgba(255,255,255,0.5)')
-       .text('This is an automatically generated receipt. NexaBank is a simulated banking application.', 50, 773, { align: 'center', width: 495 })
-       .text('All transactions are simulated for demonstration purposes only.', 50, 787, { align: 'center', width: 495 })
-       .text(`Generated: ${fmtDate(new Date())} | NexaBank © ${new Date().getFullYear()}`, 50, 805, { align: 'center', width: 495 });
+       .text('This is an automatically generated receipt.', 50, 773, { align: 'center', width: 495 })
+       .fontSize(8).fillColor('rgba(255,255,255,0.5)')
+       .text('This receipt is a valid transaction record from NexaBanking.', 50, 787, { align: 'center', width: 495 })
+       .text(`Generated on ${new Date().toUTCString()}`, 50, 799, { align: 'center', width: 495 });
 
     doc.end();
 

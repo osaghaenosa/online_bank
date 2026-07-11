@@ -23,7 +23,7 @@ exports.register = async (req, res, next) => {
     // Welcome notification
     await Notification.create({
       userId: user._id,
-      title: 'Welcome to NexaBank!',
+      title: 'Welcome to NexaBanking!',
       message: `Hi ${firstName}! Your account has been created. Complete KYC verification to unlock all features.`,
       type: 'system',
       priority: 'high'

@@ -33,7 +33,7 @@ export default function ContactPage() {
               { icon: Mail,  label: 'Email Support',   val: 'support@nexabanking.com',  sub: 'Response within 2 hours' },
               { icon: Mail,  label: 'Other Support Contact', val: 'thenexabankingteam@yahoo.com', sub: 'Alternative email' },
               { icon: Phone, label: 'Phone Support',    val: '+1 (248) 834-6313',     sub: '24/7 Available' },
-              { icon: MapPin,label: 'Headquarters',     val: '100 NexaBank Plaza',    sub: 'San Francisco, CA 94105' },
+              { icon: MapPin,label: 'Headquarters',     val: '100 NexaBanking Plaza',    sub: 'San Francisco, CA 94105' },
               { icon: Clock, label: 'Business Hours',   val: '24 hours, 7 days',      sub: 'Including holidays' },
             ].map(({ icon: Icon, label, val, sub }) => (
               <div key={label} className="flex gap-4 p-5 rounded-2xl"
@@ -131,8 +131,8 @@ export default function ContactPage() {
 
       <footer className="border-t py-10 px-6" style={{ borderColor: 'rgba(255,255,255,.08)' }}>
         <div className="max-w-7xl mx-auto flex justify-between">
-          <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBank</p>
-          <p className="text-xs text-white/30">© 2026 NexaBank.</p>
+          <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBanking</p>
+          <p className="text-xs text-white/30">© 2026 NexaBanking. All rights reserved.</p>
         </div>
       </footer>
     </div>

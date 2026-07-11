@@ -10,6 +10,7 @@ const LINKS = [
   { href: '/home',     label: 'Home' },
   { href: '/about',    label: 'About' },
   { href: '/services', label: 'Services' },
+  { href: '/blog',     label: 'Blog' },
   { href: '/contact',  label: 'Contact' },
 ]
 
@@ -34,7 +35,7 @@ export function PublicNav() {
 
         {/* Logo */}
         <Link href="/home" className="text-xl font-display font-bold text-white">
-          <span style={{ color: '#10B981' }}>N</span>exaBank
+          <span style={{ color: '#10B981' }}>N</span>exaBanking
         </Link>
 
         {/* Desktop links */}
