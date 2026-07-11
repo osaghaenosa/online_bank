@@ -16,7 +16,7 @@ const SERVICES = [
   },
   {
     icon: Send, color: '#3B82F6', title: 'Transfers',
-    desc: 'Send money to any NexaBanking user instantly with zero fees by email or account number.',,
+    desc: 'Send money to any NexaBanking user instantly with zero fees by email or account number.',
     features: ['Instant internal transfers', 'Send by email or account #', 'Zero transfer fees', 'Add a memo/note'],
   },
   {
