@@ -3,6 +3,7 @@ const Transaction = require('../models/Transaction');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 const { generateReceiptPDF } = require('../utils/receiptGenerator');
+const { sendEmail } = require('../utils/email');
 
 const fmtUSD = (n) => '$' + Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
@@ -111,6 +112,17 @@ exports.withdraw = async (req, res, next) => {
       type: 'transaction', priority: 'medium'
     });
 
+    sendEmail({
+      to: user.email,
+      subject: 'Withdrawal Request Submitted',
+      recipientName: user.firstName,
+      type: 'debit',
+      amount: numAmount,
+      bodyHTML: `<p>Your withdrawal request of <strong>${fmtUSD(numAmount)}</strong> via ${getMethodLabel(method)} is pending admin approval.</p>
+                 <p>You will be notified once it is reviewed. Your balance has not been deducted yet.</p>`,
+      bodyText: `Your withdrawal request of ${fmtUSD(numAmount)} via ${getMethodLabel(method)} is pending admin approval.`
+    }).catch(err => console.error('Withdrawal email error:', err));
+
     res.status(201).json({
       transaction: tx,
       pending: true,
@@ -173,10 +185,12 @@ exports.transfer = async (req, res, next) => {
     sender.balance = senderNewBalance;
     await sender.save({ session });
 
+    let finalRecipientBalance = null;
     if (recipient) {
       // ── Re-fetch recipient AFTER sender save to get fresh balance ─────────
       const freshRecipient = await User.findById(recipient._id).session(session);
       const recipientNewBalance = parseFloat((freshRecipient.balance + numAmount).toFixed(2));
+      finalRecipientBalance = recipientNewBalance;
       const recipientTx = new Transaction({
         userId: freshRecipient._id, type: 'credit', category: 'transfer_in',
         method: 'internal', amount: numAmount, fee: 0,
@@ -208,6 +222,30 @@ exports.transfer = async (req, res, next) => {
         type: 'transaction' });
     }
     await Notification.create(notifs);
+
+    sendEmail({
+      to: sender.email,
+      subject: 'Transfer Successful',
+      recipientName: sender.firstName,
+      type: 'debit',
+      amount: numAmount,
+      bodyHTML: `<p>You have successfully sent <strong>${fmtUSD(numAmount)}</strong> to ${senderTx.recipientName || recipientEmail}.</p>
+                 <p>Your new balance is <strong>${fmtUSD(senderNewBalance)}</strong>.</p>`,
+      bodyText: `You have successfully sent ${fmtUSD(numAmount)} to ${senderTx.recipientName || recipientEmail}. New balance: ${fmtUSD(senderNewBalance)}`
+    }).catch(err => console.error('Transfer sender email error:', err));
+
+    if (recipient) {
+      sendEmail({
+        to: recipient.email,
+        subject: 'Money Received',
+        recipientName: recipient.firstName,
+        type: 'credit',
+        amount: numAmount,
+        bodyHTML: `<p>You have received <strong>${fmtUSD(numAmount)}</strong> from ${sender.firstName} ${sender.lastName}.</p>
+                   <p>Your new balance is <strong>${fmtUSD(finalRecipientBalance)}</strong>.</p>`,
+        bodyText: `You have received ${fmtUSD(numAmount)} from ${sender.firstName} ${sender.lastName}. New balance: ${fmtUSD(finalRecipientBalance)}`
+      }).catch(err => console.error('Transfer recipient email error:', err));
+    }
 
     res.status(201).json({
       transaction: senderTx, newBalance: senderNewBalance,
