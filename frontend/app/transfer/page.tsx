@@ -243,7 +243,7 @@ export default function TransferPage() {
         <div className="space-y-4">
           <Card className="p-4 sm:p-5">
             <SectionHeader title="Transfer Limits" />
-            {[['Single Transfer','$5,000'],['Daily','$200,000'],['Monthly','$1,000,000']].map(([l,v]) => (
+            {[['Single Transfer','$100,000'],['Daily','$200,000'],['Monthly','$1,000,000']].map(([l,v]) => (
               <div key={l} className="flex justify-between py-2.5 border-b last:border-0"
                 style={{ borderColor: 'var(--color-border)' }}>
                 <span className="text-xs" style={{ color: 'var(--color-muted)' }}>{l}</span>
