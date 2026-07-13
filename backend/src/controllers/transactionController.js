@@ -152,7 +152,7 @@ exports.transfer = async (req, res, next) => {
     const { amount, recipientEmail, description, note } = req.body;
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
-    if (numAmount > 5000) return res.status(400).json({ error: 'Maximum single transfer is $5,000' });
+    if (numAmount > 100000) return res.status(400).json({ error: 'Maximum single transfer is $5,000' });
 
     const sender = await User.findById(req.user._id).session(session);
     if (sender.balance < numAmount) {
