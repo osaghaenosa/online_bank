@@ -174,15 +174,36 @@ export default function TransferPage() {
   }
 
   // BLOCK UNVERIFIED USERS
-  if ((user as any)?.kyc !== 'Verified') {
+  const kyc = (user as any)?.kyc
+  if (kyc === 'Pending') {
+    return (
+      <div className="max-w-2xl mx-auto mt-12 text-center">
+        <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 mx-auto mb-6">
+          <ShieldAlert size={40} />
+        </div>
+        <h2 className="text-3xl font-bold font-display text-gray-900 mb-4">Verification Pending</h2>
+        <p className="text-gray-500 mb-2">Your KYC documents are currently under review by our team.</p>
+        <p className="text-gray-400 text-sm mb-8">You'll be notified once your account is verified. This usually takes 1–2 business days.</p>
+        <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>Back to Dashboard</Button>
+      </div>
+    )
+  }
+  if (kyc !== 'Verified') {
     return (
       <div className="max-w-2xl mx-auto mt-12 text-center">
         <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center text-red-600 mx-auto mb-6">
           <ShieldAlert size={40} />
         </div>
-        <h2 className="text-3xl font-bold font-display text-gray-900 mb-4">KYC Required</h2>
-        <p className="text-gray-500 mb-8">You must complete KYC verification before you can make transfers.</p>
-        <Button variant="primary" onClick={() => window.location.href = '/kyc'}>Complete KYC</Button>
+        <h2 className="text-3xl font-bold font-display text-gray-900 mb-4">{kyc === 'Rejected' ? 'KYC Declined' : 'KYC Required'}</h2>
+        <p className="text-gray-500 mb-8">
+          {kyc === 'Rejected'
+            ? 'Your KYC submission was declined. Please re-submit your documents to make transfers.'
+            : 'You must complete KYC verification before you can make transfers.'}
+        </p>
+        <div className="flex gap-3 justify-center">
+          <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>Back to Dashboard</Button>
+          <Button variant="primary" onClick={() => window.location.href = '/kyc'}>{kyc === 'Rejected' ? 'Re-submit KYC' : 'Complete KYC'}</Button>
+        </div>
       </div>
     )
   }

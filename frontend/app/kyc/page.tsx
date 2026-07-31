@@ -103,6 +103,26 @@ export default function KycPage() {
         <p className="text-gray-500 mt-2">Please provide your details below to verify your identity and unlock all account features.</p>
       </div>
 
+      {/* Why KYC */}
+      <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 mb-6">
+        <h3 className="text-sm font-bold text-blue-900 mb-2 flex items-center gap-2">
+          <ShieldCheck size={15} className="text-blue-600" />
+          Why do we need to verify your identity?
+        </h3>
+        <p className="text-sm text-blue-800 mb-3">
+          KYC (Know Your Customer) is a regulatory requirement that helps us prevent fraud, money laundering, and financial crime. It is required by financial regulators worldwide for all banking services.
+        </p>
+        <p className="text-sm text-blue-700 font-medium mb-2">Completing KYC unlocks:</p>
+        <ul className="text-sm text-blue-700 space-y-1 list-none">
+          <li className="flex items-center gap-2">✅ Withdrawals &amp; international transfers</li>
+          <li className="flex items-center gap-2">✅ Virtual &amp; physical debit card</li>
+          <li className="flex items-center gap-2">✅ Higher transaction limits</li>
+          <li className="flex items-center gap-2">✅ Access to Wealth &amp; Investment features</li>
+          <li className="flex items-center gap-2">✅ Full account protection &amp; insurance</li>
+        </ul>
+        <p className="text-xs text-blue-600 mt-3">🔒 Your documents are encrypted, stored securely, and never shared with third parties without your consent.</p>
+      </div>
+
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-8">

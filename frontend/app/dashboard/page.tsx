@@ -142,14 +142,24 @@ export default function DashboardPage() {
       {/* ── KYC banner ──────────────────────────────────────────── */}
       {user?.kyc === 'Pending' && (
         <div className="flex items-start sm:items-center gap-3 p-4 rounded-xl flex-wrap sm:flex-nowrap"
+          style={{ background: '#ECFDF5', border: '1px solid #6EE7B7' }}>
+          <Zap size={16} className="text-emerald-600 flex-shrink-0 mt-0.5 sm:mt-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-emerald-800">KYC Submitted — Awaiting Approval</p>
+            <p className="text-xs text-emerald-700 mt-0.5">Your documents are under review. We'll notify you once verified. This usually takes 1–2 business days.</p>
+          </div>
+        </div>
+      )}
+      {(user?.kyc === 'Not Started' || user?.kyc === 'Rejected') && (
+        <div className="flex items-start sm:items-center gap-3 p-4 rounded-xl flex-wrap sm:flex-nowrap"
           style={{ background: '#FEF3C7', border: '1px solid #FCD34D' }}>
           <Zap size={16} className="text-amber-600 flex-shrink-0 mt-0.5 sm:mt-0" />
           <p className="text-sm text-amber-700 font-medium flex-1">
-            Complete KYC verification to unlock all features and higher limits.
+            {user?.kyc === 'Rejected' ? 'Your KYC was declined. Please re-submit your documents.' : 'Complete KYC verification to unlock all features and higher limits.'}
           </p>
-          <Link href="/profile" className="flex-shrink-0">
+          <Link href="/kyc" className="flex-shrink-0">
             <Button variant="secondary" size="sm" style={{ borderColor: '#F59E0B', color: '#B45309' }}>
-              Verify Now
+              {user?.kyc === 'Rejected' ? 'Re-submit KYC' : 'Verify Now'}
             </Button>
           </Link>
         </div>

@@ -20,7 +20,7 @@ export interface User {
   cardStatus: 'Not Requested' | 'Pending Approval' | 'Active' | 'Blocked'
   cardType: string
   status: 'active' | 'suspended' | 'pending'
-  kyc: 'Verified' | 'Pending' | 'Rejected'
+  kyc: 'Verified' | 'Pending' | 'Rejected' | 'Not Started'
   role: 'user' | 'admin'
   notifications: { email: boolean; sms: boolean; push: boolean }
   linkedAccounts: Array<{
