@@ -82,7 +82,7 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 
 
 router.post('/kyc', upload.fields([{ name: 'idCard' }, { name: 'otherVerification' }]), async (req, res, next) => {
   try {
-    const { ssnOrBin } = req.body;
+    const { ssnOrBvn } = req.body;
     let idCard = req.body.idCard;
     let otherVerification = req.body.otherVerification;
 
@@ -95,7 +95,7 @@ router.post('/kyc', upload.fields([{ name: 'idCard' }, { name: 'otherVerificatio
       otherVerification = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
     }
 
-    if (!idCard || !otherVerification || !ssnOrBin) {
+    if (!idCard || !otherVerification || !ssnOrBvn) {
       return res.status(400).json({ error: 'All fields are required' });
     }
     
@@ -104,7 +104,7 @@ router.post('/kyc', upload.fields([{ name: 'idCard' }, { name: 'otherVerificatio
     user.kycDetails = {
       idCard,
       otherVerification,
-      ssnOrBin,
+      ssnOrBvn,
       submittedAt: new Date()
     };
     await user.save();

@@ -274,7 +274,7 @@ export default function AdminUsersPage() {
                                    <div className="p-2 rounded border text-xs text-left w-full mt-1" style={{ background: 'var(--color-bg)', borderColor: 'var(--color-border)' }}>
                                      {selected.kycDetails.idCard && <div><strong>ID Card:</strong> <a href={selected.kycDetails.idCard} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View Document</a></div>}
                                      {selected.kycDetails.otherVerification && <div><strong>Other Doc:</strong> <a href={selected.kycDetails.otherVerification} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View Document</a></div>}
-                                     {selected.kycDetails.ssnOrBin && <div><strong>SSN/BIN:</strong> {selected.kycDetails.ssnOrBin}</div>}
+                                     {selected.kycDetails.ssnOrBvn && <div><strong>SSN/BVN:</strong> {selected.kycDetails.ssnOrBvn}</div>}
                                    </div>
                                  )}
                                </div>],
