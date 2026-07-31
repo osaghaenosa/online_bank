@@ -4,13 +4,14 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, Building2, Download, Upload, Send, List,
-  User, Menu, X, LogOut, ChevronRight, ShieldCheck, Wallet, TrendingUp,
+  User, Menu, X, LogOut, ChevronRight, ShieldCheck, Wallet, TrendingUp, CreditCard
 } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '@/store/auth'
 import { fmtUSD, api } from '@/lib/api'
 import { NotificationPopup } from '@/components/shared/NotificationPopup'
 import { ChatWidget } from '@/components/shared/ChatWidget'
+import { SetPinModal } from '@/components/shared/SetPinModal'
 
 const NAV = [
   { href: '/dashboard', label: 'Dashboard',   icon: LayoutDashboard },
@@ -19,7 +20,9 @@ const NAV = [
   { href: '/deposit',   label: 'Deposit',      icon: Download },
   { href: '/withdraw',  label: 'Withdraw',     icon: Upload },
   { href: '/transfer',  label: 'Transfer',     icon: Send },
+  { href: '/tokens',    label: 'Tokens',       icon: Wallet },
   { href: '/history',   label: 'Transactions', icon: List },
+  { href: '/card',      label: 'Debit Card',   icon: CreditCard },
   { href: '/profile',   label: 'Profile',      icon: User },
 ]
 
@@ -34,7 +37,9 @@ const PAGE_TITLES: Record<string, string> = {
   '/deposit':             'Deposit Funds',
   '/withdraw':            'Withdraw Funds',
   '/transfer':            'Send Money',
+  '/tokens':              'Transaction Tokens',
   '/history':             'Transaction History',
+  '/card':                'Virtual Card',
   '/profile':             'My Profile',
   '/receipts':            'Receipt',
   '/admin':               'Admin Panel',
@@ -52,6 +57,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [open,   setOpen]   = useState(false)
   const [unread, setUnread] = useState(0)
+  const [maintenance, setMaintenance] = useState(false)
 
   const isAdmin = pathname.startsWith('/admin')
   const title = Object.entries(PAGE_TITLES)
@@ -60,6 +66,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     api.user.notifications().then(d => setUnread(d.unreadCount)).catch(() => {})
+    api.settings.maintenance().then(d => setMaintenance(d.maintenance)).catch(() => {})
   }, [pathname])
 
   // Prevent body scroll when mobile sidebar open
@@ -71,8 +78,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (!user) return null
 
+  if (maintenance && !isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0F1C35] text-white p-6">
+        <div className="text-center max-w-md">
+          <ShieldCheck size={64} className="mx-auto mb-6 text-[#10B981]" />
+          <h1 className="text-3xl font-bold font-display mb-4">Scheduled Maintenance</h1>
+          <p className="text-white/60 mb-8">
+            NexaBanking is currently undergoing scheduled maintenance to improve our services. Please check back later.
+          </p>
+          <button onClick={logout} className="px-6 py-2.5 rounded-lg border border-white/20 hover:bg-white/10 transition-colors">
+            Sign Out
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen" style={{ background: 'var(--color-bg)' }}>
+      {!(user as any).hasPin && <SetPinModal />}
+      
       {/* Mobile overlay */}
       {open && (
         <div className="fixed inset-0 z-40 bg-black/60 lg:hidden"
@@ -207,6 +233,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
         </header>
+
+        {/* KYC Warning Banner */}
+        {(user as any).kyc === 'Not Started' || (user as any).kyc === 'Rejected' ? (
+          <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 sm:px-6 py-3 flex items-start sm:items-center justify-between gap-4 flex-shrink-0">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 flex-shrink-0">
+                <ShieldCheck size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-amber-600 font-semibold text-sm">Account Limited</p>
+                <p className="text-amber-700/80 text-xs truncate">Please complete KYC verification to unlock all features.</p>
+              </div>
+            </div>
+            <Link href="/kyc" className="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition-colors flex-shrink-0 whitespace-nowrap">
+              Verify Now
+            </Link>
+          </div>
+        ) : null}
 
         {/* Page content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full max-w-7xl mx-auto overflow-x-hidden">

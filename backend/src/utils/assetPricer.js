@@ -82,7 +82,8 @@ async function getStockPrices(tickers) {
     }
 
     try {
-      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}`;
+      const yfTicker = ticker.replace('.', '-');
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yfTicker}`;
       const data = await fetchJSON(url);
       const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
       if (price) {

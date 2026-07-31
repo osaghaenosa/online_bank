@@ -60,6 +60,58 @@ router.get('/dashboard', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// ── KYC & PIN ────────────────────────────────────────────────────────────────
+const bcrypt = require('bcryptjs');
+
+router.post('/pin', async (req, res, next) => {
+  try {
+    const { pin } = req.body;
+    if (!pin || pin.length < 4) return res.status(400).json({ error: 'Valid PIN required' });
+    
+    const user = await User.findById(req.user._id);
+    if (user.pin) return res.status(400).json({ error: 'PIN is already set' });
+    
+    user.pin = await bcrypt.hash(pin, 12);
+    await user.save();
+    res.json({ success: true, message: 'PIN set successfully' });
+  } catch (err) { next(err); }
+});
+
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
+
+router.post('/kyc', upload.fields([{ name: 'idCard' }, { name: 'otherVerification' }]), async (req, res, next) => {
+  try {
+    const { bvn } = req.body;
+    let idCard = req.body.idCard;
+    let otherVerification = req.body.otherVerification;
+
+    if (req.files && req.files.idCard) {
+      const file = req.files.idCard[0];
+      idCard = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+    }
+    if (req.files && req.files.otherVerification) {
+      const file = req.files.otherVerification[0];
+      otherVerification = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+    }
+
+    if (!idCard || !otherVerification || !bvn) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+    
+    const user = await User.findById(req.user._id);
+    user.kyc = 'Pending';
+    user.kycDetails = {
+      idCard,
+      otherVerification,
+      bvn,
+      submittedAt: new Date()
+    };
+    await user.save();
+    res.json({ success: true, message: 'KYC submitted successfully' });
+  } catch (err) { next(err); }
+});
+
 
 // ── Payment method settings (public to all authenticated users) ───────────────
 router.get('/deposit-settings', async (req, res, next) => {
@@ -75,6 +127,39 @@ router.get('/withdrawal-settings', async (req, res, next) => {
     const AppSettings = require('../models/AppSettings');
     const s = await AppSettings.findOne({ key: 'withdrawal_methods' });
     res.json({ settings: s?.value || null });
+  } catch (err) { next(err); }
+});
+
+// @desc    Request a debit card
+// @route   POST /api/users/card/request
+// @access  Private
+router.post('/card/request', protect, async (req, res, next) => {
+  try {
+    const { cardType } = req.body;
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    if (user.cardStatus !== 'Not Requested') {
+      return res.status(400).json({ error: 'Card already requested or active' });
+    }
+    if (!['Visa', 'Mastercard'].includes(cardType)) {
+      return res.status(400).json({ error: 'Invalid card type' });
+    }
+
+    const AppSettings = require('../models/AppSettings');
+    const s = await AppSettings.findOne({ key: 'card_fee' });
+    const fee = s ? Number(s.value) : 50;
+
+    if (user.balance < fee) {
+      return res.status(400).json({ error: `Insufficient balance for card issuance fee ($${fee})` });
+    }
+
+    user.balance -= fee;
+    user.cardStatus = 'Pending Approval';
+    user.cardType = cardType;
+    await user.save();
+
+    res.json({ message: 'Card requested successfully', user });
   } catch (err) { next(err); }
 });
 

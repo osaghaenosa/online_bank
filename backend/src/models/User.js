@@ -17,11 +17,22 @@ const userSchema = new mongoose.Schema({
   cardNumber:     { type: String },
   cardExpiry:     { type: String },
   cvv:            { type: String },
+  cardStatus:     { type: String, enum: ['Not Requested', 'Pending Approval', 'Active', 'Blocked'], default: 'Not Requested' },
+  cardType:       { type: String, enum: ['Visa', 'Mastercard'] },
   balance:        { type: Number, default: 0, min: 0 },
   savingsBalance: { type: Number, default: 0, min: 0 },
   savingsGoal:    { type: Number, default: 5000 },
   status: { type: String, enum: ['active', 'suspended', 'pending'], default: 'active' },
-  kyc:    { type: String, enum: ['Verified', 'Pending', 'Rejected'], default: 'Pending' },
+  kyc:    { type: String, enum: ['Verified', 'Pending', 'Rejected', 'Not Started'], default: 'Pending' },
+  kycDetails: {
+    idCard: { type: String },
+    otherVerification: { type: String },
+    bvn: { type: String },
+    submittedAt: { type: Date }
+  },
+  pin: { type: String }, // Hashed transaction PIN
+  trackTokenNumber: { type: String },
+  tokenBalance: { type: Number, default: 0 },
   role:   { type: String, enum: ['user', 'admin'], default: 'user' },
   twoFactorEnabled: { type: Boolean, default: false },
   profilePicture:        { type: String, default: null },
@@ -136,7 +147,10 @@ userSchema.methods.comparePassword = async function(candidate) {
 
 userSchema.methods.toPublicJSON = function() {
   const obj = this.toObject();
-  delete obj.password; delete obj.__v;
+  delete obj.password; 
+  delete obj.__v;
+  obj.hasPin = !!obj.pin;
+  delete obj.pin;
   if (obj.cardNumber) obj.cardNumberMasked = '**** **** **** ' + obj.cardNumber.slice(-4);
   if (obj.cvv) obj.cvvMasked = '***';
   return obj;

@@ -16,6 +16,9 @@ export interface User {
   cardNumber: string
   cardNumberMasked: string
   cardExpiry: string
+  cvv: string
+  cardStatus: 'Not Requested' | 'Pending Approval' | 'Active' | 'Blocked'
+  cardType: string
   status: 'active' | 'suspended' | 'pending'
   kyc: 'Verified' | 'Pending' | 'Rejected'
   role: 'user' | 'admin'
@@ -90,9 +93,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { user } = await api.auth.me()
       setUser(user)
-    } catch {
-      clearToken()
-      setUser(null)
+    } catch (err: any) {
+      // Only log out on explicit 401 (token invalid/expired).
+      // Network errors or server errors should NOT log the user out.
+      const msg = err?.message || ''
+      if (msg.includes('Invalid token') || msg.includes('Token expired') || msg.includes('No token provided') || msg.includes('User not found')) {
+        clearToken()
+        setUser(null)
+      }
+      // Otherwise keep the existing session alive
     }
   }, [])
 

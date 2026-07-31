@@ -275,6 +275,20 @@ export default function WithdrawPage() {
     </div>
   )
 
+  // BLOCK UNVERIFIED USERS
+  if ((user as any)?.kyc !== 'Verified') {
+    return (
+      <div className="max-w-2xl mx-auto mt-12 text-center">
+        <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center text-red-600 mx-auto mb-6">
+          <ShieldAlert size={40} />
+        </div>
+        <h2 className="text-3xl font-bold font-display text-gray-900 mb-4">KYC Required</h2>
+        <p className="text-gray-500 mb-8">You must complete KYC verification before you can make withdrawals.</p>
+        <Button variant="primary" onClick={() => window.location.href = '/kyc'}>Complete KYC</Button>
+      </div>
+    )
+  }
+
   // ── BLOCKED STATE ─────────────────────────────────────────────────────────
   if (!loadingRestrictions && restrictions && !restrictions.withdrawalsEnabled) {
     return (

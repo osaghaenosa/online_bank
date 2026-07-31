@@ -22,6 +22,10 @@ export default function AdminUsersPage() {
   const [adjLoading, setAdjLoading] = useState(false)
   const [confirmToggle, setConfirmToggle] = useState<any>(null)
 
+  const [kycReason, setKycReason] = useState('')
+  const [editTokens, setEditTokens] = useState({ trackTokenNumber: '', tokenBalance: '' })
+  const [editCard, setEditCard] = useState({ cardStatus: 'Not Requested', cardNumber: '', cardExpiry: '', cvv: '' })
+
   // Wealth Management States
   const [activeTab, setActiveTab] = useState<'overview' | 'wealth'>('overview')
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
@@ -40,6 +44,13 @@ export default function AdminUsersPage() {
     setExpandedCategory(null)
     setEditingCategory(null)
     setEditingAsset(null)
+    setEditTokens({ trackTokenNumber: u.trackTokenNumber || '', tokenBalance: u.tokenBalance?.toString() || '0' })
+    setEditCard({ 
+      cardStatus: u.cardStatus || 'Not Requested', 
+      cardNumber: u.cardNumber || '', 
+      cardExpiry: u.cardExpiry || '', 
+      cvv: u.cvv || '' 
+    })
     try { const d = await api.admin.userDetail(u._id); setUserTxs(d.transactions) } catch {}
   }
 
@@ -82,12 +93,45 @@ export default function AdminUsersPage() {
     finally { setConfirmToggle(null) }
   }
 
-  const handleKycVerify = async (u: any) => {
+  const handleKycUpdate = async (u: any, status: 'Verified' | 'Rejected') => {
+    if (status === 'Rejected' && !kycReason.trim()) {
+      toast('Please provide a reason for rejection', 'error')
+      return
+    }
     try {
-      const d = await api.admin.verifyKyc(u._id)
+      const d = await api.admin.updateKyc(u._id, { status, reason: kycReason })
       setUsers(p => p.map(x => x._id === d.user._id ? d.user : x))
       if (selected?._id === d.user._id) setSelected(d.user)
-      toast(`KYC for ${d.user.firstName} verified`, 'success')
+      setKycReason('')
+      toast(`KYC for ${d.user.firstName} ${status.toLowerCase()}`, 'success')
+    } catch (err: any) { toast(err.message, 'error') }
+  }
+
+  const handleTokensUpdate = async () => {
+    if (!selected) return
+    try {
+      const d = await api.admin.updateTokens(selected._id, { 
+        trackTokenNumber: editTokens.trackTokenNumber, 
+        tokenBalance: editTokens.tokenBalance 
+      })
+      setUsers(p => p.map(x => x._id === d.user._id ? d.user : x))
+      if (selected?._id === d.user._id) setSelected(d.user)
+      toast('Tokens updated successfully', 'success')
+    } catch (err: any) { toast(err.message, 'error') }
+  }
+
+  const handleCardUpdate = async () => {
+    if (!selected) return
+    try {
+      const d = await api.admin.updateCard(selected._id, { 
+        cardStatus: editCard.cardStatus, 
+        cardNumber: editCard.cardNumber,
+        cardExpiry: editCard.cardExpiry,
+        cvv: editCard.cvv
+      })
+      setUsers(p => p.map(x => x._id === d.user._id ? d.user : x))
+      if (selected?._id === d.user._id) setSelected(d.user)
+      toast('Card updated successfully', 'success')
     } catch (err: any) { toast(err.message, 'error') }
   }
 
@@ -207,12 +251,31 @@ export default function AdminUsersPage() {
                 {[
                   ['Balance',  fmtUSD(selected.balance)],
                   ['Account',  '****' + String(selected.accountNumber || '').slice(-4)],
-                  ['KYC',      <div key="k" className="flex items-center gap-2">
-                                 <StatusBadge status={selected.kyc} />
-                                 {selected.kyc === 'pending' && (
-                                   <button onClick={() => handleKycVerify(selected)} className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-bold hover:bg-emerald-200 transition-all cursor-pointer">
-                                     Verify
-                                   </button>
+                  ['KYC',      <div key="k" className="flex flex-col gap-2 items-end">
+                                 <div className="flex items-center gap-2">
+                                   <StatusBadge status={selected.kyc} />
+                                   {(selected.kyc === 'Pending' || selected.kyc === 'pending') && (
+                                     <div className="flex gap-2">
+                                       <button onClick={() => handleKycUpdate(selected, 'Verified')} className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-bold hover:bg-emerald-200 transition-all cursor-pointer">
+                                         Approve
+                                       </button>
+                                       <button onClick={() => handleKycUpdate(selected, 'Rejected')} className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold hover:bg-red-200 transition-all cursor-pointer">
+                                         Reject
+                                       </button>
+                                     </div>
+                                   )}
+                                 </div>
+                                 {(selected.kyc === 'Pending' || selected.kyc === 'pending') && (
+                                   <input placeholder="Reason (if rejecting)" value={kycReason} onChange={e => setKycReason(e.target.value)}
+                                      className="w-[200px] rounded border px-2 py-1 text-xs outline-none"
+                                      style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} />
+                                 )}
+                                 {selected.kycDetails && (
+                                   <div className="p-2 rounded border text-xs text-left w-full mt-1" style={{ background: 'var(--color-bg)', borderColor: 'var(--color-border)' }}>
+                                     {selected.kycDetails.idCard && <div><strong>ID Card:</strong> <a href={selected.kycDetails.idCard} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View Document</a></div>}
+                                     {selected.kycDetails.otherVerification && <div><strong>Other Doc:</strong> <a href={selected.kycDetails.otherVerification} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View Document</a></div>}
+                                     {selected.kycDetails.bvn && <div><strong>BVN/SSN:</strong> {selected.kycDetails.bvn}</div>}
+                                   </div>
                                  )}
                                </div>],
                   ['Status',   <StatusBadge key="s" status={selected.status} />],
@@ -223,6 +286,75 @@ export default function AdminUsersPage() {
                     <span className="text-sm font-semibold">{v}</span>
                   </div>
                 ))}
+
+                <Divider className="my-4" />
+                <p className="text-sm font-bold mb-3">Tokens & Security</p>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div>
+                    <label className="text-xs font-semibold mb-1 block" style={{ color: 'var(--color-muted)' }}>Token Balance</label>
+                    <input type="number" value={editTokens.tokenBalance} onChange={e => setEditTokens({...editTokens, tokenBalance: e.target.value})}
+                      className="w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none"
+                      style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold mb-1 block" style={{ color: 'var(--color-muted)' }}>Track Token Number</label>
+                    <input type="text" value={editTokens.trackTokenNumber} onChange={e => setEditTokens({...editTokens, trackTokenNumber: e.target.value})}
+                      className="w-full rounded-xl border px-3.5 py-2.5 text-sm font-mono outline-none"
+                      style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} />
+                  </div>
+                  <div className="col-span-2">
+                    <Button variant="secondary" size="sm" className="w-full justify-center" onClick={handleTokensUpdate}>
+                      Update Tokens
+                    </Button>
+                  </div>
+                </div>
+
+                <Divider className="my-4" />
+                <p className="text-sm font-bold mb-3">Debit Card Management</p>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="col-span-2">
+                    <label className="text-xs font-semibold mb-1 block" style={{ color: 'var(--color-muted)' }}>Card Status (Request Type: {selected.cardType || 'None'})</label>
+                    <Select value={editCard.cardStatus} onChange={e => setEditCard({...editCard, cardStatus: e.target.value})}
+                      className="w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none"
+                      style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}>
+                      <option value="Not Requested">Not Requested</option>
+                      <option value="Pending Approval">Pending Approval</option>
+                      <option value="Active">Active</option>
+                      <option value="Blocked">Blocked</option>
+                    </Select>
+                    {editCard.cardStatus === 'Active' && !editCard.cardNumber && (
+                      <p className="text-[10px] text-amber-500 mt-1">Leave details blank to auto-generate random details.</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold mb-1 block" style={{ color: 'var(--color-muted)' }}>Card Number</label>
+                    <input type="text" value={editCard.cardNumber} onChange={e => setEditCard({...editCard, cardNumber: e.target.value})}
+                      placeholder="Auto-generated if empty"
+                      className="w-full rounded-xl border px-3.5 py-2.5 text-sm font-mono outline-none"
+                      style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} />
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <label className="text-xs font-semibold mb-1 block" style={{ color: 'var(--color-muted)' }}>Expiry</label>
+                      <input type="text" value={editCard.cardExpiry} onChange={e => setEditCard({...editCard, cardExpiry: e.target.value})}
+                        placeholder="MM/YY"
+                        className="w-full rounded-xl border px-3.5 py-2.5 text-sm font-mono outline-none"
+                        style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-xs font-semibold mb-1 block" style={{ color: 'var(--color-muted)' }}>CVV</label>
+                      <input type="text" value={editCard.cvv} onChange={e => setEditCard({...editCard, cvv: e.target.value})}
+                        placeholder="123"
+                        className="w-full rounded-xl border px-3.5 py-2.5 text-sm font-mono outline-none"
+                        style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} />
+                    </div>
+                  </div>
+                  <div className="col-span-2">
+                    <Button variant="secondary" size="sm" className="w-full justify-center" onClick={handleCardUpdate}>
+                      Update Card
+                    </Button>
+                  </div>
+                </div>
 
                 <Divider className="my-4" />
                 <p className="text-sm font-bold mb-3">Adjust Balance & Reversals</p>

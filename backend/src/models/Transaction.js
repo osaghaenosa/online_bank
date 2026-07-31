@@ -70,6 +70,5 @@ transactionSchema.virtual('formattedAmount').get(function() {
 
 transactionSchema.index({ userId: 1, createdAt: -1 });
 transactionSchema.index({ status: 1 });
-transactionSchema.index({ transactionId: 1 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);

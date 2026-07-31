@@ -4,6 +4,7 @@ import { useAuth } from '@/store/auth'
 import { api, fmtUSD, COIN_PRICES } from '@/lib/api'
 import { Card, Button, Input, Select, SectionHeader, SuccessScreen } from '@/components/ui'
 import { Building, CreditCard, Bitcoin, DollarSign, Smartphone, Copy, Check, Shield, AlertTriangle } from 'lucide-react'
+import { TransactionAuthModal } from '@/components/shared/TransactionAuthModal'
 
 const ICON_MAP: Record<string, React.ElementType> = {
   bitcoin: Bitcoin, building: Building, card: CreditCard,
@@ -90,18 +91,27 @@ export default function DepositPage() {
     toast('Wallet address copied!', 'success')
   }
 
-  const handleDeposit = async () => {
-    if (!num || num <= 0) { toast('Enter a valid amount', 'error'); return }
-    if (num < 1) { toast('Minimum deposit is $1.00', 'error'); return }
-    setLoading(true)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+
+  const handleDeposit = () => {
+    if (!num || num <= 0) return toast('Enter a valid amount', 'error')
+    if (num < 1) return toast('Minimum deposit is $1.00', 'error')
+    setShowAuthModal(true)
+  }
+
+  const executeDeposit = async (pin: string, trackTokenNumber?: string) => {
     try {
-      const body: any = { amount: num, method, note }
+      const body: any = { amount: num, method, note, pin, trackTokenNumber }
       if (isCrypto) body.cryptoDetails = { coin, coinAmount: parseFloat(coinAmt), network, walletAddress: walletAddr }
       const data = await api.tx.deposit(body)
       setResult(data)
+      setShowAuthModal(false)
       await refreshUser()
-    } catch (err: any) { toast(err.message || 'Deposit failed', 'error') }
-    finally { setLoading(false) }
+    } catch (err: any) {
+      toast(err.message || 'Deposit failed', 'error')
+      setShowAuthModal(false)
+      throw err
+    }
   }
 
   if (result) return (
@@ -125,6 +135,12 @@ export default function DepositPage() {
 
   return (
     <div className="max-w-5xl space-y-4 sm:space-y-5 fade-up">
+      <TransactionAuthModal 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onConfirm={executeDeposit}
+      />
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
         <div className="lg:col-span-2 space-y-4 sm:space-y-5">
 

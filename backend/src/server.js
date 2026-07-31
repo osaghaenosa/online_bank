@@ -114,10 +114,26 @@ io.on('connection', (socket) => {
 
 app.set('io', io);
 
-const limiter = rateLimit({ windowMs: 15*60*1000, max: 100, message: { error: 'Too many requests' } });
-app.use('/api/', limiter);
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Strict limiter for auth endpoints only (prevents brute force)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30,                   // 30 login attempts per window
+  message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
+  skipSuccessfulRequests: true,
+});
+
+// Generous limiter for all other API routes
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000,                 // 1000 requests per window — plenty for normal use
+  message: { error: 'Too many requests. Please slow down.' },
+});
+
+app.use('/api/auth/login',    authLimiter);
+app.use('/api/auth/register', authLimiter);
+app.use('/api/',              apiLimiter);
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/uploads', express.static('uploads'));
 
 app.use('/api/auth',         authRoutes);
@@ -127,6 +143,7 @@ app.use('/api/admin',        adminRoutes);
 app.use('/api/receipts',     receiptRoutes);
 app.use('/api/chat',         chatRoutes);
 app.use('/api/email',        emailRoutes);
+app.use('/api/settings',     require('./routes/settings'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 

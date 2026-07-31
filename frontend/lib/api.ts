@@ -26,12 +26,21 @@ export const api = {
     updateProfile:  (body: object) => req('/auth/profile',   { method: 'PATCH', body: JSON.stringify(body) }),
     changePassword: (body: object) => req('/auth/password',  { method: 'PATCH', body: JSON.stringify(body) }),
   },
+  users: {
+    get:       () => req('/users/me'),
+    updateKyc: (body: object) => req('/users/kyc', { method: 'POST', body: JSON.stringify(body) }),
+    notifs:    () => req('/users/notifications'),
+    readNotifs:() => req('/users/notifications/read-all', { method: 'PATCH' }),
+    requestCard: (body: object) => req('/users/card/request', { method: 'POST', body: JSON.stringify(body) }),
+  },
   user: {
     dashboard:     ()             => req('/users/dashboard'),
     notifications: ()             => req('/users/notifications'),
     markAllRead:   ()             => req('/users/notifications/read-all', { method: 'PATCH' }),
     markOneRead:   (id: string)   => req(`/users/notifications/${id}/read`, { method: 'PATCH' }),
     deleteNotif:   (id: string)   => req(`/users/notifications/${id}`, { method: 'DELETE' }),
+    setPin:        (pin: string)  => req('/users/pin', { method: 'POST', body: JSON.stringify({ pin }) }),
+    kyc:           (body: object) => req('/users/kyc', { method: 'POST', body: JSON.stringify(body) }),
   },
   tx: {
     list:     (params?: Record<string, string>) => {
@@ -56,7 +65,8 @@ export const api = {
     },
     userDetail:     (id: string)   => req(`/admin/users/${id}`),
     toggleStatus:   (id: string)   => req(`/admin/users/${id}/toggle-status`, { method: 'PATCH' }),
-    verifyKyc:      (id: string)   => req(`/admin/users/${id}/kyc`, { method: 'PATCH' }),
+    updateKyc:      (id: string, body: object) => req(`/admin/users/${id}/kyc`, { method: 'PATCH', body: JSON.stringify(body) }),
+    updateTokens:   (id: string, body: object) => req(`/admin/users/${id}/tokens`, { method: 'PATCH', body: JSON.stringify(body) }),
     editName:       (id: string, body: object) => req(`/admin/users/${id}/name`, { method: 'PATCH', body: JSON.stringify(body) }),
     adjustBalance:  (body: object) => req('/admin/balance-adjust',             { method: 'POST',  body: JSON.stringify(body) }),
     addReversal:    (body: object) => req('/admin/reversal',                   { method: 'POST',  body: JSON.stringify(body) }),
@@ -71,6 +81,7 @@ export const api = {
     setWithdrawalLimit:  (id: string, body: object) => req(`/admin/users/${id}/withdrawal-limit`, { method: 'PATCH', body: JSON.stringify(body) }),
     fulfillRequirement:  (id: string, body: object) => req(`/admin/users/${id}/fulfill-requirement`, { method: 'PATCH', body: JSON.stringify(body) }),
     editCredentials:     (id: string, body: object) => req(`/admin/users/${id}/credentials`, { method: 'PATCH', body: JSON.stringify(body) }),
+    updateCard:          (id: string, body: object) => req(`/admin/users/${id}/card`, { method: 'PATCH', body: JSON.stringify(body) }),
     getDepositSettings:    ()              => req('/admin/deposit-settings'),
     saveDepositSettings:   (body: object)  => req('/admin/deposit-settings',   { method: 'POST',   body: JSON.stringify(body) }),
     getWithdrawalSettings: ()              => req('/admin/withdrawal-settings'),
@@ -121,6 +132,10 @@ export const api = {
   settings: {
     depositMethods:    () => req('/users/deposit-settings'),
     withdrawalMethods: () => req('/users/withdrawal-settings'),
+    maintenance:       () => req('/settings/maintenance'),
+    setMaintenance:    (enabled: boolean) => req('/settings/maintenance', { method: 'POST', body: JSON.stringify({ enabled }) }),
+    getCardFee:        () => req('/settings/card-fee'),
+    setCardFee:        (cardFee: number) => req('/settings/card-fee', { method: 'POST', body: JSON.stringify({ cardFee }) }),
   },
   depositSettings: {
     get: () => req('/admin/deposit-settings'),

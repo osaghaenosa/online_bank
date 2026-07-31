@@ -5,6 +5,7 @@ exports.protect = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('No token provided. Method:', req.method, 'Path:', req.originalUrl, 'Headers:', req.headers);
       return res.status(401).json({ error: 'No token provided' });
     }
     const token = authHeader.split(' ')[1];

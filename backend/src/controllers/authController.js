@@ -4,7 +4,7 @@ const Notification = require('../models/Notification');
 const { validationResult } = require('express-validator');
 
 const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, {
-  expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+  expiresIn: process.env.JWT_EXPIRES_IN || '30d'
 });
 
 exports.register = async (req, res, next) => {

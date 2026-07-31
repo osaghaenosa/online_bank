@@ -44,6 +44,8 @@ export default function AdminSettingsPage() {
   const [primaryColor, setPrimaryColor] = useState('#0F1C35')
   const [tempName,     setTempName]     = useState('NexaBank')
   const [darkMode,     setDarkMode]     = useState(false)
+  const [maintenance,  setMaintenance]  = useState(false)
+  const [cardFee,      setCardFee]      = useState(50)
   const [activeTab,    setActiveTab]    = useState<'branding'|'deposit'|'withdrawal'>('branding')
   const [depositMethods,    setDeposit]    = useState<any[]>(DEFAULT_DEPOSIT_METHODS)
   const [withdrawalMethods, setWithdrawal] = useState<any[]>(DEFAULT_WITHDRAWAL_METHODS)
@@ -60,6 +62,12 @@ export default function AdminSettingsPage() {
     api.admin.getWithdrawalSettings()
       .then(d => { if (d.settings && Array.isArray(d.settings) && d.settings.length > 0) setWithdrawal(d.settings) })
       .catch(() => {})
+    api.settings.maintenance()
+      .then(d => setMaintenance(d.maintenance))
+      .catch(() => {})
+    api.settings.getCardFee()
+      .then(d => setCardFee(d.cardFee ?? 50))
+      .catch(() => {})
   }, [])
 
   const applyAccent  = (c: string) => { setAccentColor(c);  document.documentElement.style.setProperty('--color-accent', c);   toast('Accent color updated', 'success') }
@@ -70,6 +78,26 @@ export default function AdminSettingsPage() {
     if (next) document.documentElement.classList.add('dark')
     else      document.documentElement.classList.remove('dark')
     toast(`${next ? 'Dark' : 'Light'} mode enabled`, 'success')
+  }
+
+  const toggleMaintenance = async () => {
+    try {
+      const next = !maintenance
+      await api.settings.setMaintenance(next)
+      setMaintenance(next)
+      toast(`Maintenance mode ${next ? 'enabled' : 'disabled'}`, 'success')
+    } catch (err: any) {
+      toast(err.message, 'error')
+    }
+  }
+
+  const updateCardFee = async () => {
+    try {
+      await api.settings.setCardFee(cardFee)
+      toast('Card fee updated successfully', 'success')
+    } catch (err: any) {
+      toast(err.message, 'error')
+    }
   }
 
   const updateDepositField = (id: string, field: string, value: any) => {
@@ -170,6 +198,29 @@ export default function AdminSettingsPage() {
                 <span className="text-sm font-medium">{darkMode ? 'Dark' : 'Light'} Mode</span>
               </div>
               <Toggle checked={darkMode} onChange={toggleDark}/>
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <SectionHeader title="Maintenance Mode" sub="Disable user access temporarily" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Enable Maintenance Mode</span>
+              </div>
+              <Toggle checked={maintenance} onChange={toggleMaintenance}/>
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <SectionHeader title="Debit Card Fee" sub="Amount to deduct when requesting a card" />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <DollarSign size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type="number" value={cardFee} onChange={e => setCardFee(Number(e.target.value))}
+                  className="w-full rounded-xl border pl-8 pr-3.5 py-2.5 text-sm font-sans outline-none"
+                  style={{ background:'var(--color-surface)', borderColor:'var(--color-border)', color:'var(--color-text)' }}/>
+              </div>
+              <Button variant="primary" size="sm" onClick={updateCardFee}><Check size={14}/></Button>
             </div>
           </Card>
 

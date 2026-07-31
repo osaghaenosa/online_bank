@@ -5,9 +5,28 @@ const Notification = require('../models/Notification');
 const { generateReceiptPDF } = require('../utils/receiptGenerator');
 const { sendEmail } = require('../utils/email');
 
+const bcrypt = require('bcryptjs');
+
 const fmtUSD = (n) => '$' + Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-// ── Deposit ───────────────────────────────────────────────────────────────────
+// Helper to verify PIN, TTN, KYC, and Tokens
+async function verifyTransactionSecurity(req, user) {
+  const { pin, trackTokenNumber } = req.body;
+  if (!pin) return { error: 'Transaction PIN is required' };
+  if (!trackTokenNumber) return { error: 'Track Token Number is required' };
+  
+  if (user.kyc !== 'Verified') return { error: 'KYC must be verified before performing transactions' };
+  if (!user.pin) return { error: 'Please set up your transaction PIN first' };
+  
+  const isMatch = await bcrypt.compare(pin, user.pin);
+  if (!isMatch) return { error: 'Invalid transaction PIN' };
+  
+  if (user.trackTokenNumber !== trackTokenNumber) return { error: 'Invalid Track Token Number' };
+  
+  if (user.tokenBalance < 10) return { error: 'Insufficient tokens. 10 tokens are required per transaction.' };
+  
+  return { success: true };
+}
 exports.deposit = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -23,6 +42,13 @@ exports.deposit = async (req, res, next) => {
     if (method && method.startsWith('crypto')) fee = 2.50;
 
     const user = await User.findById(req.user._id).session(session);
+    
+    const securityCheck = await verifyTransactionSecurity(req, user);
+    if (securityCheck.error) {
+      await session.abortTransaction();
+      return res.status(400).json({ error: securityCheck.error });
+    }
+    
     const newBalance = parseFloat((user.balance + numAmount).toFixed(2));
 
     const tx = new Transaction({
@@ -37,6 +63,7 @@ exports.deposit = async (req, res, next) => {
     });
     await tx.save({ session });
     user.balance = newBalance;
+    user.tokenBalance -= 10;
     await user.save({ session });
     await session.commitTransaction();
 
@@ -84,6 +111,12 @@ exports.withdraw = async (req, res, next) => {
     const total = parseFloat((numAmount + fee).toFixed(2));
 
     const user = userCheck; // reuse the same document
+    
+    const securityCheck = await verifyTransactionSecurity(req, user);
+    if (securityCheck.error) {
+      return res.status(400).json({ error: securityCheck.error });
+    }
+    
     if (user.balance < total) {
       return res.status(400).json({ error: `Insufficient funds. Available: ${fmtUSD(user.balance)}, Required: ${fmtUSD(total)}` });
     }
@@ -105,6 +138,9 @@ exports.withdraw = async (req, res, next) => {
       tx.walletAddress = cryptoDetails.walletAddress;
     }
     await tx.save();
+    
+    user.tokenBalance -= 10;
+    await user.save({ validateBeforeSave: false });
 
     await Notification.create({
       userId: user._id, title: 'Withdrawal Request Submitted',
@@ -155,6 +191,13 @@ exports.transfer = async (req, res, next) => {
     if (numAmount > 100000) return res.status(400).json({ error: 'Maximum single transfer is $5,000' });
 
     const sender = await User.findById(req.user._id).session(session);
+    
+    const securityCheck = await verifyTransactionSecurity(req, sender);
+    if (securityCheck.error) {
+      await session.abortTransaction();
+      return res.status(400).json({ error: securityCheck.error });
+    }
+    
     if (sender.balance < numAmount) {
       await session.abortTransaction();
       return res.status(400).json({ error: `Insufficient funds. Available: ${fmtUSD(sender.balance)}` });
@@ -183,6 +226,7 @@ exports.transfer = async (req, res, next) => {
     });
     await senderTx.save({ session });
     sender.balance = senderNewBalance;
+    sender.tokenBalance -= 10;
     await sender.save({ session });
 
     let finalRecipientBalance = null;

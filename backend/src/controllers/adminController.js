@@ -284,18 +284,62 @@ exports.toggleUserStatus = async (req, res, next) => {
 
 exports.updateUserKyc = async (req, res, next) => {
   try {
+    const { status, reason } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
-    if (user.kyc === 'pending') {
-      user.kyc = 'verified';
+    
+    if (status === 'Verified' || status === 'Rejected') {
+      user.kyc = status;
       await user.save({ validateBeforeSave: false });
+      
+      const title = status === 'Verified' ? 'KYC Verified' : 'KYC Rejected';
+      const message = status === 'Verified' 
+        ? 'Your identity verification (KYC) has been successfully approved by an administrator.'
+        : `Your identity verification (KYC) has been rejected. Reason: ${reason || 'Invalid documents.'}`;
+        
       await Notification.create({
         userId: user._id,
-        title: 'KYC Verified',
-        message: 'Your identity verification (KYC) has been successfully approved by an administrator.',
+        title,
+        message,
         type: 'system', priority: 'high'
       });
+      
+      try {
+        await sendEmail({
+          to: user.email,
+          recipientName: user.firstName,
+          subject: title,
+          type: 'alert',
+          bodyHTML: `<p>${message}</p>`,
+          bodyText: message
+        });
+      } catch (e) {
+        console.error('Failed to send KYC email', e);
+      }
     }
+    res.json({ user: user.toPublicJSON() });
+  } catch (err) { next(err); }
+};
+
+// ── Update Tokens and TTN ───────────────────────────────────────────────────
+exports.updateUserTokens = async (req, res, next) => {
+  try {
+    const { trackTokenNumber, tokenBalance } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    if (trackTokenNumber !== undefined) user.trackTokenNumber = trackTokenNumber;
+    if (tokenBalance !== undefined) user.tokenBalance = Number(tokenBalance);
+    
+    await user.save({ validateBeforeSave: false });
+    
+    await Notification.create({
+      userId: user._id,
+      title: 'Tokens Updated',
+      message: 'Your Track Token Number (TTN) or Token Balance has been updated by an administrator.',
+      type: 'system', priority: 'high'
+    });
+    
     res.json({ user: user.toPublicJSON() });
   } catch (err) { next(err); }
 };
@@ -786,3 +830,52 @@ exports.updateUserWealth = async (req, res, next) => {
   }
 };
 
+exports.updateUserCard = async (req, res, next) => {
+  try {
+    const { cardStatus, cardNumber, cardExpiry, cvv } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (cardStatus) user.cardStatus = cardStatus;
+    
+    if (cardStatus === 'Active') {
+      if (cardNumber && cardExpiry && cvv) {
+        user.cardNumber = cardNumber;
+        user.cardExpiry = cardExpiry;
+        user.cvv = cvv;
+      } else if (!user.cardNumber) {
+        // Auto-generate securely
+        const generateNumber = (prefix) => {
+          let num = prefix;
+          for (let i = 0; i < 16 - prefix.length; i++) num += Math.floor(Math.random() * 10);
+          return num;
+        };
+        const prefix = user.cardType === 'Visa' ? '4111' : '5500';
+        user.cardNumber = generateNumber(prefix);
+        
+        // Next year, same month
+        const now = new Date();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yy = String(now.getFullYear() + 3).slice(-2);
+        user.cardExpiry = `${mm}/${yy}`;
+        
+        user.cvv = String(Math.floor(100 + Math.random() * 900));
+      }
+      user.cardNumberMasked = '**** **** **** ' + (user.cardNumber ? user.cardNumber.slice(-4) : 'XXXX');
+    }
+
+    await user.save({ validateBeforeSave: false });
+
+    await Notification.create({
+      userId: user._id,
+      title: 'Debit Card Status Updated',
+      message: `Your debit card request is now ${user.cardStatus}.`,
+      type: 'system',
+      priority: 'high'
+    });
+
+    res.json({ user: user.toPublicJSON() });
+  } catch (err) {
+    next(err);
+  }
+};
