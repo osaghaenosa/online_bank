@@ -16,8 +16,8 @@
   "/admin/transactions/page": "app/admin/transactions/page.js",
   "/admin/transfers/page": "app/admin/transfers/page.js",
   "/admin/users/page": "app/admin/users/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
   "/deposit/page": "app/deposit/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
   "/history/page": "app/history/page.js",
   "/profile/page": "app/profile/page.js",
   "/receipts/[id]/page": "app/receipts/[id]/page.js",
@@ -33,8 +33,8 @@
   "/admin/controls/page": "app/admin/controls/page.js",
   "/admin/deposit-settings/page": "app/admin/deposit-settings/page.js",
   "/admin/email/page": "app/admin/email/page.js",
-  "/wealth/investments/page": "app/wealth/investments/page.js",
   "/wealth/crypto/page": "app/wealth/crypto/page.js",
+  "/wealth/investments/page": "app/wealth/investments/page.js",
   "/wealth/treasury/page": "app/wealth/treasury/page.js",
   "/wealth/trust/page": "app/wealth/trust/page.js"
 }

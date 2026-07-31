@@ -8,7 +8,7 @@ import clsx from 'clsx'
 export default function KycPage() {
   const { user, toast } = useAuth()
   const [loading, setLoading] = useState(false)
-  const [bvn, setBvn] = useState('')
+  const [ssnOrBin, setSsnOrBin] = useState('')
   const [idCardFile, setIdCardFile] = useState<File | null>(null)
   const [otherDocFile, setOtherDocFile] = useState<File | null>(null)
   const idInputRef = useRef<HTMLInputElement>(null)
@@ -31,7 +31,7 @@ export default function KycPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!bvn) return toast('BVN is required', 'error')
+    if (!ssnOrBin) return toast('SSN or BIN is required', 'error')
     if (!idCardFile) return toast('ID Card is required', 'error')
     if (!otherDocFile) return toast('Other Verification Document is required', 'error')
 
@@ -45,7 +45,7 @@ export default function KycPage() {
       setLoading(true)
 
       const formData = new FormData()
-      formData.append('bvn', bvn)
+      formData.append('ssnOrBin', ssnOrBin)
       formData.append('idCard', idCardFile)
       formData.append('otherVerification', otherDocFile)
 
@@ -126,14 +126,14 @@ export default function KycPage() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* BVN */}
+            {/* SSN / BIN */}
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Bank Verification Number (BVN)</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">SSN (9 digits) or Bank Identity Number (BIN)</label>
               <input
                 type="text"
-                value={bvn}
-                onChange={(e) => setBvn(e.target.value)}
-                placeholder="Enter your 11-digit BVN"
+                value={ssnOrBin}
+                onChange={(e) => setSsnOrBin(e.target.value)}
+                placeholder="Enter your SSN or BIN"
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] outline-none transition-all"
                 required
               />
@@ -192,7 +192,7 @@ export default function KycPage() {
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={loading || !bvn || !idCardFile || !otherDocFile}
+                disabled={loading || !ssnOrBin || !idCardFile || !otherDocFile}
                 className="w-full py-4 px-6 bg-[#10B981] hover:bg-emerald-600 text-white font-bold rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 size={20} className="animate-spin" /> : 'Submit Verification'}

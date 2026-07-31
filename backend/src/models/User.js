@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
   kycDetails: {
     idCard: { type: String },
     otherVerification: { type: String },
-    bvn: { type: String },
+    ssnOrBin: { type: String },
     submittedAt: { type: Date }
   },
   pin: { type: String }, // Hashed transaction PIN
