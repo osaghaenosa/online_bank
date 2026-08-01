@@ -32,7 +32,7 @@ router.post('/maintenance', protect, adminOnly, async (req, res, next) => {
 router.get('/card-fee', async (req, res, next) => {
   try {
     const s = await AppSettings.findOne({ key: 'card_fee' });
-    res.json({ fee: s ? Number(s.value) : 50 });
+    res.json({ cardFee: s ? Number(s.value) : 50 });
   } catch (err) {
     next(err);
   }
@@ -41,13 +41,13 @@ router.get('/card-fee', async (req, res, next) => {
 // Admin route to set card fee
 router.post('/card-fee', protect, adminOnly, async (req, res, next) => {
   try {
-    const { fee } = req.body;
+    const { cardFee } = req.body;
     await AppSettings.findOneAndUpdate(
       { key: 'card_fee' },
-      { key: 'card_fee', value: Number(fee) || 0, updatedAt: new Date() },
+      { key: 'card_fee', value: Number(cardFee) || 0, updatedAt: new Date() },
       { upsert: true, new: true }
     );
-    res.json({ success: true, fee: Number(fee) || 0 });
+    res.json({ success: true, cardFee: Number(cardFee) || 0 });
   } catch (err) {
     next(err);
   }
