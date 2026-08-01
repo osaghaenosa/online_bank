@@ -5,6 +5,7 @@ import { api, fmtUSD, COIN_PRICES } from '@/lib/api'
 import { Card, Button, Input, Select, SectionHeader, Divider } from '@/components/ui'
 import { Building, CreditCard, Bitcoin, AlertTriangle, ShieldAlert, Clock, CheckCircle, ArrowRight, Globe } from 'lucide-react'
 import Link from 'next/link'
+import { TransactionAuthModal } from '@/components/shared/TransactionAuthModal'
 
 const METHODS = [
   { id: 'ach',           label: 'ACH Transfer',        icon: Building,  fee: 0,    feeLabel: 'Free'  },
@@ -63,6 +64,7 @@ export default function WithdrawPage() {
   const [network, setNetwork] = useState('ERC-20')
   const [loading, setLoading] = useState(false)
   const [result,  setResult]  = useState<any>(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   // IBAN fields
   const [ibanCountry,  setIbanCountry]  = useState('')
@@ -126,9 +128,13 @@ export default function WithdrawPage() {
       if (!accountNumber) { toast('Enter the account number', 'error'); return }
     }
 
+    setShowAuthModal(true)
+  }
+
+  const executeWithdraw = async (pin: string, trackTokenNumber?: string) => {
     setLoading(true)
     try {
-      const body: any = { amount: num, method }
+      const body: any = { amount: num, method, pin, trackTokenNumber }
       if (isCrypto) body.cryptoDetails = { coin, coinAmount: parseFloat(coinAmt), network, walletAddress: wallet }
       if (isIBAN) body.bankDetails = {
         iban: ibanRaw.toUpperCase(),
@@ -150,6 +156,7 @@ export default function WithdrawPage() {
       toast(err.message || 'Withdrawal failed', 'error')
     } finally {
       setLoading(false)
+      setShowAuthModal(false)
     }
   }
 
@@ -708,6 +715,7 @@ export default function WithdrawPage() {
           </Card>
         </div>
       </div>
+      <TransactionAuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} onConfirm={executeWithdraw} />
     </div>
   )
 }

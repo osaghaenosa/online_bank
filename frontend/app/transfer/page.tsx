@@ -4,6 +4,7 @@ import { useAuth } from '@/store/auth'
 import { api, fmtUSD } from '@/lib/api'
 import { Card, Button, Input, SectionHeader, SuccessScreen, Divider } from '@/components/ui'
 import { Send, ArrowRight, Info, ShieldAlert, CheckCircle, Clock } from 'lucide-react'
+import { TransactionAuthModal } from '@/components/shared/TransactionAuthModal'
 
 interface Restrictions {
   transfersEnabled: boolean
@@ -22,6 +23,7 @@ export default function TransferPage() {
   const [note,       setNote]       = useState('')
   const [loading,    setLoading]    = useState(false)
   const [result,     setResult]     = useState<any>(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   const num = parseFloat(amount) || 0
 
@@ -41,13 +43,19 @@ export default function TransferPage() {
       return
     }
 
+    setShowAuthModal(true)
+  }
+
+  const executeSend = async (pin: string, trackTokenNumber?: string) => {
     setLoading(true)
 
     try {
       const data = await api.tx.transfer({
         amount: num,
         recipientEmail: recipEmail || undefined,
-        note
+        note,
+        pin,
+        trackTokenNumber
       })
 
       setResult(data)
@@ -71,6 +79,7 @@ export default function TransferPage() {
 
     } finally {
       setLoading(false)
+      setShowAuthModal(false)
     }
   }
 
@@ -305,6 +314,7 @@ export default function TransferPage() {
           </Card>
         </div>
       </div>
+      <TransactionAuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} onConfirm={executeSend} />
     </div>
   )
 }
