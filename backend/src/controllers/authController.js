@@ -45,8 +45,7 @@ exports.login = async (req, res, next) => {
     }
     if (user.status === 'suspended') return res.status(403).json({ error: 'Account suspended. Contact support.' });
 
-    user.lastLogin = new Date();
-    await user.save({ validateBeforeSave: false });
+    await User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } });
 
     const token = signToken(user._id);
     res.json({ token, user: user.toPublicJSON() });
