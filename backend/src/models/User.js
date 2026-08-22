@@ -25,8 +25,8 @@ const userSchema = new mongoose.Schema({
   status: { type: String, enum: ['active', 'suspended', 'pending'], default: 'active' },
   kyc:    { type: String, enum: ['Verified', 'Pending', 'Rejected', 'Not Started'], default: 'Pending' },
   kycDetails: {
-    idCard: { type: String },
-    otherVerification: { type: String },
+    idCard: { type: String, select: false },
+    otherVerification: { type: String, select: false },
     ssnOrBvn: { type: String },
     submittedAt: { type: Date }
   },

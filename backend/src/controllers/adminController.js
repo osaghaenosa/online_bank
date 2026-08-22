@@ -50,7 +50,7 @@ exports.getUsers = async (req, res, next) => {
 
 exports.getUserDetail = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id).select('-password');
+    const user = await User.findById(req.params.id).select('-password +kycDetails.idCard +kycDetails.otherVerification');
     if (!user) return res.status(404).json({ error: 'User not found' });
     const txs = await Transaction.find({ userId: user._id }).sort({ createdAt: -1 }).limit(20);
     res.json({ user: user.toPublicJSON(), transactions: txs });

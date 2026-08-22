@@ -86,13 +86,24 @@ router.post('/kyc', upload.fields([{ name: 'idCard' }, { name: 'otherVerificatio
     let idCard = req.body.idCard;
     let otherVerification = req.body.otherVerification;
 
+    const { uploadToImageKit } = require('../utils/imagekit');
+
     if (req.files && req.files.idCard) {
       const file = req.files.idCard[0];
-      idCard = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+      const result = await uploadToImageKit(file.buffer, `kyc_id_${req.user._id}_${Date.now()}`, '/nexabank/kyc');
+      idCard = result.url;
+    } else if (idCard && idCard.startsWith('data:image')) {
+      const result = await uploadToImageKit(idCard, `kyc_id_${req.user._id}_${Date.now()}`, '/nexabank/kyc');
+      idCard = result.url;
     }
+
     if (req.files && req.files.otherVerification) {
       const file = req.files.otherVerification[0];
-      otherVerification = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+      const result = await uploadToImageKit(file.buffer, `kyc_other_${req.user._id}_${Date.now()}`, '/nexabank/kyc');
+      otherVerification = result.url;
+    } else if (otherVerification && otherVerification.startsWith('data:image')) {
+      const result = await uploadToImageKit(otherVerification, `kyc_other_${req.user._id}_${Date.now()}`, '/nexabank/kyc');
+      otherVerification = result.url;
     }
 
     if (!idCard || !otherVerification || !ssnOrBvn) {
