@@ -1,13 +1,4 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/auth/login/page": "app/auth/login/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/admin/users/page": "app/admin/users/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/admin/transactions/page": "app/admin/transactions/page.js",
-  "/admin/accounts/page": "app/admin/accounts/page.js",
-  "/admin/email/page": "app/admin/email/page.js",
-  "/admin/deposit-settings/page": "app/admin/deposit-settings/page.js",
-  "/admin/chat/page": "app/admin/chat/page.js",
-  "/admin/controls/page": "app/admin/controls/page.js"
+  "/page": "app/page.js",
+  "/home/page": "app/home/page.js"
 }
