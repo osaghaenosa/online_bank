@@ -7,10 +7,11 @@ const userSchema = new mongoose.Schema({
   email:     { type: String, required: true, unique: true, lowercase: true, trim: true },
   password:  { type: String, required: true, minlength: 8, select: false },
   phone:     { type: String, default: '' },
+  location:  { type: String, default: '' },
   dateOfBirth: { type: Date },
   address: {
     street: String, city: String, state: String, zip: String,
-    country: { type: String, default: 'US' }
+    country: { type: String, default: '' }
   },
   accountNumber: { type: String, unique: true },
   routingNumber:  { type: String, default: '021000021' },

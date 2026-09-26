@@ -6,7 +6,7 @@ import { useAuth } from '@/store/auth'
 import { Eye, EyeOff, ArrowRight, CheckCircle } from 'lucide-react'
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', password: '', confirm: '' })
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', country: '', location: '', password: '', confirm: '' })
   const [show, setShow] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -23,7 +23,7 @@ export default function RegisterPage() {
     if (form.password.length < 8) { setError('Password must be at least 8 characters'); return }
     setLoading(true)
     try {
-      await register({ firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone, password: form.password })
+      await register({ firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone, country: form.country, location: form.location, password: form.password })
       toast('Account created! Welcome to NexaBanking 🎉', 'success')
       router.push('/dashboard')
     } catch (err: any) {
@@ -127,6 +127,24 @@ export default function RegisterPage() {
                   onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,.1)'} />
               </div>
             ))}
+
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { k: 'country', label: 'Country', ph: 'e.g. Nigeria' },
+                { k: 'location', label: 'City / Location', ph: 'e.g. Lagos' },
+              ].map(({ k, label, ph }) => (
+                <div key={k}>
+                  <label className="block text-xs font-semibold mb-1.5 text-white/60">{label}</label>
+                  <input type="text" required placeholder={ph}
+                    value={form[k as keyof typeof form]} onChange={f(k as keyof typeof form)}
+                    autoComplete={k === 'country' ? 'country-name' : 'address-level2'}
+                    className="w-full rounded-xl px-3.5 py-2.5 text-sm outline-none font-sans"
+                    style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', color: '#fff' }}
+                    onFocus={e => e.target.style.borderColor = '#10B981'}
+                    onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,.1)'} />
+                </div>
+              ))}
+            </div>
 
             <div>
               <label className="block text-xs font-semibold mb-1.5 text-white/60">Password</label>

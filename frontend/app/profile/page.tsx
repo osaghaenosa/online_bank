@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/store/auth'
 import { api, fmtUSD, maskCard } from '@/lib/api'
 import { Card, Button, Input, SectionHeader, StatusBadge, Badge, Toggle, Divider } from '@/components/ui'
@@ -9,10 +9,21 @@ import Link from 'next/link'
 export default function ProfilePage() {
   const { user, logout, refreshUser, toast } = useAuth()
   const [editing,      setEditing]  = useState(false)
-  const [form,         setForm]     = useState({ firstName: user?.firstName||'', lastName: user?.lastName||'', phone: user?.phone||'' })
+  const [form,         setForm]     = useState({ firstName: user?.firstName||'', lastName: user?.lastName||'', phone: user?.phone||'', country: user?.address?.country||'', location: user?.location||user?.address?.city||'' })
   const [savingProfile, setSP]      = useState(false)
   const [pwForm,        setPwForm]  = useState({ currentPassword:'', newPassword:'', confirm:'' })
   const [savingPw,      setSPw]     = useState(false)
+
+  useEffect(() => {
+    if (!user) return
+    setForm({
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      phone: user.phone || '',
+      country: user.address?.country || '',
+      location: user.location || user.address?.city || '',
+    })
+  }, [user])
 
   const saveProfile = async () => {
     setSP(true)
@@ -87,6 +98,8 @@ export default function ProfilePage() {
                   ['Last Name',  user.lastName],
                   ['Email',      user.email],
                   ['Phone',      user.phone || 'Not set'],
+                  ['Country',    user.address?.country || 'Not set'],
+                  ['Location',   user.location || user.address?.city || 'Not set'],
                 ].map(([l,v]) => (
                   <div key={l} className="flex justify-between py-2.5 sm:py-3 border-b last:border-0 gap-3"
                     style={{ borderColor:'var(--color-border)' }}>
@@ -109,6 +122,14 @@ export default function ProfilePage() {
                 <Input label="Phone" value={form.phone}
                   onChange={e => setForm(p => ({...p, phone: e.target.value}))}
                   placeholder="+1 555-0100" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Input label="Country" value={form.country}
+                    onChange={e => setForm(p => ({...p, country: e.target.value}))}
+                    placeholder="e.g. Nigeria" />
+                  <Input label="City / Location" value={form.location}
+                    onChange={e => setForm(p => ({...p, location: e.target.value}))}
+                    placeholder="e.g. Lagos" />
+                </div>
                 <div className="flex gap-2">
                   <Button variant="secondary" className="flex-1 justify-center" onClick={() => setEditing(false)}>Cancel</Button>
                   <Button variant="primary"   className="flex-1 justify-center" onClick={saveProfile} loading={savingProfile}>Save</Button>
