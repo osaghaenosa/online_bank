@@ -1,16 +1,26 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { Coins, Mail, Headphones } from 'lucide-react'
 import { useAuth } from '@/store/auth'
-import Link from 'next/link'
+import { api } from '@/lib/api'
 
-const PACKAGES = [
-  { tokens: 100, price: 80,   popular: false },
-  { tokens: 300, price: 200,  popular: true },
-  { tokens: 500, price: 350,  popular: false },
+const DEFAULT_PACKAGES = [
+  { tokens: 100, price: 10, popular: false },
+  { tokens: 300, price: 20, popular: true },
+  { tokens: 500, price: 30, popular: false },
 ]
 
 export default function TokensPage() {
   const { user } = useAuth()
+  const [packages, setPackages] = useState(DEFAULT_PACKAGES)
+
+  useEffect(() => {
+    api.settings.getTokenPackages()
+      .then(data => {
+        if (Array.isArray(data.packages) && data.packages.length === 3) setPackages(data.packages)
+      })
+      .catch(() => {})
+  }, [])
   
   return (
     <div className="max-w-4xl mx-auto">
@@ -32,7 +42,7 @@ export default function TokensPage() {
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 mb-12">
-        {PACKAGES.map((pkg, i) => (
+        {packages.map((pkg, i) => (
           <div 
             key={i} 
             className={`relative bg-white rounded-2xl border ${pkg.popular ? 'border-[#10B981] shadow-lg shadow-[#10B981]/10' : 'border-gray-200 shadow-sm'} p-6 flex flex-col`}
@@ -51,8 +61,8 @@ export default function TokensPage() {
               <span className="text-4xl font-bold text-gray-900">${pkg.price}</span>
             </div>
             
-            <a 
-              href="mailto:support@nexabanking.com?subject=Token Purchase Request&body=Hello, I would like to purchase the ${pkg.tokens} tokens package for $${pkg.price}. My account email is: "
+            <a
+              href={`mailto:support@nexabanking.com?${new URLSearchParams({ subject: 'Token Purchase Request', body: `Hello, I would like to purchase the ${pkg.tokens} tokens package for $${pkg.price}. My account email is: ${user?.email || ''}` }).toString()}`}
               className={`mt-auto w-full py-3 px-4 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 ${
                 pkg.popular 
                   ? 'bg-[#10B981] hover:bg-emerald-600 text-white' 

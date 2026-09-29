@@ -136,6 +136,8 @@ export const api = {
     setMaintenance:    (enabled: boolean) => req('/settings/maintenance', { method: 'POST', body: JSON.stringify({ enabled }) }),
     getCardFee:        () => req('/settings/card-fee'),
     setCardFee:        (cardFee: number) => req('/settings/card-fee', { method: 'POST', body: JSON.stringify({ cardFee }) }),
+    getTokenPackages:  () => req('/settings/token-packages'),
+    setTokenPackages:  (packages: Array<{ tokens: number; price: number }>) => req('/settings/token-packages', { method: 'POST', body: JSON.stringify({ packages }) }),
   },
   depositSettings: {
     get: () => req('/admin/deposit-settings'),
