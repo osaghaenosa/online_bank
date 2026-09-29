@@ -105,11 +105,15 @@ export default function AdminSettingsPage() {
     }
   }
 
-  const updateTokenPackagePrice = (index: number, price: number) => {
-    setTokenPackages(current => current.map((pkg, i) => i === index ? { ...pkg, price } : pkg))
+  const updateTokenPackage = (index: number, field: 'tokens' | 'price', value: number) => {
+    setTokenPackages(current => current.map((pkg, i) => i === index ? { ...pkg, [field]: value } : pkg))
   }
 
   const saveTokenPackages = async () => {
+    if (tokenPackages.some(pkg => !Number.isSafeInteger(pkg.tokens) || pkg.tokens <= 0)) {
+      toast('Each token amount must be a positive whole number', 'error')
+      return
+    }
     if (tokenPackages.some(pkg => !Number.isFinite(pkg.price) || pkg.price <= 0)) {
       toast('Each token package price must be greater than zero', 'error')
       return
@@ -118,7 +122,7 @@ export default function AdminSettingsPage() {
     try {
       const result = await api.settings.setTokenPackages(tokenPackages)
       setTokenPackages(result.packages)
-      toast('Token package prices updated', 'success')
+      toast('Token package amounts and prices updated', 'success')
     } catch (err: any) {
       toast(err.message, 'error')
     } finally {
@@ -251,23 +255,33 @@ export default function AdminSettingsPage() {
           </Card>
 
           <Card className="p-5">
-            <SectionHeader title="Token Package Prices" sub="Set the purchase price for each token bundle" />
+            <SectionHeader title="Token Packages" sub="Set the token amount and purchase price for each bundle" />
             <div className="space-y-3">
               {tokenPackages.map((pkg, index) => (
-                <div key={pkg.tokens} className="flex items-center gap-3">
-                  <span className="text-sm font-semibold flex-1">{pkg.tokens} tokens</span>
-                  <div className="relative w-36">
+                <div key={index} className="grid grid-cols-[1fr_1fr] gap-3 items-end">
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5">Token Amount</label>
+                    <input type="number" min="1" step="1" value={pkg.tokens}
+                      onChange={e => updateTokenPackage(index, 'tokens', Number(e.target.value))}
+                      aria-label={`Token amount for package ${index + 1}`}
+                      className="w-full rounded-xl border px-3.5 py-2.5 text-sm font-sans outline-none"
+                      style={{ background:'var(--color-surface)', borderColor:'var(--color-border)', color:'var(--color-text)' }}/>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5">Price</label>
+                    <div className="relative">
                     <DollarSign size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input type="number" min="0.01" step="0.01" value={pkg.price}
-                      onChange={e => updateTokenPackagePrice(index, Number(e.target.value))}
-                      aria-label={`Price for ${pkg.tokens} tokens`}
+                      onChange={e => updateTokenPackage(index, 'price', Number(e.target.value))}
+                      aria-label={`Price for package ${index + 1}`}
                       className="w-full rounded-xl border pl-8 pr-3.5 py-2.5 text-sm font-sans outline-none"
                       style={{ background:'var(--color-surface)', borderColor:'var(--color-border)', color:'var(--color-text)' }}/>
+                    </div>
                   </div>
                 </div>
               ))}
               <Button variant="primary" className="w-full justify-center" onClick={saveTokenPackages} loading={savingTokenPackages}>
-                <Save size={14}/> Save Token Prices
+                <Save size={14}/> Save Token Packages
               </Button>
             </div>
           </Card>

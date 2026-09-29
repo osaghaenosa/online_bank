@@ -80,10 +80,13 @@ router.post('/token-packages', protect, adminOnly, async (req, res, next) => {
       return res.status(400).json({ error: 'Exactly three token packages are required' });
     }
 
-    const normalizedPackages = packages.map((pkg, index) => ({
-      tokens: DEFAULT_TOKEN_PACKAGES[index].tokens,
+    const normalizedPackages = packages.map(pkg => ({
+      tokens: Number(pkg?.tokens),
       price: Number(pkg?.price),
     }));
+    if (normalizedPackages.some(pkg => !Number.isSafeInteger(pkg.tokens) || pkg.tokens <= 0)) {
+      return res.status(400).json({ error: 'Each token amount must be a positive whole number' });
+    }
     if (normalizedPackages.some(pkg => !Number.isFinite(pkg.price) || pkg.price <= 0)) {
       return res.status(400).json({ error: 'Each package price must be greater than zero' });
     }
