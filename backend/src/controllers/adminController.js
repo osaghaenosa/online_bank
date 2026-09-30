@@ -179,9 +179,14 @@ exports.adjustBalance = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const { userId, amount, type, description } = req.body;
+    const { userId, amount, type, description, date } = req.body;
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
+    const transactionDate = date === undefined ? new Date() : new Date(date);
+    if (Number.isNaN(transactionDate.getTime())) {
+      await session.abortTransaction();
+      return res.status(400).json({ error: 'Invalid transaction date' });
+    }
     const user = await User.findById(userId).session(session);
     if (!user) return res.status(404).json({ error: 'User not found' });
     const delta = type === 'credit' ? numAmount : -numAmount;
@@ -191,7 +196,7 @@ exports.adjustBalance = async (req, res, next) => {
       userId, type, category: type === 'credit' ? 'deposit' : 'withdrawal',
       method: 'internal', amount: numAmount, fee: 0,
       description: description || `Admin ${type === 'credit' ? 'Credit' : 'Debit'}`,
-      status: 'completed', balanceAfter: newBalance
+      status: 'completed', balanceAfter: newBalance, createdAt: transactionDate
     });
     await tx.save({ session }); user.balance = newBalance; await user.save({ session });
     await session.commitTransaction();
@@ -519,7 +524,12 @@ exports.editTransaction = async (req, res, next) => {
     if (category    !== undefined) tx.category    = category;
     if (method      !== undefined) tx.method      = method;
     if (status      !== undefined) tx.status      = status;
-    if (date        !== undefined) tx.createdAt   = new Date(date);
+    if (date !== undefined) {
+      const transactionDate = new Date(date);
+      if (Number.isNaN(transactionDate.getTime())) return res.status(400).json({ error: 'Invalid transaction date' });
+      tx.createdAt = transactionDate;
+      tx.updatedAt = new Date();
+    }
     if (amount      !== undefined) {
       const num = parseFloat(amount);
       if (!isNaN(num) && num > 0) tx.amount = num;
@@ -529,7 +539,7 @@ exports.editTransaction = async (req, res, next) => {
       if (!isNaN(f) && f >= 0) tx.fee = f;
     }
 
-    await tx.save();
+    await tx.save(date !== undefined ? { timestamps: false } : undefined);
     res.json({ transaction: tx });
   } catch (err) { next(err); }
 };

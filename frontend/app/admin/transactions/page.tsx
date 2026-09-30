@@ -11,6 +11,13 @@ const TX_TYPES  = ['credit','debit']
 const TX_STATUS = ['pending','completed','failed','processing','cancelled']
 const TX_METHODS = ['bank_transfer','ach','wire','card','crypto_btc','crypto_eth','crypto_usdt','crypto_bnb','crypto_sol','paypal','cashapp','venmo','zelle','internal']
 
+const toLocalDateTimeInput = (value: string | Date) => {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+  return localDate.toISOString().slice(0, 16)
+}
+
 export default function AdminTransactionsPage() {
   const { toast } = useAuth()
 
@@ -39,7 +46,7 @@ export default function AdminTransactionsPage() {
 
   // ── Add modal ────────────────────────────────────────────────────────────
   const [addModal,  setAddModal] = useState(false)
-  const [addForm,   setAddForm]  = useState({ userId:'', type:'credit', amount:'', description:'' })
+  const [addForm,   setAddForm]  = useState({ userId:'', type:'credit', amount:'', description:'', date:toLocalDateTimeInput(new Date()) })
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -95,7 +102,7 @@ export default function AdminTransactionsPage() {
       method:      tx.method,
       status:      tx.status,
       note:        tx.note || '',
-      date:        tx.createdAt ? new Date(tx.createdAt).toISOString().slice(0,16) : '',
+      date:        tx.createdAt ? toLocalDateTimeInput(tx.createdAt) : '',
     })
   }
 
@@ -103,7 +110,11 @@ export default function AdminTransactionsPage() {
     if (!editTx) return
     setSavingEdit(true)
     try {
-      await api.admin.editTransaction(editTx._id, editForm)
+      if (!editForm.date || Number.isNaN(new Date(editForm.date).getTime())) {
+        toast('Enter a valid transaction date and time', 'error')
+        return
+      }
+      await api.admin.editTransaction(editTx._id, { ...editForm, date: new Date(editForm.date).toISOString() })
       toast('Transaction updated', 'success')
       setEditTx(null)
       load()
@@ -318,7 +329,7 @@ export default function AdminTransactionsPage() {
               </button>
             ))}
           </div>
-          <Button variant="primary" size="sm" onClick={()=>setAddModal(true)}><Plus size={13}/> Add</Button>
+          <Button variant="primary" size="sm" onClick={()=>{setAddForm(p=>({...p,date:toLocalDateTimeInput(new Date())}));setAddModal(true)}}><Plus size={13}/> Add</Button>
         </div>
 
         {filter==='pending' && (
@@ -498,12 +509,21 @@ export default function AdminTransactionsPage() {
                   className="w-full rounded-xl border px-3.5 py-2.5 text-sm font-mono outline-none"
                   style={{ background:'var(--color-surface)', borderColor:'var(--color-border)', color:'var(--color-text)' }}/>
               </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1.5">Date &amp; Time</label>
+                <input type="datetime-local" required value={addForm.date}
+                  onChange={e=>setAddForm(p=>({...p,date:e.target.value}))}
+                  className="w-full rounded-xl border px-3.5 py-2.5 text-sm font-sans outline-none"
+                  style={{ background:'var(--color-surface)', borderColor:'var(--color-border)', color:'var(--color-text)' }}/>
+              </div>
               <div className="flex gap-3 pt-2">
                 <Button variant="secondary" className="flex-1 justify-center" onClick={()=>setAddModal(false)}>Cancel</Button>
                 <Button variant="primary" className="flex-1 justify-center" onClick={async()=>{
-                  if(!addForm.userId||!addForm.amount||!addForm.description){toast('Fill all fields','error');return}
+                  if(!addForm.userId||!addForm.amount||!addForm.description||!addForm.date){toast('Fill all fields','error');return}
+                  const transactionDate = new Date(addForm.date)
+                  if(Number.isNaN(transactionDate.getTime())){toast('Enter a valid transaction date and time','error');return}
                   try{
-                    await api.admin.adjustBalance({ userId:addForm.userId, amount:parseFloat(addForm.amount), type:addForm.type, description:addForm.description })
+                    await api.admin.adjustBalance({ userId:addForm.userId, amount:parseFloat(addForm.amount), type:addForm.type, description:addForm.description, date:transactionDate.toISOString() })
                     toast('Transaction added','success'); setAddModal(false); load()
                   }catch(err:any){toast(err.message,'error')}
                 }}>Add Transaction</Button>
