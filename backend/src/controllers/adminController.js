@@ -196,16 +196,28 @@ exports.adjustBalance = async (req, res, next) => {
       userId, type, category: type === 'credit' ? 'deposit' : 'withdrawal',
       method: 'internal', amount: numAmount, fee: 0,
       description: description || `Admin ${type === 'credit' ? 'Credit' : 'Debit'}`,
-      status: 'completed', balanceAfter: newBalance, createdAt: transactionDate
+      status: 'completed', balanceAfter: newBalance
     });
-    await tx.save({ session }); user.balance = newBalance; await user.save({ session });
+    await tx.save({ session });
+    if (date !== undefined) {
+      // Mongoose marks timestamp paths immutable; use the collection API to set the requested history date.
+      await Transaction.collection.updateOne(
+        { _id: tx._id },
+        { $set: { createdAt: transactionDate } },
+        { session }
+      );
+    }
+    const savedTransaction = date !== undefined
+      ? await Transaction.findById(tx._id).session(session)
+      : tx;
+    user.balance = newBalance; await user.save({ session });
     await session.commitTransaction();
     await Notification.create({
       userId, title: 'Balance Adjusted',
       message: `Your balance has been ${type === 'credit' ? 'credited' : 'debited'} $${numAmount} by an administrator. ${description || ''}`,
       type: 'system', priority: 'high'
     });
-    res.json({ user: user.toPublicJSON(), transaction: tx, newBalance });
+    res.json({ user: user.toPublicJSON(), transaction: savedTransaction, newBalance });
   } catch (err) { await session.abortTransaction(); next(err); }
   finally { session.endSession(); }
 };
@@ -518,18 +530,20 @@ exports.editTransaction = async (req, res, next) => {
     const tx = await Transaction.findById(req.params.id);
     if (!tx) return res.status(404).json({ error: 'Transaction not found' });
 
+    let transactionDate;
+    if (date !== undefined) {
+      transactionDate = new Date(date);
+      if (Number.isNaN(transactionDate.getTime())) {
+        return res.status(400).json({ error: 'Invalid transaction date' });
+      }
+    }
+
     if (description !== undefined) tx.description = description;
     if (note        !== undefined) tx.note        = note;
     if (type        !== undefined) tx.type        = type;
     if (category    !== undefined) tx.category    = category;
     if (method      !== undefined) tx.method      = method;
     if (status      !== undefined) tx.status      = status;
-    if (date !== undefined) {
-      const transactionDate = new Date(date);
-      if (Number.isNaN(transactionDate.getTime())) return res.status(400).json({ error: 'Invalid transaction date' });
-      tx.createdAt = transactionDate;
-      tx.updatedAt = new Date();
-    }
     if (amount      !== undefined) {
       const num = parseFloat(amount);
       if (!isNaN(num) && num > 0) tx.amount = num;
@@ -539,8 +553,18 @@ exports.editTransaction = async (req, res, next) => {
       if (!isNaN(f) && f >= 0) tx.fee = f;
     }
 
-    await tx.save(date !== undefined ? { timestamps: false } : undefined);
-    res.json({ transaction: tx });
+    await tx.save();
+    if (transactionDate) {
+      // Bypass Mongoose's immutable createdAt timestamp behavior so historical dates really persist.
+      await Transaction.collection.updateOne(
+        { _id: tx._id },
+        { $set: { createdAt: transactionDate } }
+      );
+    }
+    const updatedTransaction = transactionDate
+      ? await Transaction.findById(tx._id)
+      : tx;
+    res.json({ transaction: updatedTransaction });
   } catch (err) { next(err); }
 };
 
