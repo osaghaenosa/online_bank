@@ -50,8 +50,12 @@ const transactionSchema = new mongoose.Schema({
   completedAt: { type: Date },
   failedAt:    { type: Date },
   failReason:  { type: String },
+
+  // Explicitly declared so admins can backdate it; immutable: false overrides
+  // Mongoose v6+ default which would otherwise lock createdAt after first save.
+  createdAt:   { type: Date, default: Date.now, immutable: false },
 }, {
-  timestamps: true
+  timestamps: { createdAt: false, updatedAt: true }
 });
 
 // Pre-save: calculate netAmount
