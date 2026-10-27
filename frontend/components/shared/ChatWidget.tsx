@@ -16,7 +16,6 @@ export function ChatWidget() {
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef  = useRef<HTMLInputElement>(null)
 
-  // ── Read token client-side only (avoids hydration mismatch) ──────────────
   useEffect(() => {
     setMounted(true)
     setToken(localStorage.getItem('nexabank_token'))
@@ -63,44 +62,55 @@ export function ChatWidget() {
     sendTyping(false)
   }
 
-  // Don't render until mounted (prevents hydration mismatch)
   if (!mounted || !user || user.role === 'admin') return null
 
   return (
-    <div className="fixed bottom-6 right-4 sm:right-6 z-[80] flex flex-col items-end gap-3">
+    <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-[80] flex flex-col items-end gap-3">
       {open && (
-        <div className="w-[calc(100vw-2rem)] sm:w-[360px] flex flex-col rounded-2xl shadow-2xl overflow-hidden"
+        <div
+          className="w-[calc(100vw-2rem)] sm:w-[360px] flex flex-col shadow-2xl overflow-hidden border-2"
           style={{
-            background: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
+            background: '#FFFFFF',
+            borderColor: '#002B5B',
             height: '420px',
-            maxHeight: 'calc(100vh - 120px)',
-          }}>
-          <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ background: '#0F1C35' }}>
+            maxHeight: 'calc(100vh - 160px)',
+          }}
+        >
+          <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0 border-b" style={{ background: '#002B5B', borderColor: '#0052CC' }}>
             <div className="relative">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                style={{ background: '#10B981' }}>N</div>
-              <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[#0F1C35] ${connected ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+              <div
+                className="w-8 h-8 flex items-center justify-center text-white text-xs font-mono font-bold"
+                style={{ background: '#0052CC' }}
+              >
+                BRB
+              </div>
+              <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 border border-[#002B5B] ${connected ? 'bg-blue-400' : 'bg-slate-500'}`} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-semibold">NexaBanking Support</p>
-              <p className="text-white/40 text-[10px]">{connected ? 'Online' : 'Connecting…'}</p>
+              <p className="text-white text-xs font-bold uppercase tracking-wider">Blue ridge Bank Support</p>
+              <p className="text-[10px] font-mono" style={{ color: '#93C5FD' }}>{connected ? '● ONLINE DESK' : 'CONNECTING…'}</p>
             </div>
-            <button onClick={() => setOpen(false)} className="text-white/50 hover:text-white transition-colors p-1">
+            <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white transition-colors p-1">
               <ChevronDown size={18} />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ background: '#F8FAFC' }}>
             {messages.length === 0 && (
               <div className="flex justify-start">
-                <div className="max-w-[80%] rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-sm"
-                  style={{ background: 'var(--color-bg)' }}>
-                  <p className="font-semibold text-xs mb-1" style={{ color: 'var(--color-accent)' }}>NexaBanking Support</p>
-                  <p style={{ color: 'var(--color-text)' }}>Hi {user.firstName}! 👋 How can we help you today?</p>
-                  <p style={{ color: 'var(--color-text)' }}>Send us a message on whatsapp <a href="https://wa.me/12488346313" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline"><i className='whatsapp-icon'></i> here</a></p>
-
-                  <p className="text-[10px] mt-1" style={{ color: 'var(--color-muted)' }}>NexaBanking</p>
+                <div
+                  className="max-w-[85%] px-3.5 py-2.5 text-sm border"
+                  style={{ background: '#FFFFFF', borderColor: '#CBD5E1', borderLeft: '3px solid #0052CC' }}
+                >
+                  <p className="font-bold text-xs mb-1" style={{ color: '#002B5B' }}>Blue ridge Bank Support</p>
+                  <p style={{ color: '#0A192F' }}>Hello {user.firstName}, how can our support desk assist you today?</p>
+                  <p className="mt-1 text-xs" style={{ color: '#475569' }}>
+                    Direct WhatsApp Desk:{' '}
+                    <a href="https://wa.me/12488346313" target="_blank" rel="noopener noreferrer" className="font-bold underline" style={{ color: '#0052CC' }}>
+                      Connect Here
+                    </a>
+                  </p>
+                  <p className="text-[10px] font-mono mt-1" style={{ color: '#64748B' }}>support@theblueridges.com</p>
                 </div>
               </div>
             )}
@@ -108,17 +118,22 @@ export function ChatWidget() {
               const isMe = msg.senderRole === 'user'
               return (
                 <div key={msg._id || i} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm ${isMe ? 'rounded-tr-sm' : 'rounded-tl-sm'}`}
+                  <div
+                    className="max-w-[80%] px-3.5 py-2.5 text-sm border"
                     style={{
-                      background: isMe ? '#10B981' : 'var(--color-bg)',
-                      color: isMe ? '#fff' : 'var(--color-text)',
-                    }}>
+                      background: isMe ? '#0052CC' : '#FFFFFF',
+                      borderColor: isMe ? '#002B5B' : '#CBD5E1',
+                      color: isMe ? '#FFFFFF' : '#0A192F',
+                    }}
+                  >
                     {!isMe && i === 0 && (
-                      <p className="font-semibold text-xs mb-1" style={{ color: 'var(--color-accent)' }}>{msg.senderName}</p>
+                      <p className="font-bold text-xs mb-1" style={{ color: '#0052CC' }}>{msg.senderName}</p>
                     )}
                     <p className="leading-relaxed break-words">{msg.message}</p>
-                    <p className={`text-[10px] mt-1 ${isMe ? 'text-white/60' : ''}`}
-                      style={{ color: isMe ? undefined : 'var(--color-muted)' }}>
+                    <p
+                      className={`text-[10px] font-mono mt-1 ${isMe ? 'text-white/75' : ''}`}
+                      style={{ color: isMe ? undefined : '#64748B' }}
+                    >
                       {new Date(msg.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
@@ -127,10 +142,10 @@ export function ChatWidget() {
             })}
             {typingInfo.isTyping && (
               <div className="flex justify-start">
-                <div className="rounded-2xl rounded-tl-sm px-4 py-3" style={{ background: 'var(--color-bg)' }}>
+                <div className="px-4 py-3 border bg-white" style={{ borderColor: '#CBD5E1' }}>
                   <div className="flex items-center gap-1">
-                    {[0,1,2].map(i => (
-                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-emerald-500 chat-dot" />
+                    {[0, 1, 2].map(i => (
+                      <div key={i} className="w-1.5 h-1.5 bg-[#0052CC] chat-dot" />
                     ))}
                   </div>
                 </div>
@@ -139,18 +154,26 @@ export function ChatWidget() {
             <div ref={bottomRef} />
           </div>
 
-          <div className="px-3 py-3 border-t flex-shrink-0 flex items-center gap-2"
-            style={{ borderColor: 'var(--color-border)' }}>
-            <input ref={inputRef} value={input}
+          <div
+            className="px-3 py-3 border-t flex-shrink-0 flex items-center gap-2 bg-white"
+            style={{ borderColor: '#CBD5E1' }}
+          >
+            <input
+              ref={inputRef}
+              value={input}
               onChange={e => { setInput(e.target.value); sendTyping(e.target.value.length > 0) }}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
-              placeholder="Type a message…"
-              className="flex-1 rounded-xl border px-3.5 py-2 text-sm font-sans outline-none min-w-0"
-              style={{ background: 'var(--color-bg)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
-              disabled={!connected} />
-            <button onClick={handleSend} disabled={!input.trim() || !connected}
-              className="w-9 h-9 flex items-center justify-center rounded-xl transition-all disabled:opacity-40 flex-shrink-0"
-              style={{ background: '#10B981' }}>
+              placeholder="Write a message to support…"
+              className="flex-1 border px-3.5 py-2 text-sm font-sans outline-none min-w-0"
+              style={{ background: '#F8FAFC', borderColor: '#CBD5E1', color: '#0A192F' }}
+              disabled={!connected}
+            />
+            <button
+              onClick={handleSend}
+              disabled={!input.trim() || !connected}
+              className="w-9 h-9 flex items-center justify-center transition-all disabled:opacity-40 flex-shrink-0"
+              style={{ background: '#0052CC' }}
+            >
               <Send size={15} className="text-white" />
             </button>
           </div>
@@ -159,12 +182,16 @@ export function ChatWidget() {
 
       <button
         onClick={() => setOpen(v => !v)}
-        className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95 relative"
-        style={{ background: open ? '#0F1C35' : '#10B981' }}
-        aria-label="Chat with support">
-        {open ? <X size={22} className="text-white" /> : <MessageCircle size={24} className="text-white" />}
+        className="w-13 h-13 px-4 py-3.5 flex items-center justify-center shadow-xl border-2 transition-colors relative"
+        style={{
+          background: open ? '#002B5B' : '#0052CC',
+          borderColor: '#FFFFFF',
+        }}
+        aria-label="Chat with support"
+      >
+        {open ? <X size={20} className="text-white" /> : <MessageCircle size={22} className="text-white" />}
         {!open && unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[20px] h-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1">
+          <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 flex items-center justify-center bg-red-600 text-white text-[10px] font-bold px-1">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}

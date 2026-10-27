@@ -1,268 +1,466 @@
 'use client'
 import Link from 'next/link'
 import { PublicNav } from '@/components/layout/PublicNav'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 import {
-  Shield, Zap, Globe, TrendingUp, CreditCard, Smartphone,
-  ChevronRight, Star, ArrowRight, CheckCircle, Bitcoin,
-  PiggyBank, Lock, Building, Users, DollarSign,
+  Shield, Zap, Globe, CreditCard, ArrowRight, CheckCircle,
+  Bitcoin, PiggyBank, Lock, Building2, Users, DollarSign, FileText, Landmark
 } from 'lucide-react'
 
 const FEATURES = [
-  { icon: Zap,        title: 'Instant Transfers',     desc: 'Move money in seconds between any accounts, anywhere in the world with zero fees.' },
-  { icon: Shield,     title: 'Bank-Grade Security',   desc: '256-bit encryption, 2FA, and 24/7 fraud monitoring protect every transaction.' },
-  { icon: Bitcoin,    title: 'Crypto Integration',    desc: 'Buy, sell, and hold BTC, ETH, USDT, BNB, and SOL directly from your account.' },
-  { icon: PiggyBank,  title: 'Smart Savings',         desc: 'Set goals, automate savings, and watch your wealth grow with competitive rates.' },
-  { icon: CreditCard, title: 'Virtual Cards',         desc: 'Instant virtual debit cards for secure online shopping with spending controls.' },
+  {
+    code: 'SRV-01',
+    icon: Zap,
+    title: 'Direct Wire & ACH Clearing',
+    desc: 'Execute domestic and international transfers with immediate ledger settlement and transparent tracking.',
+  },
+  {
+    code: 'SRV-02',
+    icon: Shield,
+    title: 'Institutional Custody & Security',
+    desc: 'Protected by 256-bit encryption, multi-token hardware verification, and 24/7 automated risk controls.',
+  },
+  {
+    code: 'SRV-03',
+    icon: Bitcoin,
+    title: 'Digital Asset Treasury',
+    desc: 'Deposit, custody, and settle BTC, ETH, USDT, BNB, and SOL directly alongside your fiat checking balance.',
+  },
+  {
+    code: 'SRV-04',
+    icon: PiggyBank,
+    title: 'High-Yield Reserve Vaults',
+    desc: 'Allocate capital into structured savings vaults with competitive institutional yield and instant liquidity.',
+  },
+  {
+    code: 'SRV-05',
+    icon: CreditCard,
+    title: 'Commercial & Virtual Cards',
+    desc: 'Issue instant virtual debit cards with programmable spending limits, merchant locks, and PIN controls.',
+  },
+  {
+    code: 'SRV-06',
+    icon: FileText,
+    title: 'Certified Audit Statements',
+    desc: 'Download official PDF transaction receipts with cryptographic reference numbers for every ledger movement.',
+  },
 ]
 
-const PAYMENT_METHODS = [
-  { name: 'Bank Transfer', color: '#3B82F6' },
-  { name: 'ACH / Wire',    color: '#8B5CF6' },
-  { name: 'Bitcoin',       color: '#F59E0B' },
-  { name: 'Ethereum',      color: '#6366F1' },
-  { name: 'USDT',          color: '#26A17B' },
-  { name: 'Solana',        color: '#9945FF' },
+const SETTLEMENT_RAILS = [
+  { rail: 'Fedwire / Domestic Wire', speed: 'Same-Day Clearing', status: 'OPERATIONAL', code: 'USD-WIRE' },
+  { rail: 'ACH Direct Network', speed: 'Instant / Next-Day', status: 'OPERATIONAL', code: 'USD-ACH' },
+  { rail: 'SWIFT International', speed: '180+ Corridors', status: 'OPERATIONAL', code: 'INTL-SWIFT' },
+  { rail: 'Bitcoin & Ethereum Settlement', speed: 'On-Chain / Instant', status: 'OPERATIONAL', code: 'CRYPTO-L1' },
+  { rail: 'USDT / Solana Treasury', speed: 'Near-Zero Latency', status: 'OPERATIONAL', code: 'STABLE-NET' },
+  { rail: 'Virtual Card Issuance', speed: 'Immediate Provision', status: 'OPERATIONAL', code: 'VISA-COMM' },
 ]
 
 const STATS = [
-  { value: '500K+', label: 'Active Users',        icon: Users },
-  { value: '$2.4B', label: 'Transactions Processed', icon: DollarSign },
-  { value: '99.9%', label: 'Uptime Guarantee',    icon: CheckCircle },
-  { value: '180+',  label: 'Countries Supported', icon: Globe },
+  { value: '500K+', label: 'VERIFIED CLIENT ACCOUNTS', icon: Users },
+  { value: '$2.4B+', label: 'ANNUAL CLEARED VOLUME', icon: DollarSign },
+  { value: '99.99%', label: 'CORE LEDGER UPTIME', icon: CheckCircle },
+  { value: '180+', label: 'SUPPORTED JURISDICTIONS', icon: Globe },
 ]
 
 const TESTIMONIALS = [
-  { name: 'Sarah M.', role: 'Freelance Designer', text: 'NexaBanking transformed how I handle international payments. The crypto integration alone saved me thousands in fees.', stars: 5 },
-  { name: 'James K.', role: 'Small Business Owner', text: 'The admin controls and real-time notifications give me complete visibility over every dollar that moves.', stars: 5 },
-  { name: 'Priya S.', role: 'Software Engineer', text: 'I love that I can send money via Zelle, PayPal, or crypto all from one dashboard. The receipts are perfect for expense tracking.', stars: 5 },
+  {
+    name: 'Sarah M.',
+    role: 'Principal Consultant',
+    text: 'Blue ridge Bank transformed how our firm handles international settlements. The instant PDF audit receipts and multi-rail support keep our accounting effortless.',
+  },
+  {
+    name: 'James K.',
+    role: 'Managing Director',
+    text: 'Having wire transfers, ACH, and digital asset treasury in a single institutional portal gives us complete visibility over every dollar.',
+  },
+  {
+    name: 'Priya S.',
+    role: 'Senior Systems Architect',
+    text: 'Clean, structured, and dependable. The security token architecture and real-time balance ledger set the standard for modern online banking.',
+  },
 ]
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen" style={{ background: '#080E1C', color: '#fff' }}>
+    <div className="min-h-screen" style={{ background: '#F2F5F9', color: '#0A192F' }}>
       <PublicNav />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="hero-gradient min-h-screen flex items-center pt-16 relative overflow-hidden">
-        {/* Decorative orbs */}
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #10B981 0%, transparent 70%)', filter: 'blur(40px)' }} />
-        <div className="absolute bottom-1/4 left-1/4 w-64 h-64 rounded-full opacity-8" style={{ background: 'radial-gradient(circle, #3B82F6 0%, transparent 70%)', filter: 'blur(40px)' }} />
-
-        <div className="max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left */}
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 fade-up"
-              style={{ background: 'rgba(16,185,129,.12)', border: '1px solid rgba(16,185,129,.3)' }}>
-              <div className="status-dot-green" />
-              <span className="text-xs font-semibold" style={{ color: '#10B981' }}>Banking reimagined for 2024</span>
+      {/* ── Architectural Hero Section ────────────────────────────────────── */}
+      <section
+        className="pt-28 sm:pt-32 pb-16 sm:pb-24 border-b-4"
+        style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+          {/* Left Column (7 cols) */}
+          <div className="lg:col-span-7">
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 border"
+              style={{ background: '#001F42', borderColor: '#0052CC' }}
+            >
+              <span className="w-2 h-2" style={{ background: '#60A5FA' }} />
+              <span className="text-[11px] font-mono uppercase tracking-widest font-bold" style={{ color: '#93C5FD' }}>
+                BLUE RIDGE BANK · CHARTERED DIGITAL INSTITUTION
+              </span>
             </div>
 
-            <h1 className="font-display text-5xl md:text-6xl font-bold leading-tight mb-6 fade-up-1">
-              The Future of
+            <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-white">
+              Institutional Strength.
               <br />
-              <span style={{ color: '#10B981' }}>Personal Banking</span>
-              <br />
-              Is Here.
+              <span style={{ color: '#60A5FA' }}>Uncompromised Personal Banking.</span>
             </h1>
 
-            <p className="text-lg text-white/60 mb-8 max-w-lg leading-relaxed fade-up-2">
-              One account for everything — bank transfers, crypto, PayPal, wire transfers, bill payments, and more. 
-              Bank smarter with real-time receipts and complete transparency.
+            <p className="text-base sm:text-lg mb-8 max-w-2xl leading-relaxed" style={{ color: '#BFDBFE' }}>
+              Manage checking, high-yield savings, domestic &amp; international wires, and digital asset settlements from a unified, high-security banking ledger with certified real-time receipts.
             </p>
 
-            <div className="flex flex-wrap gap-4 mb-10 fade-up-3">
-              <Link href="/auth/register" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold text-white pulse-glow"
-                style={{ background: '#10B981' }}>
-                Open Free Account <ArrowRight size={16} />
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-10">
+              <Link
+                href="/auth/register"
+                className="inline-flex items-center justify-center gap-2 px-7 py-4 text-xs font-bold uppercase tracking-wider text-white border transition-colors"
+                style={{ background: '#0052CC', borderColor: '#60A5FA' }}
+              >
+                Open an Account <ArrowRight size={15} />
               </Link>
-              <Link href="/services" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold"
-                style={{ background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', color: '#fff' }}>
-                Explore Features
+              <Link
+                href="/auth/login"
+                className="inline-flex items-center justify-center gap-2 px-7 py-4 text-xs font-bold uppercase tracking-wider text-white border transition-colors hover:bg-white/10"
+                style={{ background: '#001F42', borderColor: '#60A5FA' }}
+              >
+                Access Client Portal
               </Link>
             </div>
 
-            {/* Trust badges */}
-            <div className="flex flex-wrap gap-5 fade-up-4">
-              {['FDIC Insured up to $250K', '256-bit Encryption', 'No Hidden Fees'].map(b => (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 border-t" style={{ borderColor: '#1E3A5F' }}>
+              {[
+                'FDIC Insured up to $250,000',
+                '256-Bit Cryptographic Ledger',
+                'Certified PDF Audit Receipts',
+              ].map(b => (
                 <div key={b} className="flex items-center gap-2">
-                  <CheckCircle size={14} style={{ color: '#10B981' }} />
-                  <span className="text-xs text-white/50">{b}</span>
+                  <CheckCircle size={14} style={{ color: '#60A5FA' }} className="flex-shrink-0" />
+                  <span className="text-xs font-medium" style={{ color: '#DBEAFE' }}>{b}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Right – fake card UI */}
-          <div className="fade-up-2 relative">
-            {/* Main card */}
-            <div className="rounded-2xl p-6 relative overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #1A2B4A 0%, #0F1C35 100%)', border: '1px solid rgba(255,255,255,.1)' }}>
-              <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full opacity-10" style={{ background: '#10B981' }} />
-              <div className="absolute right-12 -bottom-12 w-32 h-32 rounded-full opacity-5" style={{ background: '#3B82F6' }} />
-
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <p className="text-white/40 text-xs uppercase tracking-widest">Checking Account</p>
-                    <p className="font-mono text-3xl font-bold text-white mt-1">$24,850.00</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-white/40 text-xs mb-1">Monthly</p>
-                    <p className="text-emerald-400 text-sm font-semibold">+$3,240</p>
-                  </div>
+          {/* Right Column – Institutional Ledger Preview Box (5 cols) */}
+          <div className="lg:col-span-5">
+            <div
+              className="border-2 bg-white text-slate-900"
+              style={{ borderColor: '#60A5FA', boxShadow: '0 8px 24px rgba(0, 20, 43, 0.35)' }}
+            >
+              {/* Top Header Bar */}
+              <div
+                className="px-5 py-3.5 flex items-center justify-between border-b"
+                style={{ background: '#001F42', borderColor: '#1E3A5F', color: '#FFFFFF' }}
+              >
+                <div className="flex items-center gap-2">
+                  <Landmark size={15} style={{ color: '#60A5FA' }} />
+                  <span className="text-xs font-mono uppercase tracking-wider font-bold">
+                    EXECUTIVE CHECKING LEDGER
+                  </span>
                 </div>
-                <div className="w-10 h-7 rounded bg-amber-400/70 flex items-center justify-center text-[8px] font-bold text-amber-900 mb-4">CHIP</div>
-                <p className="font-mono text-sm tracking-[3px] text-white/60 mb-4">4532 •••• •••• 8921</p>
-                <div className="flex justify-between items-end">
-                  <div>
-                    <p className="text-white/30 text-[10px] uppercase tracking-wider">Card Holder</p>
-                    <p className="text-white text-sm font-semibold">JORDAN MITCHELL</p>
+                <span
+                  className="px-2 py-0.5 text-[10px] font-mono uppercase font-bold"
+                  style={{ background: '#0052CC', color: '#FFFFFF' }}
+                >
+                  ACTIVE · VERIFIED
+                </span>
+              </div>
+
+              {/* Balance Summary */}
+              <div className="p-6 border-b" style={{ borderColor: '#CBD5E1', background: '#FFFFFF' }}>
+                <div className="flex items-baseline justify-between mb-1">
+                  <span className="text-[11px] font-mono uppercase tracking-wider font-semibold" style={{ color: '#475569' }}>
+                    AVAILABLE LIQUID BALANCE
+                  </span>
+                  <span className="text-xs font-mono font-bold" style={{ color: '#0052CC' }}>
+                    ACCT #4532-8921
+                  </span>
+                </div>
+                <p className="font-mono text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: '#002B5B' }}>
+                  $124,850.00 <span className="text-sm font-normal" style={{ color: '#64748B' }}>USD</span>
+                </p>
+
+                <div className="grid grid-cols-2 gap-3 mt-5 pt-4 border-t" style={{ borderColor: '#E2E8F0' }}>
+                  <div className="p-3 border" style={{ background: '#F8FAFC', borderColor: '#CBD5E1' }}>
+                    <p className="text-[10px] font-mono uppercase" style={{ color: '#64748B' }}>30-DAY INFLOW</p>
+                    <p className="font-mono text-sm font-bold mt-0.5" style={{ color: '#0052CC' }}>+$18,420.00</p>
                   </div>
-                  <div className="flex -space-x-2">
-                    <div className="w-7 h-7 rounded-full bg-white/20" />
-                    <div className="w-7 h-7 rounded-full bg-emerald-500/80" />
+                  <div className="p-3 border" style={{ background: '#F8FAFC', borderColor: '#CBD5E1' }}>
+                    <p className="text-[10px] font-mono uppercase" style={{ color: '#64748B' }}>RESERVE YIELD</p>
+                    <p className="font-mono text-sm font-bold mt-0.5" style={{ color: '#002B5B' }}>4.85% APY</p>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Floating transaction cards */}
-            <div className="absolute -right-6 top-12 rounded-xl px-4 py-3 shadow-2xl min-w-44 fade-up-3"
-              style={{ background: '#0F2A1A', border: '1px solid rgba(16,185,129,.3)' }}>
-              <p className="text-xs text-white/40 mb-0.5">Transfer Received</p>
-              <p className="font-mono font-bold text-emerald-400">+$1,500.00</p>
-              <p className="text-xs text-white/30 mt-0.5">From Samantha L.</p>
-            </div>
-            <div className="absolute -left-4 bottom-12 rounded-xl px-4 py-3 shadow-2xl min-w-44 fade-up-4"
-              style={{ background: '#1A1A2E', border: '1px solid rgba(99,102,241,.3)' }}>
-              <p className="text-xs text-white/40 mb-0.5">Bitcoin Deposit</p>
-              <p className="font-mono font-bold" style={{ color: '#F59E0B' }}>+$850.00</p>
-              <p className="text-xs text-white/30 mt-0.5">0.0126 BTC</p>
+              {/* Recent Cleared Settlements */}
+              <div className="p-5" style={{ background: '#F2F5F9' }}>
+                <p className="text-[10px] font-mono uppercase tracking-widest font-bold mb-3" style={{ color: '#002B5B' }}>
+                  RECENT CLEARED SETTLEMENTS
+                </p>
+                <div className="space-y-2">
+                  {[
+                    { ref: 'TXN-9841A', desc: 'Incoming Domestic Wire · Meridian Corp', amt: '+$14,500.00', status: 'CLEARED' },
+                    { ref: 'TXN-9839C', desc: 'ACH Treasury Allocation · Vault Reserve', amt: '+$3,200.00', status: 'CLEARED' },
+                    { ref: 'TXN-9832B', desc: 'International SWIFT Settlement', amt: '-$1,850.00', status: 'VERIFIED' },
+                  ].map(row => (
+                    <div
+                      key={row.ref}
+                      className="px-3.5 py-2.5 bg-white border flex items-center justify-between text-xs"
+                      style={{ borderColor: '#CBD5E1' }}
+                    >
+                      <div>
+                        <p className="font-semibold" style={{ color: '#0A192F' }}>{row.desc}</p>
+                        <p className="font-mono text-[10px]" style={{ color: '#64748B' }}>REF: {row.ref}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-mono font-bold" style={{ color: row.amt.startsWith('+') ? '#0052CC' : '#002B5B' }}>
+                          {row.amt}
+                        </p>
+                        <span className="text-[9px] font-mono uppercase font-bold" style={{ color: '#475569' }}>
+                          {row.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Stats ─────────────────────────────────────────────────────────── */}
-      <section className="py-16 border-y" style={{ background: 'rgba(255,255,255,.02)', borderColor: 'rgba(255,255,255,.06)' }}>
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+      {/* ── Key Institutional Metrics Bar ─────────────────────────────────── */}
+      <section className="bg-white border-b" style={{ borderColor: '#CBD5E1' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x" style={{ borderColor: '#CBD5E1' }}>
           {STATS.map(({ value, label, icon: Icon }) => (
-            <div key={label} className="text-center">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3"
-                style={{ background: 'rgba(16,185,129,.15)' }}>
-                <Icon size={18} style={{ color: '#10B981' }} />
+            <div key={label} className="p-6 sm:p-8 flex items-start gap-4">
+              <div
+                className="w-10 h-10 flex items-center justify-center flex-shrink-0"
+                style={{ background: '#002B5B', color: '#FFFFFF' }}
+              >
+                <Icon size={18} />
               </div>
-              <p className="font-display text-3xl font-bold text-white mb-1">{value}</p>
-              <p className="text-sm text-white/40">{label}</p>
+              <div>
+                <p className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#002B5B' }}>{value}</p>
+                <p className="text-[11px] font-mono uppercase tracking-wider font-semibold mt-1" style={{ color: '#475569' }}>
+                  {label}
+                </p>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── Features ──────────────────────────────────────────────────────── */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#10B981' }}>Everything you need</p>
-            <h2 className="font-display text-4xl font-bold text-white mb-4">Banking Without Limits</h2>
-            <p className="text-white/50 max-w-xl mx-auto">From everyday spending to international crypto transfers, NexaBanking handles it all in one seamless platform.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {FEATURES.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="rounded-2xl p-6 group hover:border-emerald-500/40 transition-all duration-300"
-                style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)' }}>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform"
-                  style={{ background: 'rgba(16,185,129,.15)' }}>
-                  <Icon size={22} style={{ color: '#10B981' }} />
-                </div>
-                <h3 className="font-semibold text-white mb-2">{title}</h3>
-                <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Payment Methods ────────────────────────────────────────────────── */}
-      <section className="py-20" style={{ background: 'rgba(255,255,255,.02)' }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl font-bold text-white mb-3">12+ Payment Methods</h2>
-            <p className="text-white/50">Pay and receive money any way you want</p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            {PAYMENT_METHODS.map(({ name, color }) => (
-              <div key={name} className="flex items-center gap-2.5 px-4 py-2.5 rounded-full"
-                style={{ background: color + '18', border: `1px solid ${color}40` }}>
-                <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-                <span className="text-sm font-medium text-white/80">{name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Receipts CTA ──────────────────────────────────────────────────── */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="rounded-3xl p-10 md:p-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
-            style={{ background: 'linear-gradient(135deg, rgba(16,185,129,.12) 0%, rgba(10,36,69,.6) 100%)', border: '1px solid rgba(16,185,129,.25)' }}>
+      {/* ── Core Banking Capabilities Grid ────────────────────────────────── */}
+      <section className="py-16 sm:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 pb-6 border-b-2" style={{ borderColor: '#002B5B' }}>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#10B981' }}>Full transparency</p>
-              <h2 className="font-display text-4xl font-bold text-white mb-4">Professional Receipts for Every Transaction</h2>
-              <p className="text-white/60 mb-6 leading-relaxed">
-                Every deposit, withdrawal, transfer, and bill payment generates a beautiful PDF receipt with full transaction details, account information, and timestamps — automatically.
+              <p className="text-xs font-mono uppercase tracking-widest font-bold mb-2" style={{ color: '#0052CC' }}>
+                CORE BANKING INFRASTRUCTURE
               </p>
-              <Link href="/auth/register" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white"
-                style={{ background: '#10B981' }}>
-                Get Started Free <ArrowRight size={16} />
+              <h2 className="font-display text-3xl sm:text-4xl font-bold" style={{ color: '#002B5B' }}>
+                Engineered for Financial Precision
+              </h2>
+            </div>
+            <p className="text-sm max-w-md mt-3 md:mt-0" style={{ color: '#475569' }}>
+              Comprehensive personal and commercial banking services operating on a unified, zero-compromise digital ledger.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {FEATURES.map(({ code, icon: Icon, title, desc }) => (
+              <div
+                key={title}
+                className="bg-white border p-6 flex flex-col justify-between transition-colors"
+                style={{ borderColor: '#CBD5E1', borderTop: '3px solid #002B5B' }}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-5">
+                    <div
+                      className="w-11 h-11 flex items-center justify-center"
+                      style={{ background: '#0052CC', color: '#FFFFFF' }}
+                    >
+                      <Icon size={20} />
+                    </div>
+                    <span
+                      className="px-2.5 py-1 text-[10px] font-mono font-bold uppercase"
+                      style={{ background: '#EBF2FF', color: '#002B5B' }}
+                    >
+                      {code}
+                    </span>
+                  </div>
+                  <h3 className="font-display text-lg font-bold mb-2" style={{ color: '#002B5B' }}>
+                    {title}
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: '#475569' }}>
+                    {desc}
+                  </p>
+                </div>
+                <div className="mt-6 pt-4 border-t flex items-center justify-between" style={{ borderColor: '#E2E8F0' }}>
+                  <Link
+                    href="/services"
+                    className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"
+                    style={{ color: '#0052CC' }}
+                  >
+                    Service Specifications <ArrowRight size={13} />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Global Settlement Rails Table ─────────────────────────────────── */}
+      <section className="py-16 sm:py-20 bg-white border-y" style={{ borderColor: '#CBD5E1' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="mb-10">
+            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-2" style={{ color: '#0052CC' }}>
+              MULTI-RAIL CLEARING NETWORK
+            </p>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#002B5B' }}>
+              Supported Payment &amp; Treasury Channels
+            </h2>
+          </div>
+
+          <div className="overflow-x-auto border" style={{ borderColor: '#CBD5E1' }}>
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr style={{ background: '#002B5B', color: '#FFFFFF' }}>
+                  <th className="py-3.5 px-4 text-xs font-mono uppercase tracking-wider">Rail Code</th>
+                  <th className="py-3.5 px-4 text-xs font-mono uppercase tracking-wider">Settlement Channel</th>
+                  <th className="py-3.5 px-4 text-xs font-mono uppercase tracking-wider">Clearing Window</th>
+                  <th className="py-3.5 px-4 text-xs font-mono uppercase tracking-wider text-right">Network Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y text-sm" style={{ borderColor: '#CBD5E1' }}>
+                {SETTLEMENT_RAILS.map(r => (
+                  <tr key={r.code} className="hover:bg-slate-50">
+                    <td className="py-3.5 px-4 font-mono text-xs font-bold" style={{ color: '#0052CC' }}>{r.code}</td>
+                    <td className="py-3.5 px-4 font-semibold" style={{ color: '#002B5B' }}>{r.rail}</td>
+                    <td className="py-3.5 px-4 text-xs" style={{ color: '#475569' }}>{r.speed}</td>
+                    <td className="py-3.5 px-4 text-right">
+                      <span
+                        className="inline-block px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase"
+                        style={{ background: '#EBF2FF', color: '#0052CC', border: '1px solid #93C5FD' }}
+                      >
+                        ● {r.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Certified Receipt & Audit Banner ──────────────────────────────── */}
+      <section className="py-16 sm:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div
+            className="p-8 sm:p-12 border-2 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center"
+            style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
+          >
+            <div className="lg:col-span-7">
+              <div
+                className="inline-block px-3 py-1 mb-4 text-[11px] font-mono uppercase tracking-widest font-bold"
+                style={{ background: '#0052CC', color: '#FFFFFF' }}
+              >
+                VERIFIED AUDIT TRAIL
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl font-bold text-white mb-4">
+                Official PDF Receipts Generated for Every Transaction
+              </h2>
+              <p className="text-sm sm:text-base mb-8 leading-relaxed" style={{ color: '#BFDBFE' }}>
+                Every deposit, wire transfer, withdrawal, and bill settlement automatically generates a standardized Blue ridge Bank PDF receipt containing timestamps, reference codes, and post-transaction balances.
+              </p>
+              <Link
+                href="/auth/register"
+                className="inline-flex items-center gap-2 px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-white border"
+                style={{ background: '#0052CC', borderColor: '#60A5FA' }}
+              >
+                Enroll for Online Banking <ArrowRight size={15} />
               </Link>
             </div>
-            {/* Receipt preview mockup */}
-            <div className="rounded-2xl p-5 text-sm" style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)' }}>
-              <div className="rounded-lg p-4 mb-3" style={{ background: '#0F1C35' }}>
-                <div className="flex justify-between mb-2">
-                  <span className="text-[10px] uppercase tracking-widest text-white/40">Transaction ID</span>
-                  <span className="font-mono text-[10px] text-white/60">TXN4F2A9C1</span>
+
+            <div className="lg:col-span-5">
+              <div className="bg-white p-5 border-2 text-slate-900" style={{ borderColor: '#60A5FA' }}>
+                <div className="pb-3 mb-3 border-b flex items-center justify-between" style={{ borderColor: '#CBD5E1' }}>
+                  <div>
+                    <p className="text-[10px] font-mono uppercase font-bold" style={{ color: '#0052CC' }}>
+                      OFFICIAL TRANSACTION RECEIPT
+                    </p>
+                    <p className="font-display text-sm font-bold" style={{ color: '#002B5B' }}>
+                      BLUE RIDGE BANK · LEDGER RECORD
+                    </p>
+                  </div>
+                  <span
+                    className="px-2 py-0.5 text-[10px] font-mono font-bold"
+                    style={{ background: '#002B5B', color: '#FFFFFF' }}
+                  >
+                    PDF
+                  </span>
                 </div>
-                <p className="font-mono text-2xl font-bold text-emerald-400 mb-1">+$2,500.00</p>
-                <p className="text-xs text-white/40">Bank Transfer Deposit</p>
-              </div>
-              {[['Status', '✅ Completed'], ['Method', 'ACH Transfer'], ['Date', 'Jan 15, 2025 · 14:32'], ['Balance After', '$24,850.00']].map(([k, v]) => (
-                <div key={k} className="flex justify-between py-1.5 border-b" style={{ borderColor: 'rgba(255,255,255,.06)' }}>
-                  <span className="text-white/40 text-xs">{k}</span>
-                  <span className="text-white text-xs font-medium">{v}</span>
+
+                <div className="p-3 mb-3 border" style={{ background: '#EBF2FF', borderColor: '#93C5FD' }}>
+                  <p className="text-[10px] font-mono uppercase" style={{ color: '#002B5B' }}>SETTLED AMOUNT</p>
+                  <p className="font-mono text-2xl font-bold" style={{ color: '#0052CC' }}>+$2,500.00 USD</p>
                 </div>
-              ))}
-              <div className="mt-3 text-center">
-                <span className="text-xs px-3 py-1 rounded-full font-semibold" style={{ background: 'rgba(16,185,129,.15)', color: '#10B981' }}>📄 Download PDF Receipt</span>
+
+                {[
+                  ['Reference ID', 'TXN-4F2A9C1'],
+                  ['Settlement Rail', 'ACH Direct Transfer'],
+                  ['Verification', 'Completed & Cleared'],
+                  ['Resulting Balance', '$24,850.00 USD'],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex justify-between py-2 border-b text-xs" style={{ borderColor: '#E2E8F0' }}>
+                    <span style={{ color: '#64748B' }}>{k}</span>
+                    <span className="font-mono font-semibold" style={{ color: '#0A192F' }}>{v}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Testimonials ──────────────────────────────────────────────────── */}
-      <section className="py-20" style={{ background: 'rgba(255,255,255,.02)' }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl font-bold text-white mb-3">Loved by Thousands</h2>
-            <p className="text-white/50">Real stories from real NexaBanking customers</p>
+      {/* ── Client Testimonials ───────────────────────────────────────────── */}
+      <section className="py-16 sm:py-20 bg-white border-t" style={{ borderColor: '#CBD5E1' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="mb-12">
+            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-2" style={{ color: '#0052CC' }}>
+              CLIENT ENDORSEMENTS
+            </p>
+            <h2 className="font-display text-3xl font-bold" style={{ color: '#002B5B' }}>
+              Trusted by Individuals &amp; Enterprises
+            </h2>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map(({ name, role, text, stars }) => (
-              <div key={name} className="rounded-2xl p-6"
-                style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)' }}>
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: stars }).map((_, i) => <Star key={i} size={14} fill="#F59E0B" stroke="none" />)}
-                </div>
-                <p className="text-sm text-white/70 leading-relaxed mb-5">"{text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                    style={{ background: '#10B981' }}>{name[0]}</div>
+            {TESTIMONIALS.map(({ name, role, text }) => (
+              <div
+                key={name}
+                className="p-6 border flex flex-col justify-between"
+                style={{ background: '#F8FAFC', borderColor: '#CBD5E1', borderTop: '3px solid #0052CC' }}
+              >
+                <p className="text-sm leading-relaxed mb-6" style={{ color: '#1E293B' }}>
+                  &ldquo;{text}&rdquo;
+                </p>
+                <div className="flex items-center gap-3 pt-4 border-t" style={{ borderColor: '#E2E8F0' }}>
+                  <div
+                    className="w-9 h-9 flex items-center justify-center text-xs font-bold text-white"
+                    style={{ background: '#002B5B' }}
+                  >
+                    {name[0]}
+                  </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">{name}</p>
-                    <p className="text-xs text-white/40">{role}</p>
+                    <p className="text-sm font-bold" style={{ color: '#002B5B' }}>{name}</p>
+                    <p className="text-xs" style={{ color: '#64748B' }}>{role}</p>
                   </div>
                 </div>
               </div>
@@ -271,29 +469,55 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Final CTA ─────────────────────────────────────────────────────── */}
-      <section className="py-28">
-        <div className="max-w-2xl mx-auto px-6 text-center">
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">
-            Ready to bank<br /><span style={{ color: '#10B981' }}>smarter?</span>
-          </h2>
-          <p className="text-white/50 mb-8">Open your free account in under 2 minutes. No paperwork. No hidden fees.</p>
-          <Link href="/auth/register" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-semibold text-white"
-            style={{ background: '#10B981' }}>
-            Create Free Account <ArrowRight size={18} />
-          </Link>
-        </div>
-      </section>
+      {/* ── Institutional Footer ──────────────────────────────────────────── */}
+      <footer
+        className="border-t-4 py-12"
+        style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b" style={{ borderColor: '#1E3A5F' }}>
+            <div className="md:col-span-2">
+              <BrandLogo variant="light" size="md" showTagline />
+              <p className="text-xs mt-4 max-w-md leading-relaxed" style={{ color: '#BFDBFE' }}>
+                Blue ridge Bank provides personal checking, high-yield savings, international wire clearing, and digital asset custody under strict regulatory and cryptographic standards.
+              </p>
+              <p className="text-xs font-mono mt-3" style={{ color: '#93C5FD' }}>
+                Support Desk: <a href="mailto:support@theblueridges.com" className="underline text-white">support@theblueridges.com</a>
+              </p>
+            </div>
 
-      {/* Footer */}
-      <footer className="border-t py-10" style={{ borderColor: 'rgba(255,255,255,.08)' }}>
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-4">
-          <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBanking</p>
-          <p className="text-xs text-white/30">© 2026 NexaBanking. All rights reserved.</p>
-          <div className="flex gap-5">
-            {['Privacy', 'Terms', 'Security'].map(l => (
-              <Link key={l} href="#" className="text-xs text-white/40 hover:text-white/70 transition-colors">{l}</Link>
-            ))}
+            <div>
+              <p className="text-xs font-mono uppercase tracking-wider font-bold mb-3" style={{ color: '#60A5FA' }}>
+                Navigation
+              </p>
+              <ul className="space-y-2 text-xs" style={{ color: '#DBEAFE' }}>
+                <li><Link href="/home" className="hover:underline">Overview</Link></li>
+                <li><Link href="/services" className="hover:underline">Banking Services</Link></li>
+                <li><Link href="/about" className="hover:underline">About the Institution</Link></li>
+                <li><Link href="/blog" className="hover:underline">Market Insights</Link></li>
+                <li><Link href="/contact" className="hover:underline">Client Support</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="text-xs font-mono uppercase tracking-wider font-bold mb-3" style={{ color: '#60A5FA' }}>
+                Client Portal
+              </p>
+              <ul className="space-y-2 text-xs" style={{ color: '#DBEAFE' }}>
+                <li><Link href="/auth/login" className="hover:underline">Sign In to Online Banking</Link></li>
+                <li><Link href="/auth/register" className="hover:underline">Open a New Account</Link></li>
+                <li><Link href="/contact" className="hover:underline">Wire &amp; Routing Instructions</Link></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs" style={{ color: '#93C5FD' }}>
+            <p>© 2026 Blue ridge Bank. All rights reserved. Member FDIC. Equal Housing Lender.</p>
+            <div className="flex gap-6">
+              <Link href="/about" className="hover:text-white">Privacy Policy</Link>
+              <Link href="/about" className="hover:text-white">Terms of Service</Link>
+              <Link href="/contact" className="hover:text-white">Security Disclosure</Link>
+            </div>
           </div>
         </div>
       </footer>

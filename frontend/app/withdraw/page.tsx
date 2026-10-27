@@ -322,9 +322,9 @@ export default function WithdrawPage() {
     return (
       <div className="max-w-2xl mx-auto space-y-4 sm:space-y-5 fade-up">
         <div className="rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg,#1a0c0a,#2a1505)', border: '2px solid rgba(249,115,22,.35)' }}>
+          style={{ background: '#002B5B', border: '2px solid rgba(249,115,22,.35)' }}>
           <div className="absolute -right-10 -top-10 w-48 h-48 rounded-full opacity-10 pointer-events-none"
-            style={{ background: 'radial-gradient(circle,#F97316,transparent 70%)' }} />
+            style={{ background: 'transparent' }} />
           <div className="relative z-10">
             <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
               style={{ background: 'rgba(249,115,22,.2)' }}>
@@ -372,7 +372,7 @@ export default function WithdrawPage() {
           style={{ background: 'rgba(59,130,246,.06)', border: '1px solid rgba(59,130,246,.2)' }}>
           <p className="text-xs text-blue-600">
             <strong>Deposits remain available.</strong>{' '}
-            Contact support at <strong>+1 (888) 639-2265</strong>, <strong>compliance@nexabanking.com</strong>, or <strong>thenexabankingteam@yahoo.com</strong>.
+            Contact support at <strong>+1 (888) 639-2265</strong> or <strong>support@theblueridges.com</strong>.
           </p>
         </div>
       </div>
@@ -401,9 +401,9 @@ export default function WithdrawPage() {
                 <button key={m.id} onClick={() => setMethod(m.id)}
                   className="flex items-center gap-2 sm:gap-2.5 p-2.5 sm:p-3 rounded-xl border-2 text-xs font-semibold transition-all font-sans cursor-pointer"
                   style={{
-                    borderColor: method === m.id ? '#10B981' : 'var(--color-border)',
-                    background:  method === m.id ? 'rgba(16,185,129,.08)' : 'var(--color-surface)',
-                    color:       method === m.id ? '#10B981' : 'var(--color-muted)',
+                    borderColor: method === m.id ? '#0052CC' : 'var(--color-border)',
+                    background:  method === m.id ? 'rgba(0,82,204,.08)' : 'var(--color-surface)',
+                    color:       method === m.id ? '#0052CC' : 'var(--color-muted)',
                   }}>
                   <m.icon size={14} className="flex-shrink-0" />
                   <div className="min-w-0">
@@ -437,7 +437,7 @@ export default function WithdrawPage() {
 
                 {/* Info banner */}
                 <div className="flex gap-2.5 p-3.5 rounded-xl"
-                  style={{ background: 'rgba(16,185,129,.06)', border: '1px solid rgba(16,185,129,.25)' }}>
+                  style={{ background: 'rgba(0,82,204,.06)', border: '1px solid rgba(0,82,204,.25)' }}>
                   <Globe size={14} className="text-emerald-500 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-xs font-semibold text-emerald-700">International Bank Transfer (IBAN)</p>
@@ -645,7 +645,7 @@ export default function WithdrawPage() {
               ].map(({ step, label, desc }) => (
                 <div key={step} className="flex gap-3">
                   <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5"
-                    style={{ background: '#10B981' }}>
+                    style={{ background: '#0052CC' }}>
                     {step}
                   </div>
                   <div>
@@ -697,7 +697,7 @@ export default function WithdrawPage() {
             <p className="text-xs font-semibold mb-1" style={{ color: 'var(--color-muted)' }}>
               Current Balance
             </p>
-            <p className="text-xl sm:text-2xl font-bold font-mono" style={{ color: '#10B981' }}>
+            <p className="text-xl sm:text-2xl font-bold font-mono" style={{ color: '#0052CC' }}>
               {fmtUSD(user?.balance || 0)}
             </p>
             {num > 0 && num <= (user?.balance || 0) && (
@@ -710,8 +710,7 @@ export default function WithdrawPage() {
           <Card className="p-4 sm:p-5">
             <SectionHeader title="Need Help?" />
             <p className="text-xs mb-2" style={{ color: 'var(--color-muted)' }}>Contact support:</p>
-            <p className="text-xs font-semibold mb-1">support@nexabanking.com</p>
-            <p className="text-xs font-semibold">thenexabankingteam@yahoo.com</p>
+            <p className="text-xs font-semibold">support@theblueridges.com</p>
           </Card>
         </div>
       </div>

@@ -1,90 +1,106 @@
 'use client'
 import Link from 'next/link'
 import { PublicNav } from '@/components/layout/PublicNav'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 import { Shield, Users, Globe, Award, ArrowRight, CheckCircle, TrendingUp, Lock, Zap } from 'lucide-react'
 
 const TIMELINE = [
-  { year: '2020', title: 'Founded', desc: 'NexaBanking was born from a simple idea: banking should work for everyone, not just the privileged few.' },
-  { year: '2021', title: 'First 10K Users', desc: 'Launched our core checking accounts with instant transfers and reached 10,000 customers in our first year.' },
-  { year: '2022', title: 'Crypto Integration', desc: 'Became one of the first digital banks to offer native crypto holdings alongside traditional USD accounts.' },
-  { year: '2023', title: 'Global Expansion', desc: 'Expanded to support international wire transfers, 12+ payment methods, and 180+ countries.' },
-  { year: '2024', title: '500K+ Members', desc: 'Passed half a million active members and $2.4B in processed transactions with 99.9% uptime.' },
+  { year: '2020', title: 'Institutional Founding', desc: 'Blue ridge Bank was established with a clear mandate: bring institutional-grade banking precision to personal and business accounts.' },
+  { year: '2021', title: 'Core Ledger Launch', desc: 'Launched our core checking and reserve accounts with real-time settlement and certified PDF audit receipts.' },
+  { year: '2022', title: 'Digital Asset Treasury', desc: 'Integrated native digital asset custody alongside USD checking accounts under unified compliance controls.' },
+  { year: '2023', title: 'Global Clearing Expansion', desc: 'Expanded settlement corridors to support international wire transfers, 12+ payment rails, and 180+ jurisdictions.' },
+  { year: '2024', title: '500K+ Verified Accounts', desc: 'Surpassed half a million active client accounts and $2.4B in cleared volume with 99.99% core uptime.' },
 ]
 
 const VALUES = [
-  { icon: Shield,    title: 'Security First',    desc: 'Every feature is built with bank-grade 256-bit encryption and multi-factor authentication as the baseline, not an afterthought.' },
-  { icon: Users,     title: 'People Over Profit', desc: 'No hidden fees, no selling your data, no confusing terms. We earn when you thrive — a model built on aligned incentives.' },
-  { icon: Globe,     title: 'Borderless Finance', desc: 'Money should move freely. We built the infrastructure so your wealth isn\'t locked in by geography or legacy systems.' },
-  { icon: TrendingUp,title: 'Continuous Growth',  desc: 'Every deposit, every transfer, every transaction is an opportunity to learn and improve the product for everyone.' },
+  { icon: Shield, title: 'Cryptographic Security First', desc: 'Every account is fortified with 256-bit AES encryption, hardware-grade authentication, and continuous risk monitoring.' },
+  { icon: Users, title: 'Transparent Governance', desc: 'No hidden maintenance fees, no opaque clearing delays, and complete auditability across every ledger entry.' },
+  { icon: Globe, title: 'Borderless Settlement', desc: 'Engineered so your capital moves seamlessly across domestic ACH, Fedwire, SWIFT, and digital asset networks.' },
+  { icon: TrendingUp, title: 'Disciplined Capital Growth', desc: 'High-yield savings vaults and structured wealth tools designed to preserve and compound client capital.' },
 ]
 
 const TEAM = [
-  { name: 'Alex Rivera',   role: 'CEO & Co-Founder',      init: 'AR', color: '#10B981' },
-  { name: 'Mia Chen',      role: 'CTO & Co-Founder',      init: 'MC', color: '#3B82F6' },
-  { name: 'Jordan Patel',  role: 'Head of Security',      init: 'JP', color: '#8B5CF6' },
-  { name: 'Sadie Okonkwo', role: 'Head of Product',       init: 'SO', color: '#F59E0B' },
-  { name: 'Lucas Torres',  role: 'Lead Engineer',         init: 'LT', color: '#EF4444' },
-  { name: 'Nina Walsh',    role: 'Customer Experience',   init: 'NW', color: '#06B6D4' },
+  { name: 'Alex Rivera', role: 'Chief Executive Officer', init: 'AR' },
+  { name: 'Mia Chen', role: 'Chief Technology Officer', init: 'MC' },
+  { name: 'Jordan Patel', role: 'Chief Information Security Officer', init: 'JP' },
+  { name: 'Sadie Okonkwo', role: 'VP of Banking Operations', init: 'SO' },
+  { name: 'Lucas Torres', role: 'Principal Ledger Architect', init: 'LT' },
+  { name: 'Nina Walsh', role: 'Director of Client Relations', init: 'NW' },
 ]
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen" style={{ background: '#080E1C', color: '#fff' }}>
+    <div className="min-h-screen" style={{ background: '#F2F5F9', color: '#0A192F' }}>
       <PublicNav />
 
-      {/* Hero */}
-      <section className="pt-32 pb-20 px-6 max-w-7xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6"
-          style={{ background: 'rgba(16,185,129,.1)', border: '1px solid rgba(16,185,129,.25)' }}>
-          <span className="text-xs font-semibold" style={{ color: '#10B981' }}>Our Story</span>
+      {/* Hero Header */}
+      <section
+        className="pt-28 sm:pt-36 pb-16 sm:pb-20 px-4 sm:px-6 border-b-4"
+        style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
+      >
+        <div className="max-w-7xl mx-auto">
+          <div
+            className="inline-block px-3 py-1 mb-5 text-xs font-mono uppercase tracking-widest font-bold"
+            style={{ background: '#0052CC', color: '#FFFFFF' }}
+          >
+            INSTITUTIONAL PROFILE · CHARTER &amp; GOVERNANCE
+          </div>
+          <h1 className="font-display text-3xl sm:text-5xl font-bold text-white mb-6 max-w-3xl leading-tight">
+            Built on Banking Discipline, Transparency, and Security.
+          </h1>
+          <p className="text-base sm:text-lg max-w-2xl leading-relaxed" style={{ color: '#BFDBFE' }}>
+            Blue ridge Bank combines traditional institutional banking standards with modern real-time clearing infrastructure for individuals and global enterprises.
+          </p>
         </div>
-        <h1 className="font-display text-5xl md:text-6xl font-bold text-white mb-6">
-          We believe banking<br /><span style={{ color: '#10B981' }}>should be human.</span>
-        </h1>
-        <p className="text-lg text-white/55 max-w-2xl mx-auto leading-relaxed">
-          NexaBanking was built by a team of engineers and designers who were tired of outdated, opaque, 
-          and fee-heavy banking. We set out to build the bank we wished existed.
-        </p>
       </section>
 
-      {/* Mission Banner */}
-      <section className="py-16 px-6">
-        <div className="max-w-7xl mx-auto rounded-3xl p-10 md:p-16 relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #0F2A1A 0%, #0A1628 100%)', border: '1px solid rgba(16,185,129,.2)' }}>
-          <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full opacity-10"
-            style={{ background: 'radial-gradient(circle, #10B981, transparent 70%)' }} />
-          <div className="relative z-10 max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: '#10B981' }}>Our Mission</p>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-6 leading-snug">
-              "To make sophisticated financial tools accessible to every person on the planet — not just the wealthy few."
+      {/* Mission Statement */}
+      <section className="py-16 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto">
+          <div
+            className="bg-white p-8 sm:p-12 border"
+            style={{ borderColor: '#CBD5E1', borderLeft: '6px solid #0052CC' }}
+          >
+            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-3" style={{ color: '#0052CC' }}>
+              INSTITUTIONAL MANDATE
+            </p>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold mb-4 leading-snug" style={{ color: '#002B5B' }}>
+              &ldquo;To deliver institutional-grade financial custody, multi-rail settlement, and verifiable transparency to every account holder.&rdquo;
             </h2>
-            <p className="text-white/50 leading-relaxed">
-              From the freelancer receiving international payments to the small business owner managing payroll, 
-              NexaBanking is engineered to handle every financial need with the speed, transparency, and security 
-              that modern life demands.
+            <p className="text-sm sm:text-base leading-relaxed max-w-4xl" style={{ color: '#475569' }}>
+              From cross-border corporate settlements to personal checking and high-yield reserve management, Blue ridge Bank is engineered to execute every transaction with uncompromising accuracy and complete auditability.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Values */}
-      <section className="py-20 px-6">
+      {/* Core Values */}
+      <section className="py-12 sm:py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="font-display text-3xl font-bold text-white mb-3">What We Stand For</h2>
-            <p className="text-white/50">The principles that guide every decision we make</p>
+          <div className="mb-10 pb-4 border-b-2" style={{ borderColor: '#002B5B' }}>
+            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-1" style={{ color: '#0052CC' }}>
+              OPERATING PRINCIPLES
+            </p>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#002B5B' }}>
+              What Blue ridge Bank Stands For
+            </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {VALUES.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="rounded-2xl p-7 flex gap-5"
-                style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)' }}>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(16,185,129,.15)' }}>
-                  <Icon size={22} style={{ color: '#10B981' }} />
+              <div
+                key={title}
+                className="bg-white p-6 sm:p-8 border flex gap-5"
+                style={{ borderColor: '#CBD5E1', borderTop: '3px solid #002B5B' }}
+              >
+                <div
+                  className="w-12 h-12 flex items-center justify-center flex-shrink-0"
+                  style={{ background: '#0052CC', color: '#FFFFFF' }}
+                >
+                  <Icon size={22} />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white mb-2">{title}</h3>
-                  <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
+                  <h3 className="font-display text-lg font-bold mb-2" style={{ color: '#002B5B' }}>{title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: '#475569' }}>{desc}</p>
                 </div>
               </div>
             ))}
@@ -92,119 +108,142 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Timeline */}
-      <section className="py-20 px-6" style={{ background: 'rgba(255,255,255,.02)' }}>
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="font-display text-3xl font-bold text-white mb-3">Our Journey</h2>
-            <p className="text-white/50">From a bold idea to banking half a million people</p>
-          </div>
-          <div className="relative">
-            {/* Line */}
-            <div className="absolute left-16 top-0 bottom-0 w-px" style={{ background: 'rgba(16,185,129,.2)' }} />
-            <div className="space-y-10">
-              {TIMELINE.map(({ year, title, desc }) => (
-                <div key={year} className="flex gap-8 items-start">
-                  <div className="w-32 flex-shrink-0 text-right pr-4">
-                    <span className="font-mono font-bold text-sm" style={{ color: '#10B981' }}>{year}</span>
-                  </div>
-                  {/* Dot */}
-                  <div className="relative flex-shrink-0 mt-1">
-                    <div className="w-3 h-3 rounded-full" style={{ background: '#10B981', boxShadow: '0 0 0 4px rgba(16,185,129,.2)' }} />
-                  </div>
-                  <div className="pb-2">
-                    <h3 className="font-semibold text-white mb-1">{title}</h3>
-                    <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="font-display text-3xl font-bold text-white mb-3">The Team Behind NexaBanking</h2>
-            <p className="text-white/50">Passionate builders, engineers, and dreamers</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
-            {TEAM.map(({ name, role, init, color }) => (
-              <div key={name} className="text-center">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold mx-auto mb-3"
-                  style={{ background: color + '25', border: `1px solid ${color}40` }}>
-                  <span style={{ color }}>{init}</span>
-                </div>
-                <p className="text-sm font-semibold text-white">{name}</p>
-                <p className="text-xs text-white/40 mt-0.5">{role}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Security section */}
-      <section className="py-20 px-6" style={{ background: 'rgba(255,255,255,.02)' }}>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: '#10B981' }}>Security & Compliance</p>
-            <h2 className="font-display text-3xl font-bold text-white mb-5">Your money is safe with us</h2>
-            <p className="text-white/55 mb-7 leading-relaxed">
-              We take security as seriously as the best banks in the world. Every piece of your financial data is protected with military-grade encryption, and our systems are monitored 24/7 for threats.
+      {/* Institutional Timeline */}
+      <section className="py-16 px-4 sm:px-6 bg-white border-y" style={{ borderColor: '#CBD5E1' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-12">
+            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-1" style={{ color: '#0052CC' }}>
+              HISTORICAL MILESTONES
             </p>
-            <div className="space-y-3">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#002B5B' }}>
+              Institutional Progression
+            </h2>
+          </div>
+          <div className="border-t" style={{ borderColor: '#CBD5E1' }}>
+            {TIMELINE.map(({ year, title, desc }) => (
+              <div
+                key={year}
+                className="grid grid-cols-1 sm:grid-cols-12 gap-4 py-6 border-b items-start"
+                style={{ borderColor: '#CBD5E1' }}
+              >
+                <div className="sm:col-span-2">
+                  <span
+                    className="inline-block px-3 py-1 font-mono font-bold text-xs"
+                    style={{ background: '#002B5B', color: '#FFFFFF' }}
+                  >
+                    {year}
+                  </span>
+                </div>
+                <div className="sm:col-span-4">
+                  <h3 className="font-display font-bold text-base" style={{ color: '#002B5B' }}>{title}</h3>
+                </div>
+                <div className="sm:col-span-6">
+                  <p className="text-sm leading-relaxed" style={{ color: '#475569' }}>{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Executive Leadership */}
+      <section className="py-16 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-10 pb-4 border-b-2" style={{ borderColor: '#002B5B' }}>
+            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-1" style={{ color: '#0052CC' }}>
+              GOVERNANCE BOARD
+            </p>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#002B5B' }}>
+              Executive Leadership
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {TEAM.map(({ name, role, init }) => (
+              <div
+                key={name}
+                className="bg-white p-5 border text-center"
+                style={{ borderColor: '#CBD5E1', borderTop: '3px solid #0052CC' }}
+              >
+                <div
+                  className="w-14 h-14 flex items-center justify-center text-white text-base font-mono font-bold mx-auto mb-3"
+                  style={{ background: '#002B5B' }}
+                >
+                  {init}
+                </div>
+                <p className="text-sm font-bold" style={{ color: '#002B5B' }}>{name}</p>
+                <p className="text-xs mt-1" style={{ color: '#64748B' }}>{role}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Security & Compliance */}
+      <section className="py-16 px-4 sm:px-6 bg-white border-t" style={{ borderColor: '#CBD5E1' }}>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="lg:col-span-7">
+            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-2" style={{ color: '#0052CC' }}>
+              REGULATORY &amp; SECURITY STANDARDS
+            </p>
+            <h2 className="font-display text-3xl font-bold mb-4" style={{ color: '#002B5B' }}>
+              Your Capital Is Protected at Every Layer
+            </h2>
+            <p className="text-sm sm:text-base mb-6 leading-relaxed" style={{ color: '#475569' }}>
+              Every client account is safeguarded by multi-layered cryptographic verification, strict transaction PIN and token authorization, and 24/7 automated ledger auditing.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 'FDIC insured up to $250,000',
-                '256-bit AES encryption at rest and in transit',
-                'Multi-factor authentication on every login',
-                'Real-time fraud detection and alerts',
-                'SOC 2 Type II compliant infrastructure',
-                'Automatic session timeouts and device management',
+                '256-bit AES encryption at rest & in transit',
+                'Multi-factor & PIN transaction verification',
+                'Real-time fraud monitoring & alerts',
+                'SOC 2 Type II certified infrastructure',
+                'Automatic session & device governance',
               ].map(item => (
-                <div key={item} className="flex items-center gap-3">
-                  <CheckCircle size={15} style={{ color: '#10B981', flexShrink: 0 }} />
-                  <span className="text-sm text-white/70">{item}</span>
+                <div key={item} className="flex items-center gap-2.5 p-3 border" style={{ background: '#F8FAFC', borderColor: '#CBD5E1' }}>
+                  <CheckCircle size={15} style={{ color: '#0052CC', flexShrink: 0 }} />
+                  <span className="text-xs font-semibold" style={{ color: '#0A192F' }}>{item}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+
+          <div className="lg:col-span-5 grid grid-cols-2 gap-4">
             {[
-              { icon: Lock,   label: 'End-to-End Encrypted',  color: '#10B981' },
-              { icon: Shield, label: 'Fraud Protected',        color: '#3B82F6' },
-              { icon: Zap,    label: '99.9% Uptime SLA',       color: '#F59E0B' },
-              { icon: Award,  label: 'SOC 2 Certified',        color: '#8B5CF6' },
-            ].map(({ icon: Icon, label, color }) => (
-              <div key={label} className="rounded-2xl p-5 text-center"
-                style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)' }}>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
-                  style={{ background: color + '18' }}>
-                  <Icon size={22} style={{ color }} />
+              { icon: Lock, label: 'End-to-End Encrypted', sub: 'TLS 1.3 / AES-256' },
+              { icon: Shield, label: 'Fraud Protected', sub: '24/7 Ledger Audit' },
+              { icon: Zap, label: '99.99% Uptime SLA', sub: 'Redundant Core' },
+              { icon: Award, label: 'SOC 2 Type II', sub: 'Certified Controls' },
+            ].map(({ icon: Icon, label, sub }) => (
+              <div
+                key={label}
+                className="p-6 border text-center"
+                style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
+              >
+                <div
+                  className="w-11 h-11 flex items-center justify-center mx-auto mb-3"
+                  style={{ background: '#0052CC', color: '#FFFFFF' }}
+                >
+                  <Icon size={20} />
                 </div>
-                <p className="text-xs font-semibold text-white/80">{label}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-white">{label}</p>
+                <p className="text-[11px] font-mono mt-1" style={{ color: '#93C5FD' }}>{sub}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-24 px-6 text-center">
-        <h2 className="font-display text-4xl font-bold text-white mb-4">Join our mission</h2>
-        <p className="text-white/50 mb-8 max-w-md mx-auto">Open your free account today and experience banking the way it should be.</p>
-        <Link href="/auth/register"
-          className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white"
-          style={{ background: '#10B981' }}>
-          Open Free Account <ArrowRight size={16} />
-        </Link>
-      </section>
-
-      <footer className="border-t py-10 px-6" style={{ borderColor: 'rgba(255,255,255,.08)' }}>
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-4">
-          <p className="text-sm font-display font-bold text-white"><span style={{ color: '#10B981' }}>N</span>exaBanking</p>
-          <p className="text-xs text-white/30">© 2026 NexaBanking. All rights reserved.</p>
+      {/* Footer */}
+      <footer
+        className="border-t-4 py-10 px-4 sm:px-6"
+        style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
+      >
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <BrandLogo variant="light" size="sm" />
+          <p className="text-xs" style={{ color: '#93C5FD' }}>
+            © 2026 Blue ridge Bank. All rights reserved. · support@theblueridges.com
+          </p>
         </div>
       </footer>
     </div>

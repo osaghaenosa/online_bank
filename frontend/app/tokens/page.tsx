@@ -21,81 +21,112 @@ export default function TokensPage() {
       })
       .catch(() => {})
   }, [])
-  
+
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 pb-5 border-b-2" style={{ borderColor: '#002B5B' }}>
         <div>
-          <h1 className="text-3xl font-bold font-display text-gray-900 flex items-center gap-3">
-            <Coins className="text-[#10B981]" size={32} />
-            Transaction Tokens
+          <p className="text-[11px] font-mono uppercase tracking-widest font-bold mb-1" style={{ color: '#0052CC' }}>
+            CRYPTOGRAPHIC SETTLEMENT CREDENTIALS
+          </p>
+          <h1 className="text-2xl sm:text-3xl font-bold font-display flex items-center gap-3" style={{ color: '#002B5B' }}>
+            <Coins style={{ color: '#0052CC' }} size={28} />
+            Security Authorization Tokens
           </h1>
-          <p className="text-gray-500 mt-2">
-            Tokens are required to process your transactions smoothly. Each transaction costs 10 tokens.
+          <p className="text-sm mt-1.5" style={{ color: '#475569' }}>
+            Track Token Numbers (TTN) are required to authorize outbound settlements. Each transaction requires 10 tokens.
           </p>
         </div>
-        
-        <div className="bg-emerald-50 border border-[#10B981]/20 rounded-xl p-4 flex flex-col items-center min-w-[160px]">
-          <span className="text-sm font-semibold text-emerald-800 mb-1">Your Balance</span>
-          <span className="text-3xl font-mono font-bold text-[#10B981]">{(user as any)?.tokenBalance || 0}</span>
+
+        <div
+          className="border-2 p-4 flex flex-col items-center min-w-[160px]"
+          style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
+        >
+          <span className="text-[10px] font-mono uppercase tracking-wider mb-1" style={{ color: '#93C5FD' }}>
+            AVAILABLE TOKENS
+          </span>
+          <span className="text-3xl font-mono font-bold text-white">{(user as any)?.tokenBalance || 0}</span>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 mb-12">
+      <div className="grid md:grid-cols-3 gap-6 mb-10">
         {packages.map((pkg, i) => (
-          <div 
-            key={i} 
-            className={`relative bg-white rounded-2xl border ${pkg.popular ? 'border-[#10B981] shadow-lg shadow-[#10B981]/10' : 'border-gray-200 shadow-sm'} p-6 flex flex-col`}
+          <div
+            key={i}
+            className="relative bg-white border-2 p-6 flex flex-col"
+            style={{
+              borderColor: pkg.popular ? '#0052CC' : '#CBD5E1',
+              borderTop: pkg.popular ? '5px solid #0052CC' : '4px solid #002B5B',
+            }}
           >
             {pkg.popular && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#10B981] text-white text-xs font-bold px-3 py-1 rounded-full">
-                MOST POPULAR
+              <div
+                className="mb-4 py-1 px-3 text-white text-[10px] font-mono font-bold uppercase tracking-widest text-center"
+                style={{ background: '#0052CC' }}
+              >
+                RECOMMENDED ALLOCATION
               </div>
             )}
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">{pkg.tokens} Tokens</h3>
-              <div className="text-gray-500 text-sm">Perfect for active users</div>
+              <h3 className="text-2xl font-bold font-display mb-1" style={{ color: '#002B5B' }}>
+                {pkg.tokens} Tokens
+              </h3>
+              <div className="text-xs font-mono uppercase" style={{ color: '#64748B' }}>
+                {Math.floor(pkg.tokens / 10)} Outbound Authorizations
+              </div>
             </div>
-            
-            <div className="text-center mb-8">
-              <span className="text-4xl font-bold text-gray-900">${pkg.price}</span>
+
+            <div className="text-center mb-8 py-4 border-y" style={{ background: '#F8FAFC', borderColor: '#E2E8F0' }}>
+              <span className="text-4xl font-mono font-bold" style={{ color: '#002B5B' }}>${pkg.price}</span>
+              <span className="text-xs font-mono ml-1" style={{ color: '#64748B' }}>USD</span>
             </div>
-            
+
             <a
-              href={`mailto:support@nexabanking.com?${new URLSearchParams({ subject: 'Token Purchase Request', body: `Hello, I would like to purchase the ${pkg.tokens} tokens package for $${pkg.price}. My account email is: ${user?.email || ''}` }).toString()}`}
-              className={`mt-auto w-full py-3 px-4 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 ${
-                pkg.popular 
-                  ? 'bg-[#10B981] hover:bg-emerald-600 text-white' 
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-              }`}
+              href={`mailto:support@theblueridges.com?${new URLSearchParams({
+                subject: 'Token Purchase Request',
+                body: `Hello, I would like to purchase the ${pkg.tokens} tokens package for $${pkg.price}. My account email is: ${user?.email || ''}`,
+              }).toString()}`}
+              className="mt-auto w-full py-3 px-4 text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 border"
+              style={{
+                background: pkg.popular ? '#0052CC' : '#002B5B',
+                borderColor: '#002B5B',
+                color: '#FFFFFF',
+              }}
             >
-              Buy Now
+              Request Token Allocation
             </a>
           </div>
         ))}
       </div>
 
-      <div className="bg-[#0F1C35] rounded-2xl p-6 sm:p-8 text-white flex flex-col sm:flex-row items-center gap-6 sm:gap-8 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#10B981]/20 to-transparent rounded-full blur-3xl" />
-        
-        <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 relative z-10">
-          <Headphones size={32} className="text-[#10B981]" />
+      <div
+        className="p-6 sm:p-8 text-white flex flex-col sm:flex-row items-center gap-6 sm:gap-8 border-2"
+        style={{ background: '#002B5B', borderColor: '#0052CC' }}
+      >
+        <div
+          className="w-14 h-14 flex items-center justify-center flex-shrink-0 border"
+          style={{ background: '#0052CC', borderColor: '#60A5FA' }}
+        >
+          <Headphones size={28} className="text-white" />
         </div>
-        
-        <div className="flex-1 text-center sm:text-left relative z-10">
-          <h3 className="text-xl font-bold font-display mb-2">How to purchase tokens?</h3>
-          <p className="text-white/70 text-sm max-w-lg">
-            To ensure secure processing, token purchases are handled manually. Click 'Buy Now' to email support or contact us directly via the live chat. A secure payment link will be generated uniquely for you.
+
+        <div className="flex-1 text-center sm:text-left">
+          <h3 className="text-lg font-bold font-display mb-1.5 text-white">
+            Token Provisioning Procedure
+          </h3>
+          <p className="text-xs sm:text-sm max-w-lg leading-relaxed" style={{ color: '#BFDBFE' }}>
+            For compliance verification, token allocations are provisioned by our support desk. Click &ldquo;Request Token Allocation&rdquo; or contact us via Live Support Chat to receive your Track Token Number.
           </p>
         </div>
-        
-        <div className="relative z-10 w-full sm:w-auto">
-          <a 
-            href="mailto:support@nexabanking.com" 
-            className="w-full sm:w-auto px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+
+        <div className="w-full sm:w-auto">
+          <a
+            href="mailto:support@theblueridges.com"
+            className="w-full sm:w-auto px-6 py-3 text-xs font-bold uppercase tracking-wider text-white border transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+            style={{ background: '#0052CC', borderColor: '#60A5FA' }}
           >
-            <Mail size={18} />
-            Contact Support
+            <Mail size={15} />
+            Contact Support Desk
           </a>
         </div>
       </div>

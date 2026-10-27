@@ -155,7 +155,7 @@ export default function AdminChatPage() {
             {/* Connection indicator */}
             <div className={`flex items-center gap-1.5 text-[10px] font-semibold ${connected ? 'text-emerald-500' : 'text-slate-400'}`}>
               <div className={`w-2 h-2 rounded-full ${connected ? 'bg-emerald-500' : 'bg-slate-400'}`}
-                style={connected ? { boxShadow: '0 0 0 3px rgba(16,185,129,.25)' } : {}} />
+                style={connected ? { boxShadow: '0 0 0 3px rgba(0,82,204,.25)' } : {}} />
               {token ? (connected ? 'Live' : 'Connecting…') : 'Loading…'}
             </div>
           </div>
@@ -187,11 +187,11 @@ export default function AdminChatPage() {
                 className="w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors border-b"
                 style={{
                   borderColor: 'var(--color-border)',
-                  background: isActive ? 'rgba(16,185,129,.08)' : 'transparent',
+                  background: isActive ? 'rgba(0,82,204,.08)' : 'transparent',
                 }}>
                 <div className="relative flex-shrink-0">
                   <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                    style={{ background: '#0F1C35' }}>
+                    style={{ background: '#002B5B' }}>
                     {room.user.firstName[0]}{room.user.lastName[0]}
                   </div>
                 </div>
@@ -239,13 +239,13 @@ export default function AdminChatPage() {
           <>
             {/* Chat header */}
             <div className="flex items-center gap-3 px-4 py-3 border-b flex-shrink-0"
-              style={{ background: '#0F1C35', borderColor: '#1E2D47' }}>
+              style={{ background: '#002B5B', borderColor: '#1E2D47' }}>
               <button className="sm:hidden text-white/60 hover:text-white p-1"
                 onClick={() => setActiveRoom(null)}>
                 ←
               </button>
               <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                style={{ background: '#10B981' }}>
+                style={{ background: '#0052CC' }}>
                 {activeRoom.user.firstName[0]}{activeRoom.user.lastName[0]}
               </div>
               <div className="flex-1 min-w-0">
@@ -285,7 +285,7 @@ export default function AdminChatPage() {
                     )}
                     <div className={`max-w-[75%] rounded-2xl px-3.5 py-2.5 text-sm ${isAdmin ? 'rounded-tr-sm' : 'rounded-tl-sm'}`}
                       style={{
-                        background: isAdmin ? '#10B981' : 'var(--color-bg)',
+                        background: isAdmin ? '#0052CC' : 'var(--color-bg)',
                         color:      isAdmin ? '#fff'    : 'var(--color-text)',
                       }}>
                       {/* Show sender label on first message or role change */}
@@ -346,7 +346,7 @@ export default function AdminChatPage() {
               />
               <button onClick={handleSend} disabled={!input.trim() || !connected}
                 className="w-9 h-9 flex items-center justify-center rounded-xl transition-all disabled:opacity-40 flex-shrink-0"
-                style={{ background: '#10B981' }}>
+                style={{ background: '#0052CC' }}>
                 <Send size={15} className="text-white" />
               </button>
             </div>

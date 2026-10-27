@@ -38,16 +38,13 @@ export function TransactionAuthModal({ isOpen, onClose, onConfirm, requireTtn = 
   const handleTtnSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!ttn) return
-    
+
     setStep('processing')
-    
+
     try {
-      // Small artificial delay for visual feedback of "Processing..."
       await new Promise(r => setTimeout(r, 1500))
       await onConfirm(pin, ttn)
     } finally {
-      // If it throws or finishes, reset to initial state if it's still open
-      // In most cases, the parent will close the modal on success or error.
       setStep('pin')
       setPin('')
       setTtn('')
@@ -56,11 +53,18 @@ export function TransactionAuthModal({ isOpen, onClose, onConfirm, requireTtn = 
 
   if (step === 'processing') {
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
-          <Loader2 size={48} className="animate-spin text-[#10B981] mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Processing Transaction</h2>
-          <p className="text-gray-500">Connecting to secure banking network... Please wait.</p>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4">
+        <div
+          className="bg-white p-8 max-w-sm w-full text-center shadow-2xl border-2"
+          style={{ borderColor: '#002B5B', borderTop: '5px solid #0052CC' }}
+        >
+          <Loader2 size={44} className="animate-spin mx-auto mb-4" style={{ color: '#0052CC' }} />
+          <h2 className="text-xl font-bold font-display mb-2" style={{ color: '#002B5B' }}>
+            Authorizing Transaction
+          </h2>
+          <p className="text-xs text-slate-600">
+            Verifying cryptographic credentials with Blue ridge Bank clearing network...
+          </p>
         </div>
       </div>
     )
@@ -68,35 +72,42 @@ export function TransactionAuthModal({ isOpen, onClose, onConfirm, requireTtn = 
 
   if (step === 'ttn') {
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl relative">
-          <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-900">&times;</button>
-          
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-[#10B981]">
-              <Coins size={32} />
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4">
+        <div
+          className="bg-white p-6 sm:p-8 max-w-sm w-full shadow-2xl relative border-2"
+          style={{ borderColor: '#002B5B', borderTop: '5px solid #0052CC' }}
+        >
+          <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 text-lg font-bold">&times;</button>
+
+          <div className="flex justify-center mb-5">
+            <div className="w-14 h-14 flex items-center justify-center text-white" style={{ background: '#002B5B' }}>
+              <Coins size={26} />
             </div>
           </div>
-          
-          <h2 className="text-2xl font-bold text-center text-gray-900 mb-2">Track Token Number</h2>
-          <p className="text-center text-gray-500 mb-6 text-sm">
-            Please enter your Track Token Number (TTN) to authorize this transaction. (Cost: 10 Tokens)
+
+          <h2 className="text-xl font-bold font-display text-center mb-2" style={{ color: '#002B5B' }}>
+            Track Token Number
+          </h2>
+          <p className="text-center text-slate-600 mb-6 text-xs leading-relaxed">
+            Enter your Track Token Number (TTN) to authorize this settlement. (10 Tokens Required)
           </p>
 
           <form onSubmit={handleTtnSubmit} className="space-y-4">
             <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="block text-sm font-medium text-gray-700">Track Token Number (TTN)</label>
-                <button type="button" onClick={() => setShowTtnHelp(true)} className="text-[#10B981] hover:text-emerald-700">
-                  <HelpCircle size={16} />
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: '#002B5B' }}>
+                  Track Token Number (TTN)
+                </label>
+                <button type="button" onClick={() => setShowTtnHelp(true)} style={{ color: '#0052CC' }}>
+                  <HelpCircle size={15} />
                 </button>
               </div>
               <input
                 type="text"
                 value={ttn}
                 onChange={(e) => setTtn(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] outline-none transition-all text-center text-lg font-mono uppercase"
-                placeholder="Enter your TTN"
+                className="w-full px-4 py-3 border border-slate-300 focus:border-[#0052CC] outline-none transition-all text-center text-base font-mono uppercase"
+                placeholder="ENTER TTN CODE"
                 required
               />
             </div>
@@ -105,36 +116,43 @@ export function TransactionAuthModal({ isOpen, onClose, onConfirm, requireTtn = 
               <button
                 type="button"
                 onClick={() => setStep('pin')}
-                className="flex-1 py-3 px-4 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all text-sm"
+                className="flex-1 py-3 px-4 text-xs font-bold uppercase tracking-wider text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all"
               >
                 Back
               </button>
               <button
                 type="submit"
                 disabled={!ttn}
-                className="flex-[2] py-3 px-4 rounded-xl font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
-                style={{ background: '#10B981' }}
+                className="flex-[2] py-3 px-4 text-xs font-bold uppercase tracking-wider text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                style={{ background: '#0052CC' }}
               >
-                Authorize
+                Authorize Settlement
               </button>
             </div>
           </form>
 
-          {/* TTN Help Tooltip / Popup */}
           {showTtnHelp && (
-            <div className="absolute inset-0 bg-white/95 backdrop-blur-sm z-10 rounded-2xl p-6 flex flex-col text-center border border-gray-100 shadow-sm">
-              <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <HelpCircle size={24} />
+            <div className="absolute inset-0 bg-white z-10 p-6 flex flex-col text-center border-2" style={{ borderColor: '#002B5B' }}>
+              <div className="w-12 h-12 flex items-center justify-center mx-auto mb-4 text-white" style={{ background: '#0052CC' }}>
+                <HelpCircle size={22} />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">What is a TTN?</h3>
-              <p className="text-sm text-gray-600 mb-6 flex-1">
-                A Track Token Number (TTN) is required for all outbound transactions to ensure absolute security and tracking. You can purchase tokens from your dashboard.
+              <h3 className="text-base font-bold font-display mb-2" style={{ color: '#002B5B' }}>What is a TTN?</h3>
+              <p className="text-xs text-slate-600 mb-6 flex-1 leading-relaxed">
+                A Track Token Number (TTN) is required for outbound settlements to ensure full cryptographic auditability. You can acquire tokens from the Security Tokens section.
               </p>
               <div className="space-y-2">
-                <Link href="/tokens" onClick={onClose} className="block w-full py-2.5 px-4 rounded-xl font-bold text-white bg-blue-500 hover:bg-blue-600 transition-all text-sm">
-                  Buy Tokens Now
+                <Link
+                  href="/tokens"
+                  onClick={onClose}
+                  className="block w-full py-2.5 px-4 text-xs font-bold uppercase tracking-wider text-white"
+                  style={{ background: '#0052CC' }}
+                >
+                  Acquire Tokens Now
                 </Link>
-                <button onClick={() => setShowTtnHelp(false)} className="block w-full py-2.5 px-4 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all text-sm">
+                <button
+                  onClick={() => setShowTtnHelp(false)}
+                  className="block w-full py-2.5 px-4 text-xs font-bold uppercase tracking-wider text-slate-700 bg-slate-100 border border-slate-300"
+                >
                   Close
                 </button>
               </div>
@@ -145,26 +163,32 @@ export function TransactionAuthModal({ isOpen, onClose, onConfirm, requireTtn = 
     )
   }
 
-  // Default: PIN view
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-900">&times;</button>
-        
-        <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-[#10B981]">
-            <ShieldCheck size={32} />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4">
+      <div
+        className="bg-white p-6 sm:p-8 max-w-sm w-full shadow-2xl relative border-2"
+        style={{ borderColor: '#002B5B', borderTop: '5px solid #0052CC' }}
+      >
+        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 text-lg font-bold">&times;</button>
+
+        <div className="flex justify-center mb-5">
+          <div className="w-14 h-14 flex items-center justify-center text-white" style={{ background: '#002B5B' }}>
+            <ShieldCheck size={28} />
           </div>
         </div>
-        
-        <h2 className="text-2xl font-bold text-center text-gray-900 mb-2">Security Check</h2>
-        <p className="text-center text-gray-500 mb-6 text-sm">
-          Please enter your transaction PIN to continue.
+
+        <h2 className="text-xl font-bold font-display text-center mb-2" style={{ color: '#002B5B' }}>
+          Security Authorization
+        </h2>
+        <p className="text-center text-slate-600 mb-6 text-xs">
+          Please enter your numeric Transaction PIN to authorize this request.
         </p>
 
         <form onSubmit={handlePinSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Transaction PIN</label>
+            <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
+              Transaction PIN
+            </label>
             <input
               type="password"
               inputMode="numeric"
@@ -172,24 +196,24 @@ export function TransactionAuthModal({ isOpen, onClose, onConfirm, requireTtn = 
               maxLength={6}
               value={pin}
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] outline-none transition-all text-center text-xl tracking-widest"
+              className="w-full px-4 py-3 border border-slate-300 focus:border-[#0052CC] outline-none transition-all text-center text-xl font-mono tracking-widest"
               placeholder="••••"
               required
             />
           </div>
 
-          <div className="flex items-center justify-center gap-2 text-xs text-gray-500 py-2">
-            <Lock size={12} className="text-emerald-500" />
-            <span>Your PIN is securely encrypted end-to-end. We do not store your raw PIN.</span>
+          <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500 py-1">
+            <Lock size={12} style={{ color: '#0052CC' }} />
+            <span>Encrypted end-to-end verification</span>
           </div>
 
           <button
             type="submit"
             disabled={pin.length < 4}
-            className="w-full py-3 px-4 rounded-xl font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
-            style={{ background: '#10B981' }}
+            className="w-full py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+            style={{ background: '#0052CC' }}
           >
-            Continue <ArrowRight size={18} />
+            Continue <ArrowRight size={15} />
           </button>
         </form>
       </div>

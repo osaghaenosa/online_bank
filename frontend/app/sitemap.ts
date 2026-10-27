@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://nexabanking.com'
+  const baseUrl = 'https://theblueridges.com'
 
   return [
     {

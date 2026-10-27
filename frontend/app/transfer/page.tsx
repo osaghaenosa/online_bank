@@ -94,7 +94,7 @@ export default function TransferPage() {
         <div className="text-sm rounded-xl p-4 space-y-2.5 text-left" style={{ background: 'var(--color-bg)' }}>
           <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>To</span><span className="font-semibold">{result.transaction?.recipientName || recipEmail}</span></div>
           <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Amount</span><span className="font-mono font-bold text-red-500">-{fmtUSD(num)}</span></div>
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Recipient</span><span>{result.recipientFound ? '✅ NexaBanking user' : '⚠ External transfer'}</span></div>
+          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Recipient</span><span>{result.recipientFound ? '✅ Blue ridge Bank user' : '⚠ External transfer'}</span></div>
           <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>New Balance</span><span className="font-mono font-bold">{fmtUSD(result.newBalance)}</span></div>
           {note && <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Note</span><span>{note}</span></div>}
           <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Ref</span><span className="font-mono text-xs">{result.transaction?.transactionId}</span></div>
@@ -119,9 +119,9 @@ export default function TransferPage() {
     return (
       <div className="max-w-2xl mx-auto space-y-5 fade-up">
         <div className="rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #1a0a0a, #2a0f0f)', border: '2px solid rgba(239,68,68,.35)' }}>
+          style={{ background: '#002B5B', border: '2px solid rgba(239,68,68,.35)' }}>
           <div className="absolute -right-10 -top-10 w-48 h-48 rounded-full opacity-10 pointer-events-none"
-            style={{ background: 'radial-gradient(circle, #EF4444, transparent 70%)' }} />
+            style={{ background: 'transparent' }} />
           <div className="relative z-10">
             <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
               style={{ background: 'rgba(239,68,68,.2)' }}>
@@ -144,8 +144,8 @@ export default function TransferPage() {
               {restrictions.transferRequirements.map((req, i) => (
                 <div key={req._id || i} className="flex items-start gap-3 p-3 rounded-xl border"
                   style={{
-                    borderColor: req.fulfilled ? 'rgba(16,185,129,.25)' : 'var(--color-border)',
-                    background:  req.fulfilled ? 'rgba(16,185,129,.04)' : 'var(--color-bg)',
+                    borderColor: req.fulfilled ? 'rgba(0,82,204,.25)' : 'var(--color-border)',
+                    background:  req.fulfilled ? 'rgba(0,82,204,.04)' : 'var(--color-bg)',
                   }}>
                   {req.fulfilled
                     ? <CheckCircle size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
@@ -170,7 +170,7 @@ export default function TransferPage() {
           style={{ background: 'rgba(59,130,246,.06)', border: '1px solid rgba(59,130,246,.2)' }}>
           <Info size={14} className="text-blue-500 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-blue-600">
-            <strong>Deposits remain available.</strong> Contact support at <strong>+1 (888) 639-2265</strong>, <strong>compliance@nexabanking.com</strong>, or <strong>thenexabankingteam@yahoo.com</strong>.
+            <strong>Deposits remain available.</strong> Contact support at <strong>+1 (888) 639-2265</strong> or <strong>support@theblueridges.com</strong>.
           </p>
         </div>
 
@@ -223,7 +223,7 @@ export default function TransferPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
         <div className="lg:col-span-2">
           <Card className="p-4 sm:p-6">
-            <SectionHeader title="Send Money" sub="Transfer to any NexaBank user instantly — free" />
+            <SectionHeader title="Send Money" sub="Transfer to any Blue ridge Bank user instantly — free" />
             <div className="space-y-4">
               <Input
                 label="Recipient Email"
@@ -297,7 +297,7 @@ export default function TransferPage() {
           </Card>
           <Card className="p-4 sm:p-5">
             <SectionHeader title="Your Balance" />
-            <p className="text-xl sm:text-2xl font-bold font-mono" style={{ color: '#10B981' }}>
+            <p className="text-xl sm:text-2xl font-bold font-mono" style={{ color: '#0052CC' }}>
               {fmtUSD(user?.balance || 0)}
             </p>
             {num > 0 && num <= (user?.balance || 0) && (
@@ -309,8 +309,7 @@ export default function TransferPage() {
           <Card className="p-4 sm:p-5">
             <SectionHeader title="Need Help?" />
             <p className="text-xs mb-2" style={{ color: 'var(--color-muted)' }}>Contact support:</p>
-            <p className="text-xs font-semibold mb-1">support@nexabanking.com</p>
-            <p className="text-xs font-semibold">thenexabankingteam@yahoo.com</p>
+            <p className="text-xs font-semibold">support@theblueridges.com</p>
           </Card>
         </div>
       </div>

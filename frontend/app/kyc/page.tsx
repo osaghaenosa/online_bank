@@ -2,7 +2,6 @@
 import { useState, useRef } from 'react'
 import { UploadCloud, ShieldCheck, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
 import { useAuth } from '@/store/auth'
-import { api } from '@/lib/api'
 import clsx from 'clsx'
 
 export default function KycPage() {
@@ -15,19 +14,6 @@ export default function KycPage() {
   const otherInputRef = useRef<HTMLInputElement>(null)
 
   const kycStatus = (user as any)?.kyc
-
-  const handleUpload = async (file: File) => {
-    // Re-use the admin profile picture upload endpoint but via the generic image upload.
-    // Actually we added api.admin.uploadImage, but it's protected by adminOnly.
-    // Wait, the generic image upload might be admin only... I should check that.
-    // We can use a base64 string for now to avoid the admin requirement, or update the generic uploader to be public.
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
-    });
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,9 +39,9 @@ export default function KycPage() {
       const res = await fetch(`${baseUrl}/users/kyc`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
-        body: formData
+        body: formData,
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || data.message || 'Failed to submit KYC')
@@ -71,131 +57,142 @@ export default function KycPage() {
 
   if (kycStatus === 'Verified') {
     return (
-      <div className="max-w-2xl mx-auto mt-12 text-center">
-        <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mx-auto mb-6">
-          <CheckCircle2 size={40} />
+      <div className="max-w-2xl mx-auto mt-12 p-8 bg-white border-2 text-center" style={{ borderColor: '#002B5B', borderTop: '5px solid #0052CC' }}>
+        <div className="w-16 h-16 flex items-center justify-center text-white mx-auto mb-5" style={{ background: '#0052CC' }}>
+          <CheckCircle2 size={32} />
         </div>
-        <h2 className="text-3xl font-bold font-display text-gray-900 mb-4">KYC Verified</h2>
-        <p className="text-gray-500">Your account is fully verified. You have access to all banking features.</p>
+        <h2 className="text-2xl font-bold font-display mb-2" style={{ color: '#002B5B' }}>KYC Compliance Verified</h2>
+        <p className="text-sm text-slate-600">Your identity verification is complete. You have full access to all Blue ridge Bank features.</p>
       </div>
     )
   }
 
   if (kycStatus === 'Pending') {
     return (
-      <div className="max-w-2xl mx-auto mt-12 text-center">
-        <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 mx-auto mb-6">
-          <AlertCircle size={40} />
+      <div className="max-w-2xl mx-auto mt-12 p-8 bg-white border-2 text-center" style={{ borderColor: '#002B5B', borderTop: '5px solid #0052CC' }}>
+        <div className="w-16 h-16 flex items-center justify-center text-white mx-auto mb-5" style={{ background: '#002B5B' }}>
+          <AlertCircle size={32} />
         </div>
-        <h2 className="text-3xl font-bold font-display text-gray-900 mb-4">Verification Pending</h2>
-        <p className="text-gray-500">Your KYC documents are currently under review by our team. We will notify you once your account is verified.</p>
+        <h2 className="text-2xl font-bold font-display mb-2" style={{ color: '#002B5B' }}>Verification Under Review</h2>
+        <p className="text-sm text-slate-600">Your KYC documents are currently under review by our compliance team. We will notify you once approved.</p>
       </div>
     )
   }
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold font-display text-gray-900 flex items-center gap-3">
-          <ShieldCheck className="text-[#10B981]" size={32} />
-          KYC Verification
+      <div className="mb-6 pb-4 border-b-2" style={{ borderColor: '#002B5B' }}>
+        <p className="text-[11px] font-mono uppercase tracking-widest font-bold mb-1" style={{ color: '#0052CC' }}>
+          REGULATORY COMPLIANCE
+        </p>
+        <h1 className="text-2xl sm:text-3xl font-bold font-display flex items-center gap-3" style={{ color: '#002B5B' }}>
+          <ShieldCheck style={{ color: '#0052CC' }} size={28} />
+          Identity Verification (KYC)
         </h1>
-        <p className="text-gray-500 mt-2">Please provide your details below to verify your identity and unlock all account features.</p>
+        <p className="text-sm mt-1" style={{ color: '#475569' }}>
+          Submit your identification documents below to unlock full settlement limits and card issuance.
+        </p>
       </div>
 
       {/* Why KYC */}
-      <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 mb-6">
-        <h3 className="text-sm font-bold text-blue-900 mb-2 flex items-center gap-2">
-          <ShieldCheck size={15} className="text-blue-600" />
-          Why do we need to verify your identity?
+      <div className="p-5 mb-6 border-l-4" style={{ background: '#EBF2FF', borderColor: '#0052CC' }}>
+        <h3 className="text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2" style={{ color: '#002B5B' }}>
+          <ShieldCheck size={15} style={{ color: '#0052CC' }} />
+          Regulatory Compliance Notice
         </h3>
-        <p className="text-sm text-blue-800 mb-3">
-          KYC (Know Your Customer) is a regulatory requirement that helps us prevent fraud, money laundering, and financial crime. It is required by financial regulators worldwide for all banking services.
+        <p className="text-xs leading-relaxed mb-3" style={{ color: '#1E3A5F' }}>
+          Know Your Customer (KYC) verification is required by international banking regulations to protect client accounts and prevent unauthorized activity.
         </p>
-        <p className="text-sm text-blue-700 font-medium mb-2">Completing KYC unlocks:</p>
-        <ul className="text-sm text-blue-700 space-y-1 list-none">
-          <li className="flex items-center gap-2">✅ Withdrawals &amp; international transfers</li>
-          <li className="flex items-center gap-2">✅ Virtual &amp; physical debit card</li>
-          <li className="flex items-center gap-2">✅ Higher transaction limits</li>
-          <li className="flex items-center gap-2">✅ Access to Wealth &amp; Investment features</li>
-          <li className="flex items-center gap-2">✅ Full account protection &amp; insurance</li>
+        <p className="text-xs font-bold mb-1.5" style={{ color: '#002B5B' }}>Completing KYC unlocks:</p>
+        <ul className="text-xs space-y-1 list-none" style={{ color: '#1E3A5F' }}>
+          <li>• Domestic &amp; international wire withdrawals</li>
+          <li>• Virtual &amp; commercial debit card provisioning</li>
+          <li>• Elevated daily and monthly transaction limits</li>
+          <li>• Full Wealth, Reserve, &amp; Trust Fund access</li>
         </ul>
-        <p className="text-xs text-blue-600 mt-3">🔒 Your documents are encrypted, stored securely, and never shared with third parties without your consent.</p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white border" style={{ borderColor: '#CBD5E1', borderTop: '4px solid #002B5B' }}>
         <div className="p-6 sm:p-8">
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* SSN / BVN */}
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">SSN or BVN (9 - 11 digits)</label>
+              <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#002B5B' }}>
+                SSN / Tax ID / National Identification Number
+              </label>
               <input
                 type="text"
                 value={ssnOrBvn}
                 onChange={(e) => setSsnOrBvn(e.target.value)}
-                placeholder="Enter your SSN or BVN"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] outline-none transition-all"
+                placeholder="Enter your SSN, Tax ID, or National ID number"
+                className="w-full px-4 py-3 bg-white border border-slate-300 focus:border-[#0052CC] outline-none transition-all text-sm font-mono"
                 required
               />
             </div>
 
-            {/* ID Card */}
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Government Issued ID Card</label>
-              <p className="text-xs text-gray-500 mb-4">Upload a clear photo of your Driver's License, Passport, or National ID.</p>
-              
-              <div 
+              <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#002B5B' }}>
+                Government-Issued Photo Identification
+              </label>
+              <p className="text-xs text-slate-500 mb-3">Upload a clear scan or photo of your Passport, Driver&apos;s License, or National ID Card.</p>
+
+              <div
                 onClick={() => idInputRef.current?.click()}
                 className={clsx(
-                  "border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors",
-                  idCardFile ? "border-[#10B981] bg-emerald-50" : "border-gray-300 hover:border-[#10B981] hover:bg-gray-50"
+                  'border-2 border-dashed p-7 text-center cursor-pointer transition-colors',
+                  idCardFile ? 'border-[#0052CC] bg-[#EBF2FF]' : 'border-slate-300 hover:border-[#0052CC] hover:bg-slate-50'
                 )}
               >
-                <input 
-                  type="file" 
-                  ref={idInputRef} 
-                  className="hidden" 
+                <input
+                  type="file"
+                  ref={idInputRef}
+                  className="hidden"
                   accept="image/*"
                   onChange={(e) => setIdCardFile(e.target.files?.[0] || null)}
                 />
-                <UploadCloud className={clsx("mx-auto mb-3", idCardFile ? "text-[#10B981]" : "text-gray-400")} size={32} />
-                <p className="font-medium text-gray-900">{idCardFile ? idCardFile.name : 'Click to upload ID Card'}</p>
-                <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                <UploadCloud className="mx-auto mb-2" style={{ color: idCardFile ? '#0052CC' : '#64748B' }} size={28} />
+                <p className="font-bold text-sm" style={{ color: '#002B5B' }}>
+                  {idCardFile ? idCardFile.name : 'Click to Select Photo ID Document'}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">PNG or JPG up to 5MB</p>
               </div>
             </div>
 
-            {/* Other Verification */}
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Other Verification Document (Utility Bill)</label>
-              <p className="text-xs text-gray-500 mb-4">Upload a recent utility bill or bank statement showing your address.</p>
-              
-              <div 
+              <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#002B5B' }}>
+                Proof of Address Document (Utility Bill or Bank Statement)
+              </label>
+              <p className="text-xs text-slate-500 mb-3">Upload a recent utility bill or statement displaying your residential address.</p>
+
+              <div
                 onClick={() => otherInputRef.current?.click()}
                 className={clsx(
-                  "border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors",
-                  otherDocFile ? "border-[#10B981] bg-emerald-50" : "border-gray-300 hover:border-[#10B981] hover:bg-gray-50"
+                  'border-2 border-dashed p-7 text-center cursor-pointer transition-colors',
+                  otherDocFile ? 'border-[#0052CC] bg-[#EBF2FF]' : 'border-slate-300 hover:border-[#0052CC] hover:bg-slate-50'
                 )}
               >
-                <input 
-                  type="file" 
-                  ref={otherInputRef} 
-                  className="hidden" 
+                <input
+                  type="file"
+                  ref={otherInputRef}
+                  className="hidden"
                   accept="image/*"
                   onChange={(e) => setOtherDocFile(e.target.files?.[0] || null)}
                 />
-                <UploadCloud className={clsx("mx-auto mb-3", otherDocFile ? "text-[#10B981]" : "text-gray-400")} size={32} />
-                <p className="font-medium text-gray-900">{otherDocFile ? otherDocFile.name : 'Click to upload Document'}</p>
-                <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                <UploadCloud className="mx-auto mb-2" style={{ color: otherDocFile ? '#0052CC' : '#64748B' }} size={28} />
+                <p className="font-bold text-sm" style={{ color: '#002B5B' }}>
+                  {otherDocFile ? otherDocFile.name : 'Click to Select Proof of Address'}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">PNG or JPG up to 5MB</p>
               </div>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={loading || !ssnOrBvn || !idCardFile || !otherDocFile}
-                className="w-full py-4 px-6 bg-[#10B981] hover:bg-emerald-600 text-white font-bold rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-4 px-6 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                style={{ background: '#0052CC' }}
               >
-                {loading ? <Loader2 size={20} className="animate-spin" /> : 'Submit Verification'}
+                {loading ? <Loader2 size={18} className="animate-spin" /> : 'Submit Compliance Documents'}
               </button>
             </div>
           </form>

@@ -35,7 +35,7 @@ router.get('/:transactionId/download', async (req, res, next) => {
     const receipt = await generateReceiptPDF(tx, user);
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="NexaBank_Receipt_${tx.transactionId}.pdf"`);
+    res.setHeader('Content-Disposition', `attachment; filename="Blue_ridge_Bank_Receipt_${tx.transactionId}.pdf"`);
     fs.createReadStream(receipt.filepath).pipe(res);
   } catch (err) { next(err); }
 });

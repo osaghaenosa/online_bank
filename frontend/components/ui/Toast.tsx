@@ -18,7 +18,7 @@ export function ToastContainer() {
         const { icon: Icon, border, icon_cls } = CFG[t.type]
         return (
           <div key={t.id} className={clsx(
-            'toast-in pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border-l-4 min-w-[300px] max-w-sm',
+            'toast-in pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-none shadow-xl border-l-4 min-w-[300px] max-w-sm',
             border
           )}
           style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>

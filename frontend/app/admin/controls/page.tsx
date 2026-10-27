@@ -158,7 +158,7 @@ export default function AdminControlsPage() {
                   <div className="flex items-center gap-4 p-4"
                     style={{ background: 'var(--color-surface)' }}>
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-                      style={{ background: '#0F1C35' }}>
+                      style={{ background: '#002B5B' }}>
                       {u.firstName[0]}{u.lastName[0]}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -191,7 +191,7 @@ export default function AdminControlsPage() {
                           </span>
                         </div>
                         {txBlocked
-                          ? <Button variant="secondary" size="xs" style={{ color:'#10B981', borderColor:'#10B981' }}
+                          ? <Button variant="secondary" size="xs" style={{ color:'#0052CC', borderColor:'#0052CC' }}
                               onClick={() => openEnable(u, 'transfer')}>
                               <ShieldCheck size={11} /> Restore
                             </Button>
@@ -246,7 +246,7 @@ export default function AdminControlsPage() {
                           </span>
                         </div>
                         {wdBlocked
-                          ? <Button variant="secondary" size="xs" style={{ color:'#10B981', borderColor:'#10B981' }}
+                          ? <Button variant="secondary" size="xs" style={{ color:'#0052CC', borderColor:'#0052CC' }}
                               onClick={() => openEnable(u, 'withdrawal')}>
                               <ShieldCheck size={11} /> Restore
                             </Button>
@@ -322,8 +322,8 @@ export default function AdminControlsPage() {
                   {REQUIREMENT_PRESETS.map(preset => (
                     <label key={preset.type} className="flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-colors"
                       style={{
-                        background: selectedReqs.includes(preset.type) ? 'rgba(16,185,129,.06)' : 'var(--color-bg)',
-                        border: `1px solid ${selectedReqs.includes(preset.type) ? 'rgba(16,185,129,.3)' : 'var(--color-border)'}`
+                        background: selectedReqs.includes(preset.type) ? 'rgba(0,82,204,.06)' : 'var(--color-bg)',
+                        border: `1px solid ${selectedReqs.includes(preset.type) ? 'rgba(0,82,204,.3)' : 'var(--color-border)'}`
                       }}>
                       <input type="checkbox" checked={selectedReqs.includes(preset.type)}
                         onChange={e => {

@@ -187,8 +187,8 @@ export default function AdminTransfersPage() {
               <button key={f} onClick={() => { setCatFilter(f); setPage(1) }}
                 className="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all font-sans capitalize"
                 style={{
-                  background:   catFilter === f ? '#0F1C35' : 'var(--color-surface)',
-                  borderColor:  catFilter === f ? '#0F1C35' : 'var(--color-border)',
+                  background:   catFilter === f ? '#002B5B' : 'var(--color-surface)',
+                  borderColor:  catFilter === f ? '#002B5B' : 'var(--color-border)',
                   color:        catFilter === f ? '#fff'    : 'var(--color-muted)',
                 }}>
                 {f === 'all' ? 'All Outgoing' : f.replace(/_/g, ' ')}
@@ -215,7 +215,7 @@ export default function AdminTransfersPage() {
           { label: 'Total Shown',     value: filtered.length,                                                              color: '#6366F1' },
           { label: 'Withdrawals',     value: filtered.filter(t => t.category === 'withdrawal').length,                     color: '#EF4444' },
           { label: 'Transfers Out',   value: filtered.filter(t => t.category === 'transfer_out').length,                   color: '#F59E0B' },
-          { label: 'Total Volume',    value: fmtUSD(filtered.reduce((s, t) => s + (t.amount || 0), 0)),                    color: '#10B981' },
+          { label: 'Total Volume',    value: fmtUSD(filtered.reduce((s, t) => s + (t.amount || 0), 0)),                    color: '#0052CC' },
         ].map(s => (
           <Card key={s.label} className="p-3 sm:p-4">
             <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--color-muted)' }}>{s.label}</p>

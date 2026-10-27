@@ -143,8 +143,20 @@ export const api = {
     get: () => req('/admin/deposit-settings'),
   },
   email: {
-    send:   (body: object) => req('/email/send',  { method: 'POST', body: JSON.stringify(body) }),
-    verify: ()             => req('/email/verify'),
+    send:        (body: object) => req('/email/send',  { method: 'POST', body: JSON.stringify(body) }),
+    verify:      ()             => req('/email/verify'),
+    inbox:       (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return req(`/email/inbox${qs}`)
+    },
+    inboxDetail: (id: string) => req(`/email/inbox/${encodeURIComponent(id)}`),
+    attachment:  (emailId: string, attachmentId: string) =>
+      req(`/email/inbox/${encodeURIComponent(emailId)}/attachments/${encodeURIComponent(attachmentId)}`),
+    sent:        (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return req(`/email/sent${qs}`)
+    },
+    sentDetail:  (id: string) => req(`/email/sent/${encodeURIComponent(id)}`),
   },
   chat: {
     history:       ()              => req('/chat/history'),

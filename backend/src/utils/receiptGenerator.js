@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const RECEIPTS_DIR = path.join(process.cwd(), 'uploads', 'receipts');
+const LOGO_PATH = path.join(__dirname, 'logo.jpg');
 
 // Ensure dir exists
 if (!fs.existsSync(RECEIPTS_DIR)) {
@@ -39,79 +40,91 @@ exports.generateReceiptPDF = async (transaction, user) => {
     const stream = fs.createWriteStream(filepath);
     doc.pipe(stream);
 
-    // ── Header ────────────────────────────────────────────────────────────────
-    // Navy background header
-    doc.rect(0, 0, 595, 120).fill('#1A2B4A');
+    // ── Header (Solid Corporate Blue #002B5B + #0052CC Accent Strip) ──────────
+    doc.rect(0, 0, 595, 116).fill('#002B5B');
+    doc.rect(0, 116, 595, 5).fill('#0052CC');
+
+    let textStartX = 50;
+    if (fs.existsSync(LOGO_PATH)) {
+      try {
+        doc.rect(48, 28, 56, 56).fill('#FFFFFF');
+        doc.image(LOGO_PATH, 50, 30, { width: 52, height: 52 });
+        textStartX = 116;
+      } catch (e) {
+        // Fallback if image read fails
+      }
+    }
 
     // Bank name
-    doc.font('Helvetica-Bold').fontSize(28).fillColor('#10B981').text('N', 50, 35, { continued: true });
-    doc.font('Helvetica-Bold').fontSize(28).fillColor('#ffffff').text('exaBank');
+    doc.font('Helvetica-Bold').fontSize(24).fillColor('#FFFFFF').text('BLUE RIDGE ', textStartX, 34, { continued: true });
+    doc.font('Helvetica-Bold').fontSize(24).fillColor('#60A5FA').text('BANK');
 
-    doc.font('Helvetica').fontSize(11).fillColor('rgba(255,255,255,0.6)').text('Personal Banking', 50, 70);
-    doc.font('Helvetica').fontSize(10).fillColor('rgba(255,255,255,0.5)').text('www.nexabanking.com | support@nexabanking.com', 50, 88);
+    doc.font('Helvetica-Bold').fontSize(9).fillColor('#93C5FD').text('INSTITUTIONAL & PERSONAL BANKING', textStartX, 64);
+    doc.font('Helvetica').fontSize(9).fillColor('#BFDBFE').text('www.theblueridges.com | support@theblueridges.com', textStartX, 79);
 
     // Receipt label top right
-    doc.font('Helvetica-Bold').fontSize(18).fillColor('#10B981').text('TRANSACTION RECEIPT', 350, 42);
-    doc.font('Helvetica').fontSize(9).fillColor('rgba(255,255,255,0.6)').text(`Receipt #: ${transaction.transactionId}`, 350, 68);
+    doc.font('Helvetica-Bold').fontSize(14).fillColor('#FFFFFF').text('OFFICIAL RECEIPT', 370, 38, { align: 'right', width: 175 });
+    doc.font('Helvetica').fontSize(9).fillColor('#93C5FD').text(`REF #: ${transaction.transactionId}`, 370, 58, { align: 'right', width: 175 });
 
     // ── Status Badge ──────────────────────────────────────────────────────────
-    const statusColor = transaction.status === 'completed' ? '#10B981' : transaction.status === 'pending' ? '#F59E0B' : '#EF4444';
-    doc.rect(50, 135, 100, 26).fill(statusColor + '20').stroke(statusColor);
-    doc.font('Helvetica-Bold').fontSize(10).fillColor(statusColor)
-       .text(transaction.status.toUpperCase(), 55, 143);
+    const statusColor = transaction.status === 'completed' ? '#0052CC' : transaction.status === 'pending' ? '#B45309' : '#DC2626';
+    const statusBg = transaction.status === 'completed' ? '#EBF2FF' : transaction.status === 'pending' ? '#FEF3C7' : '#FEF2F2';
+    doc.rect(50, 138, 110, 24).fill(statusBg).stroke(statusColor);
+    doc.font('Helvetica-Bold').fontSize(9).fillColor(statusColor)
+       .text(transaction.status.toUpperCase(), 50, 146, { width: 110, align: 'center' });
 
-    doc.rect(50, 170, 495, 1).fill('#E2E8F0');
+    doc.rect(50, 174, 495, 1).fill('#CBD5E1');
 
     // ── Amount Section ────────────────────────────────────────────────────────
     const isCredit = transaction.type === 'credit';
-    doc.font('Helvetica').fontSize(12).fillColor('#6B7A99').text('Transaction Amount', 50, 185);
-    doc.font('Helvetica-Bold').fontSize(32).fillColor(isCredit ? '#10B981' : '#EF4444')
-       .text(`${isCredit ? '+' : '-'}${fmtUSD(transaction.amount)}`, 50, 202);
+    doc.font('Helvetica-Bold').fontSize(10).fillColor('#475569').text('SETTLEMENT AMOUNT (USD)', 50, 188);
+    doc.font('Helvetica-Bold').fontSize(30).fillColor(isCredit ? '#0052CC' : '#002B5B')
+       .text(`${isCredit ? '+' : '-'}${fmtUSD(transaction.amount)}`, 50, 204);
 
     if (transaction.fee > 0) {
-      doc.font('Helvetica').fontSize(11).fillColor('#6B7A99')
-         .text(`Fee: ${fmtUSD(transaction.fee)} | Net: ${fmtUSD(transaction.netAmount || transaction.amount - transaction.fee)}`, 50, 240);
+      doc.font('Helvetica').fontSize(10).fillColor('#475569')
+         .text(`Fee: ${fmtUSD(transaction.fee)} | Net Settlement: ${fmtUSD(transaction.netAmount || transaction.amount - transaction.fee)}`, 50, 242);
     }
 
-    doc.rect(50, 265, 495, 1).fill('#E2E8F0');
+    doc.rect(50, 265, 495, 2).fill('#002B5B');
 
     // ── Transaction Details ────────────────────────────────────────────────────
-    doc.font('Helvetica-Bold').fontSize(13).fillColor('#1A2B4A').text('Transaction Details', 50, 280);
+    doc.font('Helvetica-Bold').fontSize(12).fillColor('#002B5B').text('TRANSACTION LEDGER DETAILS', 50, 280);
 
     const details = [
       ['Transaction ID', transaction.transactionId],
       ['Date & Time', fmtDate(transaction.createdAt || new Date())],
-      ['Type', isCredit ? 'Credit (Money In)' : 'Debit (Money Out)'],
+      ['Entry Type', isCredit ? 'Credit (Inflow)' : 'Debit (Outflow)'],
       ['Category', CATEGORY_LABELS[transaction.category] || transaction.category],
-      ['Payment Method', METHOD_LABELS[transaction.method] || transaction.method],
+      ['Settlement Method', METHOD_LABELS[transaction.method] || transaction.method],
       ['Description', transaction.description],
-      ...(transaction.note ? [['Note', transaction.note]] : []),
-      ...(transaction.balanceAfter !== undefined ? [['Balance After', fmtUSD(transaction.balanceAfter)]] : []),
+      ...(transaction.note ? [['Audit Memo', transaction.note]] : []),
+      ...(transaction.balanceAfter !== undefined ? [['Resulting Balance', fmtUSD(transaction.balanceAfter)]] : []),
     ];
 
     let y = 305;
     details.forEach(([label, value], i) => {
-      if (i % 2 === 0) doc.rect(50, y - 4, 495, 22).fill('#F8FAFC');
-      doc.font('Helvetica-Bold').fontSize(10).fillColor('#374151').text(label + ':', 60, y);
-      doc.font('Helvetica').fontSize(10).fillColor('#1A2B4A').text(String(value), 220, y, { width: 315 });
+      if (i % 2 === 0) doc.rect(50, y - 4, 495, 22).fill('#F2F5F9');
+      doc.font('Helvetica-Bold').fontSize(10).fillColor('#334155').text(label + ':', 60, y);
+      doc.font('Helvetica').fontSize(10).fillColor('#002B5B').text(String(value), 220, y, { width: 315 });
       y += 24;
     });
 
     // ── Crypto Details ────────────────────────────────────────────────────────
     if (transaction.cryptoCoin) {
       y += 8;
-      doc.font('Helvetica-Bold').fontSize(13).fillColor('#1A2B4A').text('Crypto Details', 50, y);
+      doc.font('Helvetica-Bold').fontSize(12).fillColor('#002B5B').text('DIGITAL ASSET SETTLEMENT DETAILS', 50, y);
       y += 22;
       const cryptoDetails = [
-        ['Coin', transaction.cryptoCoin],
-        ['Amount', `${transaction.cryptoAmount} ${transaction.cryptoCoin}`],
+        ['Asset', transaction.cryptoCoin],
+        ['Quantity', `${transaction.cryptoAmount} ${transaction.cryptoCoin}`],
         ['Network', transaction.cryptoNetwork || 'N/A'],
         ...(transaction.walletAddress ? [['Wallet Address', transaction.walletAddress]] : []),
       ];
       cryptoDetails.forEach(([label, value], i) => {
-        if (i % 2 === 0) doc.rect(50, y - 4, 495, 22).fill('#F0FDF4');
-        doc.font('Helvetica-Bold').fontSize(10).fillColor('#374151').text(label + ':', 60, y);
-        doc.font('Helvetica').fontSize(10).fillColor('#1A2B4A').text(String(value), 220, y, { width: 315 });
+        if (i % 2 === 0) doc.rect(50, y - 4, 495, 22).fill('#EBF2FF');
+        doc.font('Helvetica-Bold').fontSize(10).fillColor('#334155').text(label + ':', 60, y);
+        doc.font('Helvetica').fontSize(10).fillColor('#002B5B').text(String(value), 220, y, { width: 315 });
         y += 24;
       });
     }
@@ -119,46 +132,47 @@ exports.generateReceiptPDF = async (transaction, user) => {
     // ── Recipient Details ─────────────────────────────────────────────────────
     if (transaction.recipientName) {
       y += 8;
-      doc.font('Helvetica-Bold').fontSize(13).fillColor('#1A2B4A').text('Recipient Details', 50, y);
+      doc.font('Helvetica-Bold').fontSize(12).fillColor('#002B5B').text('COUNTERPARTY / RECIPIENT', 50, y);
       y += 22;
       const recipDetails = [
-        ['Name', transaction.recipientName],
+        ['Beneficiary Name', transaction.recipientName],
         ...(transaction.recipientAccount ? [['Account', '****' + String(transaction.recipientAccount).slice(-4)]] : []),
       ];
       recipDetails.forEach(([label, value], i) => {
-        if (i % 2 === 0) doc.rect(50, y - 4, 495, 22).fill('#EFF6FF');
-        doc.font('Helvetica-Bold').fontSize(10).fillColor('#374151').text(label + ':', 60, y);
-        doc.font('Helvetica').fontSize(10).fillColor('#1A2B4A').text(String(value), 220, y, { width: 315 });
+        if (i % 2 === 0) doc.rect(50, y - 4, 495, 22).fill('#EBF2FF');
+        doc.font('Helvetica-Bold').fontSize(10).fillColor('#334155').text(label + ':', 60, y);
+        doc.font('Helvetica').fontSize(10).fillColor('#002B5B').text(String(value), 220, y, { width: 315 });
         y += 24;
       });
     }
 
-    y += 20;
-    doc.rect(50, y, 495, 1).fill('#E2E8F0');
+    y += 18;
+    doc.rect(50, y, 495, 1).fill('#CBD5E1');
     y += 15;
 
     // ── Account Info ──────────────────────────────────────────────────────────
-    doc.font('Helvetica-Bold').fontSize(13).fillColor('#1A2B4A').text('Account Information', 50, y);
+    doc.font('Helvetica-Bold').fontSize(12).fillColor('#002B5B').text('ORIGINATING ACCOUNT INFORMATION', 50, y);
     y += 22;
     const accountDetails = [
       ['Account Holder', `${user.firstName} ${user.lastName}`],
       ['Account Number', '****' + String(user.accountNumber).slice(-4)],
-      ['Routing Number', user.routingNumber || '021000021'],
+      ['ABA Routing Number', user.routingNumber || '021000021'],
     ];
     accountDetails.forEach(([label, value], i) => {
-      if (i % 2 === 0) doc.rect(50, y - 4, 495, 22).fill('#F8FAFC');
-      doc.font('Helvetica-Bold').fontSize(10).fillColor('#374151').text(label + ':', 60, y);
-      doc.font('Helvetica').fontSize(10).fillColor('#1A2B4A').text(String(value), 220, y);
+      if (i % 2 === 0) doc.rect(50, y - 4, 495, 22).fill('#F2F5F9');
+      doc.font('Helvetica-Bold').fontSize(10).fillColor('#334155').text(label + ':', 60, y);
+      doc.font('Helvetica').fontSize(10).fillColor('#002B5B').text(String(value), 220, y);
       y += 24;
     });
 
     // ── Footer ────────────────────────────────────────────────────────────────
-    doc.rect(0, 760, 595, 82).fill('#1A2B4A');
-    doc.font('Helvetica').fontSize(9).fillColor('rgba(255,255,255,0.5)')
-       .text('This is an automatically generated receipt.', 50, 773, { align: 'center', width: 495 })
-       .fontSize(8).fillColor('rgba(255,255,255,0.5)')
-       .text('This receipt is a valid transaction record from NexaBanking.', 50, 787, { align: 'center', width: 495 })
-       .text(`Generated on ${new Date().toUTCString()}`, 50, 799, { align: 'center', width: 495 });
+    doc.rect(0, 756, 595, 4).fill('#0052CC');
+    doc.rect(0, 760, 595, 82).fill('#002B5B');
+    doc.font('Helvetica-Bold').fontSize(9).fillColor('#FFFFFF')
+       .text('BLUE RIDGE BANK · CERTIFIED TRANSACTION RECORD', 50, 773, { align: 'center', width: 495 })
+       .font('Helvetica').fontSize(8).fillColor('#93C5FD')
+       .text('Support & Verification Desk: support@theblueridges.com', 50, 787, { align: 'center', width: 495 })
+       .text(`Generated on ${new Date().toUTCString()}`, 50, 800, { align: 'center', width: 495 });
 
     doc.end();
 

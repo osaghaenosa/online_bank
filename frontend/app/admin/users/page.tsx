@@ -194,7 +194,7 @@ export default function AdminUsersPage() {
                 style={{ borderColor: 'var(--color-border)', background: selected?._id === u._id ? 'var(--color-bg)' : undefined }}
                 onClick={() => selectUser(u)}>
                 <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-                  style={{ background: '#0F1C35' }}>
+                  style={{ background: '#002B5B' }}>
                   {u.firstName[0]}{u.lastName[0]}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -217,7 +217,7 @@ export default function AdminUsersPage() {
           <Card className="p-4 sm:p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0"
-                style={{ background: '#0F1C35' }}>
+                style={{ background: '#002B5B' }}>
                 {selected.firstName[0]}{selected.lastName[0]}
               </div>
               <div>
@@ -363,9 +363,9 @@ export default function AdminUsersPage() {
                     <button key={t} onClick={() => setAdjType(t)}
                       className="flex-1 py-2 rounded-xl text-sm font-semibold capitalize border-2 transition-all font-sans cursor-pointer"
                       style={{
-                        borderColor: adjType === t ? (t === 'reversal' ? '#8B5CF6' : '#10B981') : 'var(--color-border)',
-                        background: adjType === t ? (t === 'reversal' ? 'rgba(139,92,246,.1)' : 'rgba(16,185,129,.1)') : 'var(--color-surface)',
-                        color: adjType === t ? (t === 'reversal' ? '#8B5CF6' : '#10B981') : 'var(--color-text)',
+                        borderColor: adjType === t ? (t === 'reversal' ? '#8B5CF6' : '#0052CC') : 'var(--color-border)',
+                        background: adjType === t ? (t === 'reversal' ? 'rgba(139,92,246,.1)' : 'rgba(0,82,204,.1)') : 'var(--color-surface)',
+                        color: adjType === t ? (t === 'reversal' ? '#8B5CF6' : '#0052CC') : 'var(--color-text)',
                       }}>
                       {t}
                     </button>

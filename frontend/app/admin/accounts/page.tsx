@@ -135,7 +135,7 @@ export default function AdminAccountsPage() {
     }
     return (
       <div className={`${dim} rounded-full flex items-center justify-center text-white font-bold flex-shrink-0`}
-        style={{ background: '#0F1C35' }}>
+        style={{ background: '#002B5B' }}>
         {u.firstName[0]}{u.lastName[0]}
       </div>
     )
@@ -307,7 +307,7 @@ export default function AdminAccountsPage() {
                                     style={{ borderColor: 'var(--color-border)' }} />
                                 ) : (
                                   <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-white text-2xl font-bold"
-                                    style={{ background: '#0F1C35' }}>
+                                    style={{ background: '#002B5B' }}>
                                     {u.firstName[0]}{u.lastName[0]}
                                   </div>
                                 )}
@@ -350,7 +350,7 @@ export default function AdminAccountsPage() {
 
                                 {/* ImageKit badge */}
                                 <div className="flex items-center gap-2 mt-3 p-2.5 rounded-xl"
-                                  style={{ background: 'rgba(16,185,129,.06)', border: '1px solid rgba(16,185,129,.2)' }}>
+                                  style={{ background: 'rgba(0,82,204,.06)', border: '1px solid rgba(0,82,204,.2)' }}>
                                   <span className="text-emerald-500 font-bold text-xs">IK</span>
                                   <p className="text-xs text-emerald-700">
                                     Uploaded directly to <strong>ImageKit CDN</strong> — no local storage used
@@ -487,10 +487,10 @@ export default function AdminAccountsPage() {
                         <div className="p-4 pt-0">
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                             {[
-                              { label: 'Checking',    value: fmtUSD(u.balance), color: '#10B981' },
+                              { label: 'Checking',    value: fmtUSD(u.balance), color: '#0052CC' },
                               { label: 'Crypto',      value: fmtUSD((u.cryptoAssets||[]).reduce((s:number,a:any)=>s+(a.valueUSD||0),0)), color: '#F59E0B' },
                               { label: 'Investments', value: fmtUSD((u.investments||[]).reduce((s:number,a:any)=>s+(a.currentValue||0),0)), color: '#3B82F6' },
-                              { label: 'Net Worth',   value: fmtUSD(netWorth(u)), color: '#10B981' },
+                              { label: 'Net Worth',   value: fmtUSD(netWorth(u)), color: '#0052CC' },
                             ].map(({ label, value, color }) => (
                               <div key={label} className="p-3 rounded-xl text-center"
                                 style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
@@ -501,7 +501,7 @@ export default function AdminAccountsPage() {
                           </div>
                           <div className="flex flex-wrap gap-3 mt-3 text-xs" style={{ color: 'var(--color-muted)' }}>
                             <span>Acct: ****{String(u.accountNumber || '').slice(-4)}</span>
-                            <span>KYC: <strong style={{ color: u.kyc === 'Verified' ? '#10B981' : '#F59E0B' }}>{u.kyc}</strong></span>
+                            <span>KYC: <strong style={{ color: u.kyc === 'Verified' ? '#0052CC' : '#F59E0B' }}>{u.kyc}</strong></span>
                             <span>Joined: {new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                             {u.profilePicture && <span className="text-emerald-600 font-semibold">📷 Photo set</span>}
                           </div>

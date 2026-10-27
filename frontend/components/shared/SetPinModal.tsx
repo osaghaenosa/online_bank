@@ -2,14 +2,12 @@ import { useState } from 'react'
 import { Lock, Loader2 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useAuth } from '@/store/auth'
-import { useRouter } from 'next/navigation'
 
 export function SetPinModal() {
   const { toast } = useAuth()
   const [pin, setPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,7 +18,7 @@ export function SetPinModal() {
       setLoading(true)
       await api.user.setPin(pin)
       toast('Transaction PIN set successfully', 'success')
-      window.location.reload() // Reload to get fresh user context
+      window.location.reload()
     } catch (err: any) {
       toast(err.message || 'Failed to set PIN', 'error')
       setLoading(false)
@@ -28,24 +26,32 @@ export function SetPinModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-2 bg-[#10B981]" />
-        
-        <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-[#10B981]">
-            <Lock size={32} />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4">
+      <div
+        className="bg-white p-6 sm:p-8 max-w-sm w-full shadow-2xl relative border-2"
+        style={{ borderColor: '#002B5B', borderTop: '5px solid #0052CC' }}
+      >
+        <div className="flex justify-center mb-5">
+          <div
+            className="w-14 h-14 flex items-center justify-center text-white"
+            style={{ background: '#002B5B' }}
+          >
+            <Lock size={26} />
           </div>
         </div>
-        
-        <h2 className="text-2xl font-bold text-center text-gray-900 mb-2">Create Transaction PIN</h2>
-        <p className="text-center text-gray-500 mb-6 text-sm">
-          A transaction PIN is required to authorize all your transfers, deposits, and withdrawals. Keep it secure.
+
+        <h2 className="text-xl font-bold font-display text-center mb-2" style={{ color: '#002B5B' }}>
+          Establish Transaction PIN
+        </h2>
+        <p className="text-center text-slate-600 mb-6 text-xs leading-relaxed">
+          A numeric security PIN is required to authorize transfers, deposits, and withdrawals on your Blue ridge Bank account.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">New PIN</label>
+            <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
+              New Security PIN (4–6 Digits)
+            </label>
             <input
               type="password"
               inputMode="numeric"
@@ -53,13 +59,15 @@ export function SetPinModal() {
               maxLength={6}
               value={pin}
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] outline-none transition-all text-center text-2xl tracking-widest"
+              className="w-full px-4 py-3 border border-slate-300 focus:border-[#0052CC] outline-none transition-all text-center text-2xl font-mono tracking-widest"
               placeholder="••••"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm PIN</label>
+            <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
+              Confirm Security PIN
+            </label>
             <input
               type="password"
               inputMode="numeric"
@@ -67,7 +75,7 @@ export function SetPinModal() {
               maxLength={6}
               value={confirmPin}
               onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, ''))}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] outline-none transition-all text-center text-2xl tracking-widest"
+              className="w-full px-4 py-3 border border-slate-300 focus:border-[#0052CC] outline-none transition-all text-center text-2xl font-mono tracking-widest"
               placeholder="••••"
               required
             />
@@ -76,10 +84,10 @@ export function SetPinModal() {
           <button
             type="submit"
             disabled={loading || pin.length < 4 || confirmPin.length < 4}
-            className="w-full py-3 px-4 rounded-xl font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            style={{ background: '#10B981' }}
+            className="w-full py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            style={{ background: '#0052CC' }}
           >
-            {loading ? <Loader2 size={20} className="animate-spin" /> : 'Secure My Account'}
+            {loading ? <Loader2 size={18} className="animate-spin" /> : 'Activate Security PIN'}
           </button>
         </form>
       </div>

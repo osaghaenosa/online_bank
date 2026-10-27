@@ -9,8 +9,8 @@ import {
   Save, ChevronDown, ChevronUp, X
 } from 'lucide-react'
 
-const ACCENT_PRESETS  = ['#10B981','#3B82F6','#8B5CF6','#F59E0B','#EF4444','#EC4899','#14B8A6','#F97316']
-const PRIMARY_PRESETS = ['#0F1C35','#1A2B4A','#1E293B','#111827','#312E81','#164E63','#44403C','#0F172A']
+const ACCENT_PRESETS  = ['#0052CC','#3B82F6','#8B5CF6','#F59E0B','#EF4444','#EC4899','#14B8A6','#F97316']
+const PRIMARY_PRESETS = ['#002B5B','#002B5B','#1E293B','#111827','#312E81','#164E63','#44403C','#0F172A']
 
 const DEFAULT_DEPOSIT_METHODS = [
   { id:'bank_transfer', label:'Bank Transfer',   icon:'🏦', fee:0,    feeType:'fixed',   enabled:true,  accountName:'', accountNumber:'', routingNumber:'', bankName:'', instructions:'' },
@@ -40,9 +40,9 @@ const DEFAULT_WITHDRAWAL_METHODS = [
 
 export default function AdminSettingsPage() {
   const { toast } = useAuth()
-  const [accentColor,  setAccentColor]  = useState('#10B981')
-  const [primaryColor, setPrimaryColor] = useState('#0F1C35')
-  const [tempName,     setTempName]     = useState('NexaBank')
+  const [accentColor,  setAccentColor]  = useState('#0052CC')
+  const [primaryColor, setPrimaryColor] = useState('#002B5B')
+  const [tempName,     setTempName]     = useState('Blue ridge Bank')
   const [darkMode,     setDarkMode]     = useState(false)
   const [maintenance,  setMaintenance]  = useState(false)
   const [cardFee,      setCardFee]      = useState(50)
@@ -199,7 +199,7 @@ export default function AdminSettingsPage() {
           <button key={t.id} onClick={() => setActiveTab(t.id as any)}
             className="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all flex-shrink-0"
             style={{
-              background: activeTab === t.id ? '#0F1C35' : 'transparent',
+              background: activeTab === t.id ? '#002B5B' : 'transparent',
               color: activeTab === t.id ? '#fff' : 'var(--color-muted)',
             }}>
             {t.label}

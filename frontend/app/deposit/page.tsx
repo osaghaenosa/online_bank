@@ -13,13 +13,13 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 const DEFAULT_METHODS = [
   { id:'bank_transfer', label:'Bank Transfer',     icon:'building', fee:'0',    feeType:'fixed',   category:'bank',    enabled:true,
-    details:{ bankName:'NexaBank Federal', accountNumber:'0012349876', routingNumber:'021000021', swiftCode:'NEXAUS33', reference:'Use your account number as reference' },
+    details:{ bankName:'Blue ridge Bank', accountNumber:'0012349876', routingNumber:'021000021', swiftCode:'BRBKUS33', reference:'Use your account number as reference' },
     instructions:'Transfer funds directly from your bank. Allow 1-3 business days.', image:'' },
   { id:'ach',           label:'ACH Transfer',      icon:'building', fee:'0',    feeType:'fixed',   category:'bank',    enabled:true,
     details:{ routingNumber:'021000021', accountNumber:'0012349876', accountType:'Business' },
     instructions:'ACH transfers settle in 1-2 business days.', image:'' },
   { id:'wire',          label:'Wire Transfer',     icon:'building', fee:'15',   feeType:'fixed',   category:'bank',    enabled:true,
-    details:{ bankName:'NexaBank Federal', routingNumber:'021000021', accountNumber:'0012349876', swiftCode:'NEXAUS33', address:'100 NexaBank Plaza, New York, NY 10001' },
+    details:{ bankName:'Blue ridge Bank', routingNumber:'021000021', accountNumber:'0012349876', swiftCode:'BRBKUS33', address:'100 Blue ridge Bank Plaza, New York, NY 10001' },
     instructions:'Wire transfers are same-day domestic and 1-2 days international.', image:'' },
   { id:'card',          label:'Debit/Credit Card', icon:'card',     fee:'2.5',  feeType:'percent', category:'card',    enabled:true,
     details:{}, instructions:'Instant credit to your account. 2.5% processing fee applies.', image:'' },
@@ -36,17 +36,17 @@ const DEFAULT_METHODS = [
     details:{ walletAddress:'4Nd1maDLH4SXCvCeXAE8zx4L7KxCFy1kHgr1', network:'Solana Mainnet', confirmations:'32 confirmations required', minDeposit:'$10' },
     instructions:'Send SOL to the address above. Credited in ~30 seconds.', image:'' },
   { id:'paypal',       label:'PayPal',             icon:'dollar',   fee:'0',    feeType:'fixed',   category:'digital', enabled:true,
-    details:{ email:'deposits@nexabanking.com', note:'Include your NexaBank account number in the note' },
+    details:{ email:'support@theblueridges.com', note:'Include your Blue ridge Bank account number in the note' },
     instructions:'Send to our PayPal email. Include your account number as the note.', image:'' },
   { id:'cashapp',      label:'Cash App',           icon:'dollar',   fee:'0',    feeType:'fixed',   category:'digital', enabled:true,
-    details:{ cashtag:'$NexaBankDeposit', note:'Include your NexaBank account number' },
+    details:{ cashtag:'$BlueRidgeBankDeposit', note:'Include your Blue ridge Bank account number' },
     instructions:'Send to our $Cashtag with your account number in the note.', image:'' },
   { id:'zelle',        label:'Zelle',              icon:'phone',    fee:'0',    feeType:'fixed',   category:'digital', enabled:true,
-    details:{ email:'zelle@nexabanking.com', phone:'+1 (888) 639-2265' },
+    details:{ email:'support@theblueridges.com', phone:'+1 (888) 639-2265' },
     instructions:'Send via Zelle using our email or phone number.', image:'' },
   { id:'venmo',        label:'Venmo',              icon:'phone',    fee:'0',    feeType:'fixed',   category:'digital', enabled:true,
-    details:{ username:'@NexaBankDeposits', note:'Include your NexaBank account number' },
-    instructions:'Send to @NexaBankDeposits with your account number in the note.', image:'' },
+    details:{ username:'@BlueRidgeBankDeposits', note:'Include your Blue ridge Bank account number' },
+    instructions:'Send to @BlueRidgeBankDeposits with your account number in the note.', image:'' },
 ]
 
 const COINS    = ['BTC','ETH','USDT','BNB','SOL']
@@ -155,9 +155,9 @@ export default function DepositPage() {
                   <button key={m.id} onClick={() => setMethod(m.id)}
                     className="flex items-center gap-2 sm:gap-2.5 p-2.5 sm:p-3 rounded-xl border-2 text-xs font-semibold text-left transition-all font-sans cursor-pointer"
                     style={{
-                      borderColor: method===m.id ? '#10B981' : 'var(--color-border)',
-                      background:  method===m.id ? 'rgba(16,185,129,.08)' : 'var(--color-surface)',
-                      color:       method===m.id ? '#10B981' : 'var(--color-muted)',
+                      borderColor: method===m.id ? '#0052CC' : 'var(--color-border)',
+                      background:  method===m.id ? 'rgba(0,82,204,.08)' : 'var(--color-surface)',
+                      color:       method===m.id ? '#0052CC' : 'var(--color-muted)',
                     }}>
                     <Icon size={14} className="flex-shrink-0" />
                     <div className="min-w-0">
@@ -177,7 +177,7 @@ export default function DepositPage() {
             {/* Instructions */}
             {sel?.instructions && (
               <div className="flex gap-2.5 p-3 rounded-xl mb-5"
-                style={{ background:'rgba(16,185,129,.06)', border:'1px solid rgba(16,185,129,.2)' }}>
+                style={{ background:'rgba(0,82,204,.06)', border:'1px solid rgba(0,82,204,.2)' }}>
                 <Shield size={13} className="text-emerald-600 flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-emerald-700">{sel.instructions}</p>
               </div>
@@ -307,14 +307,13 @@ export default function DepositPage() {
           </div>
           <Card className="p-4 sm:p-5">
             <SectionHeader title="Current Balance"/>
-            <p className="text-xl sm:text-2xl font-bold font-mono" style={{ color:'#10B981' }}>{fmtUSD(user?.balance||0)}</p>
+            <p className="text-xl sm:text-2xl font-bold font-mono" style={{ color:'#0052CC' }}>{fmtUSD(user?.balance||0)}</p>
             {num>0 && <p className="text-xs mt-1" style={{ color:'var(--color-muted)' }}>After deposit: <strong>{fmtUSD((user?.balance||0)+Math.max(0,num-fee))}</strong></p>}
           </Card>
           <Card className="p-4 sm:p-5">
             <SectionHeader title="Need Help?" />
             <p className="text-xs mb-2" style={{ color: 'var(--color-muted)' }}>Contact support:</p>
-            <p className="text-xs font-semibold mb-1">support@nexabanking.com</p>
-            <p className="text-xs font-semibold">thenexabankingteam@yahoo.com</p>
+            <p className="text-xs font-semibold">support@theblueridges.com</p>
           </Card>
         </div>
       </div>

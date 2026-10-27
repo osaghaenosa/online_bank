@@ -14,10 +14,10 @@ const DEFAULT_METHODS = [
     id: 'bank_transfer', label: 'Bank Transfer', category: 'bank',
     icon: 'building', enabled: true, fee: '0', feeType: 'fixed',
     details: {
-      bankName: 'NexaBank Federal',
+      bankName: 'Blue ridge Bank',
       accountNumber: '0012349876',
       routingNumber: '021000021',
-      swiftCode: 'NEXAUS33',
+      swiftCode: 'BRBKUS33',
       reference: 'Use your account number as reference',
     },
     instructions: 'Transfer funds directly from your bank. Allow 1-3 business days.',
@@ -38,11 +38,11 @@ const DEFAULT_METHODS = [
     id: 'wire', label: 'Wire Transfer', category: 'bank',
     icon: 'building', enabled: true, fee: '15', feeType: 'fixed',
     details: {
-      bankName: 'NexaBank Federal',
+      bankName: 'Blue ridge Bank',
       routingNumber: '021000021',
       accountNumber: '0012349876',
-      swiftCode: 'NEXAUS33',
-      address: '100 NexaBank Plaza, New York, NY 10001',
+      swiftCode: 'BRBKUS33',
+      address: '100 Blue ridge Bank Plaza, New York, NY 10001',
     },
     instructions: 'Wire transfers are same-day for domestic and 1-2 days international.',
     image: '',
@@ -106,8 +106,8 @@ const DEFAULT_METHODS = [
     id: 'paypal', label: 'PayPal', category: 'digital',
     icon: 'dollar', enabled: true, fee: '0', feeType: 'fixed',
     details: {
-      email: 'deposits@nexabanking.com',
-      note: 'Include your NexaBank account number in the note',
+      email: 'support@theblueridges.com',
+      note: 'Include your Blue ridge Bank account number in the note',
     },
     instructions: 'Send to our PayPal email. Include your account number as the note.',
     image: '',
@@ -116,8 +116,8 @@ const DEFAULT_METHODS = [
     id: 'cashapp', label: 'Cash App', category: 'digital',
     icon: 'dollar', enabled: true, fee: '0', feeType: 'fixed',
     details: {
-      cashtag: '$NexaBankDeposit',
-      note: 'Include your NexaBank account number',
+      cashtag: '$BlueRidgeBankDeposit',
+      note: 'Include your Blue ridge Bank account number',
     },
     instructions: 'Send to our $Cashtag with your account number in the note.',
     image: '',
@@ -126,7 +126,7 @@ const DEFAULT_METHODS = [
     id: 'zelle', label: 'Zelle', category: 'digital',
     icon: 'phone', enabled: true, fee: '0', feeType: 'fixed',
     details: {
-      email: 'zelle@nexabanking.com',
+      email: 'support@theblueridges.com',
       phone: '+1 (888) 639-2265',
     },
     instructions: 'Send via Zelle using our email or phone number.',
@@ -136,10 +136,10 @@ const DEFAULT_METHODS = [
     id: 'venmo', label: 'Venmo', category: 'digital',
     icon: 'phone', enabled: true, fee: '0', feeType: 'fixed',
     details: {
-      username: '@NexaBankDeposits',
-      note: 'Include your NexaBank account number',
+      username: '@BlueRidgeBankDeposits',
+      note: 'Include your Blue ridge Bank account number',
     },
-    instructions: 'Send to @NexaBankDeposits with your account number in the note.',
+    instructions: 'Send to @BlueRidgeBankDeposits with your account number in the note.',
     image: '',
   },
 ]
@@ -297,15 +297,15 @@ export default function DepositSettingsPage() {
                     <div className="flex items-center gap-3 p-3 sm:p-4"
                       style={{ background: 'var(--color-surface)' }}>
                       <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ background: m.enabled ? 'rgba(16,185,129,.1)' : 'var(--color-bg)' }}>
-                        <Icon size={16} style={{ color: m.enabled ? '#10B981' : 'var(--color-muted)' }} />
+                        style={{ background: m.enabled ? 'rgba(0,82,204,.1)' : 'var(--color-bg)' }}>
+                        <Icon size={16} style={{ color: m.enabled ? '#0052CC' : 'var(--color-muted)' }} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold truncate">{m.label}</p>
                         <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
                           Fee: {m.feeType === 'percent' ? `${m.fee}%` : m.fee === '0' ? 'Free' : `$${m.fee}`}
                           {' · '}
-                          <span style={{ color: m.enabled ? '#10B981' : '#EF4444' }}>
+                          <span style={{ color: m.enabled ? '#0052CC' : '#EF4444' }}>
                             {m.enabled ? 'Enabled' : 'Disabled'}
                           </span>
                         </p>
@@ -315,9 +315,9 @@ export default function DepositSettingsPage() {
                         onClick={() => update(m.id, { enabled: !m.enabled })}
                         className="text-xs px-3 py-1 rounded-full font-semibold border transition-all flex-shrink-0"
                         style={{
-                          background:   m.enabled ? 'rgba(16,185,129,.1)'  : 'rgba(239,68,68,.08)',
-                          borderColor:  m.enabled ? 'rgba(16,185,129,.3)'  : 'rgba(239,68,68,.3)',
-                          color:        m.enabled ? '#059669' : '#EF4444',
+                          background:   m.enabled ? 'rgba(0,82,204,.1)'  : 'rgba(239,68,68,.08)',
+                          borderColor:  m.enabled ? 'rgba(0,82,204,.3)'  : 'rgba(239,68,68,.3)',
+                          color:        m.enabled ? '#0043A8' : '#EF4444',
                         }}>
                         {m.enabled ? 'Enabled' : 'Disabled'}
                       </button>
@@ -381,7 +381,7 @@ export default function DepositSettingsPage() {
                             <label className="text-sm font-semibold">Details / Info Fields</label>
                             <button onClick={() => addDetailField(m.id)}
                               className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg font-semibold transition-colors hover:opacity-80"
-                              style={{ background:'rgba(16,185,129,.1)', color:'#059669' }}>
+                              style={{ background:'rgba(0,82,204,.1)', color:'#0043A8' }}>
                               <Plus size={11} /> Add Field
                             </button>
                           </div>

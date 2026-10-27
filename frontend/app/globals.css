@@ -1,72 +1,178 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --navy:   #0F1C35;
-  --navy2:  #1A2B4A;
-  --navy3:  #243456;
-  --green:  #10B981;
-  --green2: #059669;
-  --gold:   #F59E0B;
-  --red:    #EF4444;
-  --bg:     #F0F2F7;
+  --navy:   #002B5B;
+  --navy2:  #003B7A;
+  --navy3:  #004B9A;
+  --green:  #0052CC;
+  --green2: #003D99;
+  --gold:   #D97706;
+  --red:    #DC2626;
+  --bg:     #F2F5F9;
   --surface:#FFFFFF;
-  --border: #E2E8F0;
-  --muted:  #6B7A99;
-  --text:   #0F1C35;
+  --border: #CBD5E1;
+  --muted:  #475569;
+  --text:   #0A192F;
 
-  --color-primary: #1A2B4A;
-  --color-accent:  #10B981;
-  --color-bg:      #F0F2F7;
+  --color-primary: #002B5B;
+  --color-accent:  #0052CC;
+  --color-bg:      #F2F5F9;
   --color-surface: #FFFFFF;
-  --color-border:  #E2E8F0;
-  --color-muted:   #6B7A99;
-  --color-text:    #0F1C35;
+  --color-border:  #CBD5E1;
+  --color-muted:   #475569;
+  --color-text:    #0A192F;
 }
 
 .dark {
-  --bg:     #080E1C;
-  --surface:#0F1A2E;
-  --border: #1E2D47;
-  --muted:  #8899BB;
-  --text:   #E8EDF8;
-  --color-bg:     #080E1C;
-  --color-surface:#0F1A2E;
+  --bg:     #061224;
+  --surface:#0B1E3B;
+  --border: #1E3A63;
+  --muted:  #94A3B8;
+  --text:   #F1F5F9;
+  --color-bg:     #061224;
+  --color-surface:#0B1E3B;
   --color-border: #1E2D47;
-  --color-muted:  #8899BB;
-  --color-text:   #E8EDF8;
+  --color-muted:  #94A3B8;
+  --color-text:   #F1F5F9;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-radius: 0px !important;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
 }
 
-.font-mono  { font-family: 'DM Mono', monospace !important; }
-.font-display { font-family: 'Syne', sans-serif !important; }
+/* Clean tabular numerals for financial figures instead of typewriter font */
+.font-mono {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
+.font-display {
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  letter-spacing: -0.02em;
+}
+
+/* ── Global Reusable Component Classes ─────────────────────────────────────── */
+@layer components {
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-top: 2px solid #0052CC;
+    padding: 1rem;
+  }
+  @media (min-width: 640px) {
+    .card {
+      padding: 1.5rem;
+    }
+  }
+
+  .label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #002B5B;
+    margin-bottom: 0.375rem;
+  }
+
+  .input {
+    width: 100%;
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .input:focus {
+    border-color: #0052CC;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #0052CC;
+    color: #FFFFFF;
+    border: 1px solid #002B5B;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+  }
+  .btn-primary:hover {
+    background: #003D99;
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #F2F5F9;
+    color: #002B5B;
+    border: 1px solid #CBD5E1;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+  .btn-secondary:hover {
+    background: #E2E8F0;
+  }
+}
 
 /* ── Scrollbar ─────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #E2E8F0; }
+::-webkit-scrollbar-thumb { background: #0052CC; border-radius: 0px; }
 
-/* ── Shimmer skeleton ──────────────────────────────────────────────────────── */
-@keyframes shimmer {
-  0%   { background-position: -600px 0; }
-  100% { background-position:  600px 0; }
+/* ── Shimmer skeleton (solid pulse, no gradient) ───────────────────────────── */
+@keyframes pulseSolid {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
 }
 .shimmer {
-  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
-  background-size: 600px 100%;
-  animation: shimmer 1.6s infinite;
-  border-radius: 8px;
+  background: var(--border);
+  animation: pulseSolid 1.4s ease-in-out infinite;
+  border-radius: 0px;
 }
 
 /* ── Toast slide-in ────────────────────────────────────────────────────────── */
@@ -74,7 +180,7 @@ body {
   from { transform: translateX(110%); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
-.toast-in { animation: slideInRight 0.32s cubic-bezier(.22,1,.36,1); }
+.toast-in { animation: slideInRight 0.25s ease-out; }
 
 /* ── Check draw ────────────────────────────────────────────────────────────── */
 @keyframes checkDraw {
@@ -83,93 +189,74 @@ body {
 }
 .check-draw {
   stroke-dasharray: 100;
-  animation: checkDraw 0.6s ease forwards 0.1s;
+  animation: checkDraw 0.5s ease forwards 0.1s;
 }
 
 /* ── Fade/scale in ─────────────────────────────────────────────────────────── */
 @keyframes fadeUp {
-  from { opacity:0; transform: translateY(18px); }
+  from { opacity:0; transform: translateY(10px); }
   to   { opacity:1; transform: translateY(0); }
 }
-.fade-up { animation: fadeUp 0.45s ease both; }
-.fade-up-1 { animation: fadeUp 0.45s ease 0.05s both; }
-.fade-up-2 { animation: fadeUp 0.45s ease 0.12s both; }
-.fade-up-3 { animation: fadeUp 0.45s ease 0.20s both; }
-.fade-up-4 { animation: fadeUp 0.45s ease 0.28s both; }
-.fade-up-5 { animation: fadeUp 0.45s ease 0.36s both; }
+.fade-up   { animation: fadeUp 0.3s ease both; }
+.fade-up-1 { animation: fadeUp 0.3s ease 0.04s both; }
+.fade-up-2 { animation: fadeUp 0.3s ease 0.08s both; }
+.fade-up-3 { animation: fadeUp 0.3s ease 0.12s both; }
+.fade-up-4 { animation: fadeUp 0.3s ease 0.16s both; }
+.fade-up-5 { animation: fadeUp 0.3s ease 0.20s both; }
 
 /* ── Pulse glow ────────────────────────────────────────────────────────────── */
-@keyframes pulseGlow {
-  0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,.35); }
-  50%      { box-shadow: 0 0 0 10px rgba(16,185,129,0); }
-}
-.pulse-glow { animation: pulseGlow 2.4s ease infinite; }
+.pulse-glow { box-shadow: none; }
 
 /* ── Number ticker ─────────────────────────────────────────────────────────── */
 @keyframes countUp {
-  from { transform: translateY(8px); opacity:0; }
+  from { transform: translateY(6px); opacity:0; }
   to   { transform: translateY(0);   opacity:1; }
 }
-.count-up { animation: countUp 0.5s ease both; }
+.count-up { animation: countUp 0.35s ease both; }
 
-/* ── Landing hero gradient ─────────────────────────────────────────────────── */
+/* ── Solid hero background (no gradient) ───────────────────────────────────── */
 .hero-gradient {
-  background: radial-gradient(ellipse 90% 60% at 60% 40%, #1E3A5F 0%, #0F1C35 60%, #080E1C 100%);
+  background: #002B5B !important;
 }
 
-/* ── Card glass ────────────────────────────────────────────────────────────── */
+/* ── Solid panel ───────────────────────────────────────────────────────────── */
 .glass {
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: #003B7A;
+  border: 1px solid #1E4E8C;
 }
 
-/* ── Green dot ─────────────────────────────────────────────────────────────── */
-.status-dot-green { 
-  width:8px; height:8px; border-radius:50%; background:#10B981;
-  box-shadow: 0 0 0 3px rgba(16,185,129,.25);
-}
-.status-dot-red   { width:8px; height:8px; border-radius:50%; background:#EF4444; }
-.status-dot-amber { width:8px; height:8px; border-radius:50%; background:#F59E0B; }
+/* ── Status indicators (sharp squares) ────────────────────────────────────── */
+.status-dot-green { width: 8px; height: 8px; background: #0052CC; }
+.status-dot-red   { width: 8px; height: 8px; background: #DC2626; }
+.status-dot-amber { width: 8px; height: 8px; background: #D97706; }
 
 /* ── Public nav link ───────────────────────────────────────────────────────── */
 .nav-link {
   position: relative;
-  color: rgba(255,255,255,0.7);
-  transition: color .2s;
+  color: #002B5B;
+  transition: color .15s;
 }
 .nav-link::after {
-  content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px;
-  background: #10B981; transition: width .25s ease;
+  content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px;
+  background: #0052CC; transition: width .2s ease;
 }
-.nav-link:hover { color:#fff; }
+.nav-link:hover { color: #0052CC; }
 .nav-link:hover::after { width:100%; }
 
 /* ── Stat card hover ───────────────────────────────────────────────────────── */
-.stat-card { transition: transform .2s, box-shadow .2s; }
-.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,.08); }
+.stat-card { transition: border-color .15s, box-shadow .15s; }
+.stat-card:hover { border-color: #0052CC !important; }
 
 /* ── Mobile safety ────────────────────────────────────────────────────────── */
-* { box-sizing: border-box; }
-html, body { overflow-x: hidden; }
-
-/* Prevent horizontal scroll on any element */
+html, body { overflow-x: hidden; max-width: 100vw; }
 .overflow-x-hidden { overflow-x: hidden !important; }
-
-/* Hide scrollbars on tab bars while keeping scroll */
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Ensure text never bleeds outside containers */
-p, span, h1, h2, h3, h4, h5, h6, a, label {
+p, h1, h2, h3, h4, h5, h6, a, label {
   overflow-wrap: break-word;
-  word-break: break-word;
 }
 
-/* Font mono numbers stay contained */
-.font-mono { overflow-wrap: break-word; word-break: break-all; }
-
-/* Tables on mobile scroll horizontally */
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 /* ── Chat bounce animation ───────────────────────────────────────────────── */
@@ -183,15 +270,12 @@ p, span, h1, h2, h3, h4, h5, h6, a, label {
 
 /* ── Notification popup entrance ─────────────────────────────────────────── */
 @keyframes slideUp {
-  from { transform: translateY(12px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
 }
-.slide-up { animation: slideUp 0.2s ease both; }
+.slide-up { animation: slideUp 0.18s ease both; }
 
-/* Prevent fixed elements from causing layout shifts */
 @media (max-width: 640px) {
-  .fade-up { animation-duration: 0.25s; }
-  
-  /* Admin tab bar scrollable on mobile */
+  .fade-up { animation-duration: 0.2s; }
   .admin-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }

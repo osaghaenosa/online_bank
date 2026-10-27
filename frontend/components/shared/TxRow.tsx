@@ -1,6 +1,5 @@
 'use client'
 import Link from 'next/link'
-import clsx from 'clsx'
 import { StatusBadge } from '@/components/ui'
 import { fmtUSD, fmtDateTime } from '@/lib/api'
 import {
@@ -13,21 +12,6 @@ const CAT_ICONS: Record<string, React.ElementType> = {
   transfer_out: Send, bill: Building2, shopping: ShoppingBag,
   food: Coffee, crypto: Bitcoin, entertainment: Zap,
   health: Heart, transport: Car, salary: TrendingUp, payment: FileText,
-}
-const CAT_COLORS: Record<string, string> = {
-  deposit: 'bg-emerald-100 text-emerald-700',
-  withdrawal: 'bg-red-100 text-red-700',
-  transfer_in: 'bg-blue-100 text-blue-700',
-  transfer_out: 'bg-indigo-100 text-indigo-700',
-  bill: 'bg-orange-100 text-orange-700',
-  shopping: 'bg-amber-100 text-amber-700',
-  food: 'bg-yellow-100 text-yellow-700',
-  crypto: 'bg-purple-100 text-purple-700',
-  entertainment: 'bg-violet-100 text-violet-700',
-  health: 'bg-pink-100 text-pink-700',
-  transport: 'bg-slate-100 text-slate-700',
-  salary: 'bg-teal-100 text-teal-700',
-  payment: 'bg-gray-100 text-gray-700',
 }
 
 interface TxRowProps {
@@ -51,55 +35,70 @@ interface TxRowProps {
 
 export function TxRow({ tx, showRef, showUser, compact }: TxRowProps) {
   const Icon = CAT_ICONS[tx.category] ?? Circle
-  const colorCls = CAT_COLORS[tx.category] ?? 'bg-gray-100 text-gray-600'
   const isCredit = tx.type === 'credit'
 
   return (
     <Link href={`/receipts/${tx.transactionId}`}>
-      <div className="flex items-center gap-3 py-3.5 border-b last:border-b-0 cursor-pointer hover:bg-[var(--color-bg)] rounded-xl px-2 -mx-2 transition-colors"
-        style={{ borderColor: 'var(--color-border)' }}>
-        <div className={clsx('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', colorCls)}>
-          <Icon size={17} />
+      <div
+        className="flex items-center justify-between gap-2.5 sm:gap-3.5 py-3 sm:py-3.5 border-b last:border-b-0 cursor-pointer hover:bg-blue-50/40 px-2 -mx-2 transition-colors"
+        style={{ borderColor: 'var(--color-border)' }}
+      >
+        <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
+          <div
+            className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center flex-shrink-0 border"
+            style={{
+              background: isCredit ? '#EBF2FF' : '#F8FAFC',
+              borderColor: isCredit ? '#93C5FD' : '#CBD5E1',
+              color: isCredit ? '#0052CC' : '#002B5B',
+            }}
+          >
+            <Icon size={16} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs sm:text-sm font-semibold truncate" style={{ color: '#002B5B' }}>
+              {tx.description}
+            </p>
+
+            {(() => {
+              const m = (tx as any).metadata || {}
+              const b = m.bankDetails || {}
+              const c = m.cryptoDetails || {}
+
+              let destInfo = ''
+              if (tx.method === 'iban' && b.iban) {
+                destInfo = `IBAN: ${b.iban} · ${b.beneficiaryName || ''}`
+              } else if ((tx.method === 'wire' || tx.method === 'ach' || tx.method === 'bank_transfer') && b.accountNumber) {
+                destInfo = `To: ${b.beneficiaryName || 'Unknown'} · Acct: •••${b.accountNumber.slice(-4)} (${b.bankName || 'Bank'})`
+              } else if (tx.method?.startsWith('crypto') && (c.walletAddress || (tx as any).walletAddress)) {
+                const w = c.walletAddress || (tx as any).walletAddress
+                destInfo = `Wallet: ${w.slice(0, 6)}...${w.slice(-4)} · ${c.coin || (tx as any).cryptoCoin || ''}`
+              } else if (m.recipientName) {
+                destInfo = `To: ${m.recipientName}`
+              } else if ((tx as any).recipientName) {
+                destInfo = `To: ${(tx as any).recipientName}`
+              }
+
+              if (!destInfo) return null
+              return (
+                <p className="text-[11px] mt-0.5 truncate font-medium" style={{ color: '#0052CC' }}>
+                  {destInfo}
+                </p>
+              )
+            })()}
+
+            <p className="text-[11px] mt-0.5 truncate" style={{ color: 'var(--color-muted)' }}>
+              {fmtDateTime(tx.createdAt)}
+              {showUser ? ` · ${showUser}` : ''}
+              {showRef ? <span className="hidden sm:inline">{` · REF: ${tx.transactionId}`}</span> : ''}
+            </p>
+          </div>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold truncate">{tx.description}</p>
 
-          {/* Destination Details for withdrawals/transfers */}
-          {(() => {
-            const m = (tx as any).metadata || {}
-            const b = m.bankDetails || {}
-            const c = m.cryptoDetails || {}
-            
-            let destInfo = ''
-            if (tx.method === 'iban' && b.iban) {
-              destInfo = `IBAN: ${b.iban} · ${b.beneficiaryName || ''}`
-            } else if ((tx.method === 'wire' || tx.method === 'ach' || tx.method === 'bank_transfer') && b.accountNumber) {
-              destInfo = `To: ${b.beneficiaryName || 'Unknown'} · Acct: •••${b.accountNumber.slice(-4)} (${b.bankName || 'Bank'})`
-            } else if (tx.method?.startsWith('crypto') && (c.walletAddress || (tx as any).walletAddress)) {
-              const w = c.walletAddress || (tx as any).walletAddress
-              destInfo = `Wallet: ${w.slice(0, 6)}...${w.slice(-4)} · ${c.coin || (tx as any).cryptoCoin || ''}`
-            } else if (m.recipientName) {
-              destInfo = `To: ${m.recipientName}`
-            } else if ((tx as any).recipientName) {
-              destInfo = `To: ${(tx as any).recipientName}`
-            }
-
-            if (!destInfo) return null
-            return (
-              <p className="text-[11px] mt-0.5 truncate font-medium text-blue-600/80">
-                {destInfo}
-              </p>
-            )
-          })()}
-
-          <p className="text-[10px] mt-0.5 truncate" style={{ color: 'var(--color-muted)' }}>
-            {fmtDateTime(tx.createdAt)}
-            {showUser ? ` · ${showUser}` : ''}
-            {showRef ? ` · Ref: ${tx.transactionId}` : ''}
-          </p>
-        </div>
-        <div className="text-right flex-shrink-0 space-y-1">
-          <p className={clsx('font-mono text-sm font-bold', isCredit ? 'text-emerald-600' : 'text-red-500')}>
+        <div className="text-right flex-shrink-0 flex flex-col items-end gap-1">
+          <p
+            className="font-mono text-xs sm:text-sm font-bold whitespace-nowrap"
+            style={{ color: isCredit ? '#0052CC' : '#0A192F' }}
+          >
             {isCredit ? '+' : '-'}{fmtUSD(tx.amount)}
           </p>
           {!compact && <StatusBadge status={tx.status} />}

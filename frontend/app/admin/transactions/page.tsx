@@ -203,7 +203,7 @@ export default function AdminTransactionsPage() {
             {/* Approve/Reject for pending withdrawals */}
             {isPendingWd && (
               <>
-                <Button variant="secondary" size="xs" style={{ color:'#10B981', borderColor:'#10B981' }}
+                <Button variant="secondary" size="xs" style={{ color:'#0052CC', borderColor:'#0052CC' }}
                   onClick={() => setConfirm({ txId:tx._id, status:'completed', label:'Approve', variant:'primary',
                     msg:`Approve withdrawal of ${fmtUSD(tx.amount)} for ${u?.firstName}? This will deduct ${fmtUSD(tx.amount+(tx.fee||0))} from their balance.` })}>
                   <Check size={10}/> OK
@@ -260,8 +260,8 @@ export default function AdminTransactionsPage() {
             <button key={u._id} onClick={() => { setSelUser(u); setUTxPage(1) }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all"
               style={{
-                background: selectedUser?._id===u._id ? '#0F1C35' : 'var(--color-surface)',
-                borderColor: selectedUser?._id===u._id ? '#0F1C35' : 'var(--color-border)',
+                background: selectedUser?._id===u._id ? '#002B5B' : 'var(--color-surface)',
+                borderColor: selectedUser?._id===u._id ? '#002B5B' : 'var(--color-border)',
                 color: selectedUser?._id===u._id ? '#fff' : 'var(--color-text)',
               }}>
               <User size={10}/> {u.firstName} {u.lastName}
@@ -321,7 +321,7 @@ export default function AdminTransactionsPage() {
             {FILTERS.map(f=>(
               <button key={f} onClick={()=>{setFilter(f);setPage(1)}}
                 className="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all font-sans cursor-pointer capitalize relative"
-                style={{ background:filter===f?'#0F1C35':'var(--color-surface)', borderColor:filter===f?'#0F1C35':'var(--color-border)', color:filter===f?'#fff':'var(--color-muted)' }}>
+                style={{ background:filter===f?'#002B5B':'var(--color-surface)', borderColor:filter===f?'#002B5B':'var(--color-border)', color:filter===f?'#fff':'var(--color-muted)' }}>
                 {f==='all'?'All':f.charAt(0).toUpperCase()+f.slice(1)}
                 {f==='pending'&&pendingWds.length>0&&filter!=='pending'&&(
                   <span className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-400 text-white text-[9px] font-bold">{pendingWds.length}</span>

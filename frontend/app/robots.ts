@@ -19,6 +19,6 @@ export default function robots(): MetadataRoute.Robots {
         '/wealth/',
       ],
     },
-    sitemap: 'https://nexabanking.com/sitemap.xml',
+    sitemap: 'https://theblueridges.com/sitemap.xml',
   }
 }

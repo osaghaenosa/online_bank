@@ -8,17 +8,17 @@ import { LayoutDashboard, Users, List, Settings, Bell, FileEdit, ShieldAlert, Me
 import clsx from 'clsx'
 
 const ADMIN_NAV = [
-  { href: '/admin',               label: 'Dashboard',    icon: LayoutDashboard, exact: true },
-  { href: '/admin/users',         label: 'Users',        icon: Users },
-  { href: '/admin/accounts',      label: 'Accounts',     icon: FileEdit },
-  { href: '/admin/controls',      label: 'Controls',     icon: ShieldAlert },
-  { href: '/admin/chat',          label: 'Live Chat',    icon: MessageCircle },
-  { href: '/admin/deposit-settings',label: 'Deposit Setup',icon: Download },
-  { href: '/admin/email',         label: 'Email',        icon: Mail },
-  { href: '/admin/transactions',  label: 'Transactions', icon: List },
-  { href: '/admin/transfers',      label: 'Transfers',    icon: ArrowUpRight },
-  { href: '/admin/settings',      label: 'Customization',icon: Settings },
-  { href: '/admin/notifications', label: 'Notifications',icon: Bell },
+  { href: '/admin',                  label: 'Overview',      icon: LayoutDashboard, exact: true },
+  { href: '/admin/users',            label: 'Clients',       icon: Users },
+  { href: '/admin/accounts',         label: 'Ledgers',       icon: FileEdit },
+  { href: '/admin/controls',         label: 'Controls',      icon: ShieldAlert },
+  { href: '/admin/chat',             label: 'Support Chat',  icon: MessageCircle },
+  { href: '/admin/deposit-settings', label: 'Deposit Rails', icon: Download },
+  { href: '/admin/email',            label: 'Email Desk',    icon: Mail },
+  { href: '/admin/transactions',     label: 'Transactions',  icon: List },
+  { href: '/admin/transfers',        label: 'Transfers',     icon: ArrowUpRight },
+  { href: '/admin/settings',         label: 'Configuration', icon: Settings },
+  { href: '/admin/notifications',    label: 'Broadcasts',    icon: Bell },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -32,37 +32,41 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [user, loading, router])
 
   if (loading || !user) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#080E1C' }}>
-      <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#002B5B' }}>
+      <div className="w-8 h-8 border-2 border-white/30 border-t-white animate-spin" />
     </div>
   )
 
   return (
     <AppShell>
       <div className="max-w-7xl w-full">
-        <div className="mb-4 p-3 rounded-xl flex items-center gap-3 flex-wrap"
-          style={{ background: '#FEF3C7', border: '1px solid #FCD34D' }}>
-          <Settings size={15} className="text-amber-600 flex-shrink-0" />
-          <p className="text-sm text-amber-700 font-medium">
-            Admin Panel — changes affect all users in real time.
+        <div
+          className="mb-4 p-3 border-l-4 flex items-center gap-3 flex-wrap"
+          style={{ background: '#EBF2FF', borderColor: '#0052CC' }}
+        >
+          <Settings size={15} style={{ color: '#0052CC' }} className="flex-shrink-0" />
+          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#002B5B' }}>
+            Administrative Command Center — changes apply across all client ledgers in real time.
           </p>
         </div>
+
         {/* Scrollable tab bar */}
-        <div className="flex gap-1 p-1.5 rounded-2xl mb-6 overflow-x-auto scrollbar-none"
-          style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+        <div
+          className="flex gap-1 p-1.5 mb-6 overflow-x-auto scrollbar-none border"
+          style={{ background: '#FFFFFF', borderColor: '#CBD5E1', borderTop: '3px solid #002B5B' }}
+        >
           {ADMIN_NAV.map(({ href, label, icon: Icon, exact }) => {
             const active = exact ? pathname === href : pathname.startsWith(href)
-            const isRed  = href === '/admin/controls'
-            const isGreen = href === '/admin/chat'
-            const isBlue  = href === '/admin/email'
-            const activeBg = isRed ? '#EF4444' : isGreen ? '#10B981' : isBlue ? '#3B82F6' : '#0F1C35'
             return (
-              <Link key={href} href={href}
+              <Link
+                key={href}
+                href={href}
                 className={clsx(
-                  'flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex-shrink-0',
-                  active ? 'text-white' : 'hover:opacity-70'
+                  'flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all flex-shrink-0',
+                  active ? 'text-white' : 'hover:bg-blue-50'
                 )}
-                style={active ? { background: activeBg } : { color: 'var(--color-muted)' }}>
+                style={active ? { background: '#0052CC', color: '#FFFFFF' } : { color: '#002B5B' }}
+              >
                 <Icon size={13} />
                 {label}
               </Link>

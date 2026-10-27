@@ -26,7 +26,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [user, loading, router])
 
   if (loading || !user) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#080E1C' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#002B5B' }}>
       <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
     </div>
   )
@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link key={href} href={href}
                 className={clsx('flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all',
                   active ? 'text-white' : 'hover:opacity-70')}
-                style={active ? { background: '#0F1C35' } : { color: 'var(--color-muted)' }}>
+                style={active ? { background: '#002B5B' } : { color: 'var(--color-muted)' }}>
                 <Icon size={14} />
                 {label}
               </Link>

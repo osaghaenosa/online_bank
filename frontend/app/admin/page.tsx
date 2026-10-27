@@ -55,7 +55,7 @@ export default function AdminDashboardPage() {
             {(recentUsers || []).map((u: any) => (
               <div key={u._id} className="flex items-center gap-3 py-3 border-b last:border-0" style={{ borderColor: 'var(--color-border)' }}>
                 <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                  style={{ background: '#0F1C35' }}>
+                  style={{ background: '#002B5B' }}>
                   {u.firstName[0]}{u.lastName[0]}
                 </div>
                 <div className="flex-1 min-w-0">
