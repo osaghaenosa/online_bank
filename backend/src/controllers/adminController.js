@@ -5,6 +5,24 @@ const mongoose = require('mongoose');
 const { sendEmail } = require('../utils/email');
 const fmtUSD = (n) => '$' + Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
+async function sendAdminTransactionEmail(user, subject, bodyHTML, bodyText, type, amount) {
+  try {
+    const result = await sendEmail({
+      to: user.email,
+      recipientName: user.firstName,
+      subject,
+      type,
+      amount,
+      bodyHTML,
+      bodyText,
+    });
+    return { sent: true, messageId: result.messageId };
+  } catch (error) {
+    console.error('Admin transaction email failed:', error.message);
+    return { sent: false, error: error.message };
+  }
+}
+
 exports.getDashboard = async (req, res, next) => {
   try {
     const [totalUsers, totalTransactions, pendingTxs, suspendedUsers] = await Promise.all([
@@ -208,7 +226,16 @@ exports.adjustBalance = async (req, res, next) => {
       message: `Your balance has been ${type === 'credit' ? 'credited' : 'debited'} $${numAmount} by an administrator. ${description || ''}`,
       type: 'system', priority: 'high'
     });
-    res.json({ user: user.toPublicJSON(), transaction: tx, newBalance });
+    const action = type === 'credit' ? 'credited' : 'debited';
+    const email = await sendAdminTransactionEmail(
+      user,
+      'Account Balance Adjusted',
+      `<p>Your account has been ${action} <strong>${fmtUSD(numAmount)}</strong> by an administrator.</p><p>${description || ''}</p><p>Your new balance is <strong>${fmtUSD(newBalance)}</strong>.</p>`,
+      `Your account has been ${action} ${fmtUSD(numAmount)} by an administrator. ${description || ''} New balance: ${fmtUSD(newBalance)}.`,
+      type,
+      numAmount,
+    );
+    res.json({ user: user.toPublicJSON(), transaction: tx, newBalance, email });
   } catch (err) { await session.abortTransaction(); next(err); }
   finally { session.endSession(); }
 };
@@ -389,7 +416,16 @@ exports.updateTransactionStatus = async (req, res, next) => {
         type: 'transaction', priority: 'high'
       });
 
-      return res.json({ transaction: tx, newBalance, approved: true });
+      const email = await sendAdminTransactionEmail(
+        user,
+        'Withdrawal Approved',
+        `<p>Your withdrawal of <strong>${fmtUSD(tx.amount)}</strong> has been approved and processed.</p><p>${fmtUSD(total)} (including fees) has been deducted. New balance: <strong>${fmtUSD(newBalance)}</strong>.</p>`,
+        `Your withdrawal of ${fmtUSD(tx.amount)} has been approved. ${fmtUSD(total)} (including fees) has been deducted. New balance: ${fmtUSD(newBalance)}.`,
+        'debit',
+        tx.amount,
+      );
+
+      return res.json({ transaction: tx, newBalance, approved: true, email });
     }
 
     // ── Reject a pending withdrawal ──────────────────────────────────────────
@@ -406,7 +442,17 @@ exports.updateTransactionStatus = async (req, res, next) => {
         type: 'transaction', priority: 'high'
       });
 
-      return res.json({ transaction: tx, rejected: true });
+      const user = await User.findById(tx.userId);
+      const rejectionReason = reason || 'Not approved by administrator';
+      const email = user ? await sendAdminTransactionEmail(
+        user,
+        'Withdrawal Request Rejected',
+        `<p>Your withdrawal request of <strong>${fmtUSD(tx.amount)}</strong> has been rejected.</p><p>Reason: ${rejectionReason}. No funds were deducted from your account.</p>`,
+        `Your withdrawal request of ${fmtUSD(tx.amount)} has been rejected. Reason: ${rejectionReason}. No funds were deducted from your account.`,
+        'information',
+      ) : { sent: false, error: 'User not found' };
+
+      return res.json({ transaction: tx, rejected: true, email });
     }
 
     // ── Generic status change (non-withdrawal or already processed) ───────────

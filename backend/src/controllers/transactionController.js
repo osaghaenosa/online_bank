@@ -9,6 +9,16 @@ const bcrypt = require('bcryptjs');
 
 const fmtUSD = (n) => '$' + Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
+async function sendTransactionEmail(options) {
+  try {
+    const result = await sendEmail(options);
+    return { sent: true, messageId: result.messageId };
+  } catch (error) {
+    console.error('Transaction email failed:', error.message);
+    return { sent: false, error: error.message };
+  }
+}
+
 // Helper to verify PIN, TTN, KYC, and Tokens
 async function verifyTransactionSecurity(req, user) {
   const { pin, trackTokenNumber } = req.body;
@@ -79,7 +89,17 @@ exports.deposit = async (req, res, next) => {
       type: 'transaction', priority: 'medium'
     });
 
-    res.status(201).json({ transaction: tx, newBalance, receiptUrl: tx.receiptUrl });
+    const email = await sendTransactionEmail({
+      to: user.email,
+      subject: 'Deposit Confirmed',
+      recipientName: user.firstName,
+      type: 'credit',
+      amount: numAmount,
+      bodyHTML: `<p>Your deposit of <strong>${fmtUSD(numAmount)}</strong> via ${getMethodLabel(method)} has been processed.</p><p>Your new balance is <strong>${fmtUSD(newBalance)}</strong>.</p>`,
+      bodyText: `Your deposit of ${fmtUSD(numAmount)} via ${getMethodLabel(method)} has been processed. New balance: ${fmtUSD(newBalance)}`,
+    });
+
+    res.status(201).json({ transaction: tx, newBalance, receiptUrl: tx.receiptUrl, email });
   } catch (err) { await session.abortTransaction(); next(err); }
   finally { session.endSession(); }
 };
@@ -148,7 +168,7 @@ exports.withdraw = async (req, res, next) => {
       type: 'transaction', priority: 'medium'
     });
 
-    sendEmail({
+    const email = await sendTransactionEmail({
       to: user.email,
       subject: 'Withdrawal Request Submitted',
       recipientName: user.firstName,
@@ -157,13 +177,14 @@ exports.withdraw = async (req, res, next) => {
       bodyHTML: `<p>Your withdrawal request of <strong>${fmtUSD(numAmount)}</strong> via ${getMethodLabel(method)} is pending admin approval.</p>
                  <p>You will be notified once it is reviewed. Your balance has not been deducted yet.</p>`,
       bodyText: `Your withdrawal request of ${fmtUSD(numAmount)} via ${getMethodLabel(method)} is pending admin approval.`
-    }).catch(err => console.error('Withdrawal email error:', err));
+    });
 
     res.status(201).json({
       transaction: tx,
       pending: true,
       message: 'Withdrawal submitted for admin approval. Your balance will be deducted only upon approval.',
       currentBalance: user.balance,
+      email,
     });
   } catch (err) { next(err); }
 };
@@ -267,7 +288,8 @@ exports.transfer = async (req, res, next) => {
     }
     await Notification.create(notifs);
 
-    sendEmail({
+    const emails = await Promise.all([
+      sendTransactionEmail({
       to: sender.email,
       subject: 'Transfer Successful',
       recipientName: sender.firstName,
@@ -276,24 +298,21 @@ exports.transfer = async (req, res, next) => {
       bodyHTML: `<p>You have successfully sent <strong>${fmtUSD(numAmount)}</strong> to ${senderTx.recipientName || recipientEmail}.</p>
                  <p>Your new balance is <strong>${fmtUSD(senderNewBalance)}</strong>.</p>`,
       bodyText: `You have successfully sent ${fmtUSD(numAmount)} to ${senderTx.recipientName || recipientEmail}. New balance: ${fmtUSD(senderNewBalance)}`
-    }).catch(err => console.error('Transfer sender email error:', err));
-
-    if (recipient) {
-      sendEmail({
+      }),
+      ...(recipient ? [sendTransactionEmail({
         to: recipient.email,
         subject: 'Money Received',
         recipientName: recipient.firstName,
         type: 'credit',
         amount: numAmount,
-        bodyHTML: `<p>You have received <strong>${fmtUSD(numAmount)}</strong> from ${sender.firstName} ${sender.lastName}.</p>
-                   <p>Your new balance is <strong>${fmtUSD(finalRecipientBalance)}</strong>.</p>`,
-        bodyText: `You have received ${fmtUSD(numAmount)} from ${sender.firstName} ${sender.lastName}. New balance: ${fmtUSD(finalRecipientBalance)}`
-      }).catch(err => console.error('Transfer recipient email error:', err));
-    }
+        bodyHTML: `<p>You have received <strong>${fmtUSD(numAmount)}</strong> from ${sender.firstName} ${sender.lastName}.</p><p>Your new balance is <strong>${fmtUSD(finalRecipientBalance)}</strong>.</p>`,
+        bodyText: `You have received ${fmtUSD(numAmount)} from ${sender.firstName} ${sender.lastName}. New balance: ${fmtUSD(finalRecipientBalance)}`,
+      })] : []),
+    ]);
 
     res.status(201).json({
       transaction: senderTx, newBalance: senderNewBalance,
-      recipientFound: !!recipient, receiptUrl: senderTx.receiptUrl
+      recipientFound: !!recipient, receiptUrl: senderTx.receiptUrl, emails
     });
   } catch (err) { await session.abortTransaction(); next(err); }
   finally { session.endSession(); }
@@ -365,7 +384,16 @@ exports.payBill = async (req, res, next) => {
       const receipt = await generateReceiptPDF(tx, user);
       tx.receiptUrl = receipt.url; tx.receiptGenerated = true; await tx.save();
     } catch(e) {}
-    res.status(201).json({ transaction: tx, newBalance, receiptUrl: tx.receiptUrl });
+    const email = await sendTransactionEmail({
+      to: user.email,
+      subject: 'Bill Payment Processed',
+      recipientName: user.firstName,
+      type: 'debit',
+      amount: numAmount,
+      bodyHTML: `<p>Your ${billType || 'bill'} payment of <strong>${fmtUSD(numAmount)}</strong> has been processed.</p><p>Your new balance is <strong>${fmtUSD(newBalance)}</strong>.</p>`,
+      bodyText: `Your ${billType || 'bill'} payment of ${fmtUSD(numAmount)} has been processed. New balance: ${fmtUSD(newBalance)}`,
+    });
+    res.status(201).json({ transaction: tx, newBalance, receiptUrl: tx.receiptUrl, email });
   } catch (err) { await session.abortTransaction(); next(err); }
   finally { session.endSession(); }
 };

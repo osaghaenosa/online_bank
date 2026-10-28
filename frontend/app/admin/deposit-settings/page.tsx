@@ -14,7 +14,7 @@ const DEFAULT_METHODS = [
     id: 'bank_transfer', label: 'Bank Transfer', category: 'bank',
     icon: 'building', enabled: true, fee: '0', feeType: 'fixed',
     details: {
-      bankName: 'Blue ridge Bank',
+      bankName: 'Blue Ridge Federal',
       accountNumber: '0012349876',
       routingNumber: '021000021',
       swiftCode: 'BRBKUS33',
@@ -38,7 +38,7 @@ const DEFAULT_METHODS = [
     id: 'wire', label: 'Wire Transfer', category: 'bank',
     icon: 'building', enabled: true, fee: '15', feeType: 'fixed',
     details: {
-      bankName: 'Blue ridge Bank',
+      bankName: 'Blue Ridge Federal',
       routingNumber: '021000021',
       accountNumber: '0012349876',
       swiftCode: 'BRBKUS33',

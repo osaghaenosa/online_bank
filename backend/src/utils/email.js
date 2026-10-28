@@ -4,7 +4,7 @@ const { Resend } = require('resend');
 const RESEND_API_BASE = 'https://api.resend.com';
 
 function getApiKey() {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) {
     throw new Error(
       'RESEND_API_KEY is not set. Add it to your .env file.\n' +
@@ -292,8 +292,16 @@ function buildPlainText({ recipientName, subject, bodyText, amount, type }) {
 
 // ── Send a single email via Resend HTTP API (supports file & image attachments) ──
 async function sendEmail(opts) {
-  const fromName  = process.env.SMTP_FROM_NAME  || 'Blue ridge Bank';
-  const fromEmail = process.env.SMTP_FROM_EMAIL || 'support@theblueridges.com';
+  const fromName = process.env.EMAIL_FROM_NAME || process.env.SMTP_FROM_NAME || 'Blue ridge Bank';
+  const fromEmail = process.env.EMAIL_FROM_EMAIL || process.env.SMTP_FROM_EMAIL || 'support@theblueridges.com';
+  const recipients = (Array.isArray(opts.to) ? opts.to : [opts.to])
+    .map(email => String(email || '').trim())
+    .filter(Boolean);
+
+  if (!recipients.length || recipients.some(email => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) {
+    throw new Error('A valid recipient email address is required');
+  }
+  if (!opts.subject?.trim()) throw new Error('Email subject is required');
 
   // Normalize incoming attachments: [{ filename, content (base64), contentType }]
   const rawAttachments = Array.isArray(opts.attachments) ? opts.attachments : [];
@@ -323,7 +331,7 @@ async function sendEmail(opts) {
 
   const payload = {
     from: `${fromName} <${fromEmail}>`,
-    to: Array.isArray(opts.to) ? opts.to : [opts.to],
+    to: recipients,
     subject: opts.subject,
     html: buildEmailHTML({ ...opts, attachments: preparedAttachments }),
     text: opts.bodyText || buildPlainText(opts),

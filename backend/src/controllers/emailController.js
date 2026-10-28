@@ -35,7 +35,7 @@ exports.sendAdminEmail = async (req, res, next) => {
     // ── Resolve recipients ────────────────────────────────────────────────────
     let recipients = [];
     if (target === 'all') {
-      const users = await User.find({ role: 'user' }).select('firstName email');
+      const users = await User.find({ role: 'user', email: { $type: 'string', $ne: '' } }).select('firstName email');
       recipients  = users.map(u => ({ email: u.email, name: u.firstName }));
     } else if (target === 'custom' || (!target && customEmail)) {
       const email = (customEmail || '').trim();
@@ -177,8 +177,19 @@ exports.verifySmtp = async (req, res) => {
     });
 
     if (response.ok) {
-      const from = process.env.SMTP_FROM_EMAIL || 'support@theblueridges.com';
-      return res.json({ connected: true, provider: 'Resend', from });
+      const from = process.env.EMAIL_FROM_EMAIL || process.env.SMTP_FROM_EMAIL || 'support@theblueridges.com';
+      const fromDomain = from.split('@').pop().toLowerCase();
+      const domains = await response.json();
+      const senderDomain = (domains.data || []).find(domain => domain.name.toLowerCase() === fromDomain);
+      if (!senderDomain || senderDomain.status !== 'verified') {
+        return res.json({
+          connected: false,
+          provider: 'Resend',
+          from,
+          error: `The sender domain ${fromDomain} is not verified in Resend. Verify it and set EMAIL_FROM_EMAIL to an address on that domain.`,
+        });
+      }
+      return res.json({ connected: true, provider: 'Resend', from, domainStatus: senderDomain.status });
     }
 
     const body = await response.json().catch(() => ({}));

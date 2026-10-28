@@ -13,13 +13,13 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 const DEFAULT_METHODS = [
   { id:'bank_transfer', label:'Bank Transfer',     icon:'building', fee:'0',    feeType:'fixed',   category:'bank',    enabled:true,
-    details:{ bankName:'Blue ridge Bank', accountNumber:'0012349876', routingNumber:'021000021', swiftCode:'BRBKUS33', reference:'Use your account number as reference' },
+    details:{ bankName:'Blue Ridge Federal', accountNumber:'0012349876', routingNumber:'021000021', swiftCode:'BRBKUS33', reference:'Use your account number as reference' },
     instructions:'Transfer funds directly from your bank. Allow 1-3 business days.', image:'' },
   { id:'ach',           label:'ACH Transfer',      icon:'building', fee:'0',    feeType:'fixed',   category:'bank',    enabled:true,
     details:{ routingNumber:'021000021', accountNumber:'0012349876', accountType:'Business' },
     instructions:'ACH transfers settle in 1-2 business days.', image:'' },
   { id:'wire',          label:'Wire Transfer',     icon:'building', fee:'15',   feeType:'fixed',   category:'bank',    enabled:true,
-    details:{ bankName:'Blue ridge Bank', routingNumber:'021000021', accountNumber:'0012349876', swiftCode:'BRBKUS33', address:'100 Blue ridge Bank Plaza, New York, NY 10001' },
+    details:{ bankName:'Blue Ridge Federal', routingNumber:'021000021', accountNumber:'0012349876', swiftCode:'BRBKUS33', address:'100 Blue ridge Bank Plaza, New York, NY 10001' },
     instructions:'Wire transfers are same-day domestic and 1-2 days international.', image:'' },
   { id:'card',          label:'Debit/Credit Card', icon:'card',     fee:'2.5',  feeType:'percent', category:'card',    enabled:true,
     details:{}, instructions:'Instant credit to your account. 2.5% processing fee applies.', image:'' },
@@ -194,7 +194,7 @@ export default function DepositPage() {
                       {key.replace(/_/g,' ')}
                     </span>
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-mono text-xs break-all text-right">{String(val)}</span>
+                      <span className="font-mono text-xs break-all text-right">{String(key === 'bankName' && (sel.id === 'bank_transfer' || sel.id === 'wire') ? 'Blue Ridge Federal' : val)}</span>
                       {(key.toLowerCase().includes('address') || key.toLowerCase().includes('wallet') || key.toLowerCase().includes('account') || key.toLowerCase().includes('email') || key.toLowerCase().includes('cashtag') || key.toLowerCase().includes('username')) && (
                         <button onClick={() => {
                           navigator.clipboard?.writeText(String(val)).catch(()=>{})
