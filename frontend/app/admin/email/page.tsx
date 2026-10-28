@@ -651,7 +651,8 @@ export default function AdminEmailPage() {
                     <AtSign size={12} style={{ color: '#0052CC' }} /> Recipient Email Address
                   </label>
                   <input
-                    className="input font-mono text-sm"
+                    className="input font-mono text-sm text-slate-900 bg-white placeholder:text-slate-500 font-medium"
+                    style={{ color: '#0F172A', backgroundColor: '#FFFFFF' }}
                     type="email"
                     placeholder="anyone@example.com"
                     value={customEmail}
@@ -693,7 +694,8 @@ export default function AdminEmailPage() {
                   <div className="p-2 border-b border-slate-100 bg-slate-50 relative">
                     <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
-                      className="w-full pl-7 pr-3 py-1.5 text-xs bg-white border border-slate-200 focus:outline-none"
+                      className="w-full pl-7 pr-3 py-1.5 text-xs bg-white border border-slate-200 focus:outline-none text-slate-900 placeholder:text-slate-500 font-medium"
+                      style={{ color: '#0F172A', backgroundColor: '#FFFFFF' }}
                       placeholder="Search name, email…"
                       value={userSearch}
                       onChange={e => setUserSearch(e.target.value)}
@@ -770,7 +772,8 @@ export default function AdminEmailPage() {
               <div>
                 <label className="label">Email Subject *</label>
                 <input
-                  className="input"
+                  className="input text-slate-900 bg-white placeholder:text-slate-500 font-medium"
+                  style={{ color: '#0F172A', backgroundColor: '#FFFFFF' }}
                   placeholder="Enter email subject…"
                   value={subject}
                   onChange={e => setSubject(e.target.value)}
@@ -786,7 +789,8 @@ export default function AdminEmailPage() {
                   <div className="relative">
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
                     <input
-                      className="input pl-8 font-mono"
+                      className="input pl-8 font-mono text-slate-900 bg-white placeholder:text-slate-500 font-medium"
+                      style={{ color: '#0F172A', backgroundColor: '#FFFFFF' }}
                       type="number"
                       min="0"
                       step="0.01"
@@ -811,7 +815,8 @@ export default function AdminEmailPage() {
                   </button>
                 </div>
                 <textarea
-                  className="input resize-none font-sans text-sm leading-relaxed"
+                  className="input resize-none font-sans text-sm leading-relaxed text-slate-900 bg-white placeholder:text-slate-500 font-medium"
+                  style={{ color: '#0F172A', backgroundColor: '#FFFFFF' }}
                   rows={9}
                   placeholder={category.placeholder}
                   value={body}
@@ -1026,7 +1031,8 @@ export default function AdminEmailPage() {
               <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                className="input pl-9 py-2 text-xs"
+                className="input pl-9 py-2 text-xs text-slate-900 bg-white placeholder:text-slate-500 font-medium"
+                style={{ color: '#0F172A', backgroundColor: '#FFFFFF' }}
                 placeholder="Filter received emails by sender, subject, or recipient…"
                 value={inboxSearch}
                 onChange={e => setInboxSearch(e.target.value)}

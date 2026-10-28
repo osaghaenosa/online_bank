@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, Building2, Download, Upload, Send, List,
-  User, Menu, X, LogOut, ChevronRight, ShieldCheck, Wallet, TrendingUp, CreditCard
+  User, Menu, X, LogOut, ChevronRight, ShieldCheck, Wallet, TrendingUp, CreditCard, Smartphone
 } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '@/store/auth'
@@ -13,6 +13,7 @@ import { NotificationPopup } from '@/components/shared/NotificationPopup'
 import { ChatWidget } from '@/components/shared/ChatWidget'
 import { SetPinModal } from '@/components/shared/SetPinModal'
 import { BrandLogo } from '@/components/shared/BrandLogo'
+import { triggerPwaInstall } from '@/components/shared/PwaRegistrar'
 
 const NAV = [
   { href: '/dashboard', label: 'Account Overview',   icon: LayoutDashboard },
@@ -207,6 +208,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </>
           )}
         </nav>
+
+        {/* PWA Install Button */}
+        <div className="p-3 border-t flex-shrink-0" style={{ background: '#001938', borderColor: '#1E3A5F' }}>
+          <button
+            onClick={() => triggerPwaInstall()}
+            className="w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider text-white border transition-colors hover:bg-[#003D99]"
+            style={{ background: '#0052CC', borderColor: '#60A5FA' }}
+            title="Install Blue ridge Bank on this device"
+          >
+            <span className="flex items-center gap-2">
+              <Smartphone size={14} />
+              <span>Install App</span>
+            </span>
+            <Download size={13} />
+          </button>
+        </div>
 
         {/* Client Footer */}
         <div

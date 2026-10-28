@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { MessageCircle, X, Send, ChevronDown } from 'lucide-react'
+import { MessageCircle, X, Send, ChevronDown, Phone } from 'lucide-react'
 import { useChat } from '@/hooks/useChat'
 import { api } from '@/lib/api'
 import { useAuth } from '@/store/auth'
@@ -95,22 +95,60 @@ export function ChatWidget() {
             </button>
           </div>
 
+          {/* Persistent Telephone & WhatsApp Support Header Strip */}
+          <div
+            className="flex items-center justify-between px-3 py-2 border-b text-[11px] font-mono flex-shrink-0"
+            style={{ background: '#EBF2FF', borderColor: '#BFDBFE', color: '#002B5B' }}
+          >
+            <div className="flex items-center gap-1.5 font-bold truncate">
+              <Phone size={12} style={{ color: '#0052CC' }} />
+              <a href="tel:+12488346313" className="hover:underline">
+                +1 (248) 834-6313
+              </a>
+            </div>
+            <a
+              href="https://wa.me/12488346313"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-white transition-opacity hover:opacity-90 flex-shrink-0"
+              style={{ background: '#0052CC' }}
+              title="Open WhatsApp Support Chat (+1 248 834-6313)"
+            >
+              <MessageCircle size={10} />
+              <span>WhatsApp</span>
+            </a>
+          </div>
+
           <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ background: '#F8FAFC' }}>
             {messages.length === 0 && (
               <div className="flex justify-start">
                 <div
-                  className="max-w-[85%] px-3.5 py-2.5 text-sm border"
+                  className="max-w-[88%] px-3.5 py-2.5 text-sm border space-y-1.5"
                   style={{ background: '#FFFFFF', borderColor: '#CBD5E1', borderLeft: '3px solid #0052CC' }}
                 >
-                  <p className="font-bold text-xs mb-1" style={{ color: '#002B5B' }}>Blue ridge Bank Support</p>
-                  <p style={{ color: '#0A192F' }}>Hello {user.firstName}, how can our support desk assist you today?</p>
-                  <p className="mt-1 text-xs" style={{ color: '#475569' }}>
-                    Direct WhatsApp Desk:{' '}
-                    <a href="https://wa.me/12488346313" target="_blank" rel="noopener noreferrer" className="font-bold underline" style={{ color: '#0052CC' }}>
-                      Connect Here
-                    </a>
+                  <p className="font-bold text-xs" style={{ color: '#002B5B' }}>Blue ridge Bank Support Desk</p>
+                  <p className="text-xs" style={{ color: '#0A192F' }}>
+                    Hello {user.firstName}, how can our institutional support desk assist you today?
                   </p>
-                  <p className="text-[10px] font-mono mt-1" style={{ color: '#64748B' }}>support@theblueridges.com</p>
+                  <div className="pt-1.5 border-t border-slate-100 text-xs space-y-1">
+                    <p className="font-semibold text-[11px] uppercase tracking-wider font-mono" style={{ color: '#002B5B' }}>
+                      Official Telephone &amp; WhatsApp:
+                    </p>
+                    <a
+                      href="https://wa.me/12488346313"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 font-bold underline text-xs"
+                      style={{ color: '#0052CC' }}
+                    >
+                      <Phone size={11} />
+                      <span>+1 (248) 834-6313</span>
+                      <span className="text-[10px] uppercase font-mono px-1 py-0.5 text-white no-underline font-normal" style={{ background: '#0052CC' }}>
+                        Chat on WhatsApp
+                      </span>
+                    </a>
+                  </div>
+                  <p className="text-[10px] font-mono" style={{ color: '#64748B' }}>support@theblueridges.com</p>
                 </div>
               </div>
             )}

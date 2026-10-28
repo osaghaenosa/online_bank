@@ -37,13 +37,22 @@ export function PublicNav() {
             </span>
             <span className="hidden lg:inline">256-BIT ENCRYPTED LEDGER</span>
           </div>
-          <div className="flex items-center gap-5">
-            <a href="mailto:support@theblueridges.com" className="hover:text-white flex items-center gap-1">
-              <PhoneCall size={11} /> support@theblueridges.com
+          <div className="flex items-center gap-4">
+            <a href="tel:+12488346313" className="hover:text-white flex items-center gap-1 font-bold text-white">
+              <PhoneCall size={11} style={{ color: '#60A5FA' }} /> +1 (248) 834-6313
             </a>
-            <Link href="/contact" className="hover:text-white underline">
-              Branch &amp; Wire Desk
-            </Link>
+            <a
+              href="https://wa.me/12488346313"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white underline text-[10px] uppercase font-bold"
+              style={{ color: '#93C5FD' }}
+            >
+              WhatsApp
+            </a>
+            <a href="mailto:support@theblueridges.com" className="hover:text-white flex items-center gap-1">
+              support@theblueridges.com
+            </a>
           </div>
         </div>
       </div>
