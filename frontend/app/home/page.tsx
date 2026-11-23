@@ -18,7 +18,7 @@ const FEATURES = [
     code: 'Security',
     icon: Shield,
     title: 'Institutional Custody & Security',
-    desc: 'Protected by 256-bit encryption, multi-token hardware verification, and 24/7 automated risk controls.',
+    desc: 'Protected by multi-layer security, account verification, and 24/7 automated fraud monitoring.',
   },
   {
     code: 'Treasury',
@@ -42,7 +42,7 @@ const FEATURES = [
     code: 'Audit',
     icon: FileText,
     title: 'Certified Audit Statements',
-    desc: 'Download official PDF transaction receipts with cryptographic reference numbers for every ledger movement.',
+    desc: 'Download official PDF transaction receipts with unique reference numbers for every payment and transfer.',
   },
 ]
 
@@ -129,8 +129,8 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 border-t border-white/15">
               {[
                 'FDIC Insured up to $250,000',
-                '256-Bit Cryptographic Ledger',
-                'Certified PDF Audit Receipts',
+                'Protected Online Banking',
+                'Instant PDF Receipts',
               ].map(b => (
                 <div key={b} className="flex items-center gap-2">
                   <CheckCircle size={15} className="text-[#60A5FA] flex-shrink-0" />
@@ -473,7 +473,7 @@ export default function HomePage() {
             <div className="md:col-span-2">
               <BrandLogo variant="light" size="md" showTagline />
               <p className="text-xs mt-4 max-w-md leading-relaxed text-blue-100/85">
-                Blue ridge Bank provides personal checking, high-yield savings, international wire clearing, and digital asset custody under strict regulatory and cryptographic standards.
+                Blue ridge Bank provides personal checking, high-yield savings, international wire transfers, and digital asset accounts under strict regulatory and security standards.
               </p>
               <p className="text-xs font-mono mt-3 text-blue-200">
                 Support Desk:{' '}

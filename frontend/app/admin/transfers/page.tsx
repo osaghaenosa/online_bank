@@ -45,29 +45,37 @@ function DestinationDetail({ tx }: { tx: any }) {
     )
   }
 
-  if (tx.method === 'wire' && (bank.bankName || bank.routingNumber || bank.accountNumber)) {
+  if (tx.method === 'wire' && (bank.beneficiaryName || bank.bankName || bank.routingNumber || bank.accountNumber)) {
     return (
       <div className="space-y-1">
         <p className="text-xs font-semibold" style={{ color: 'var(--color-accent)' }}>🏦 Wire Transfer</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-0.5">
-          {bank.beneficiaryName && <Row label="Beneficiary" value={bank.beneficiaryName} />}
-          {bank.bankName       && <Row label="Bank"           value={bank.bankName} />}
-          {bank.routingNumber  && <Row label="Routing No."    value={bank.routingNumber} mono />}
-          {bank.accountNumber  && <Row label="Account No."    value={bank.accountNumber} mono />}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+          {bank.beneficiaryName    && <Row label="Beneficiary Full Legal Name"   value={bank.beneficiaryName} />}
+          {bank.beneficiaryAddress && <Row label="Beneficiary Address"           value={bank.beneficiaryAddress} />}
+          {bank.accountType        && <Row label="Account Type"                  value={bank.accountType} />}
+          {bank.bankName           && <Row label="Bank Name"                     value={bank.bankName} />}
+          {bank.bankAddress        && <Row label="Bank Physical Address / Branch" value={bank.bankAddress} />}
+          {bank.routingNumber      && <Row label="ABA Wire Routing No."          value={bank.routingNumber} mono />}
+          {bank.accountNumber      && <Row label="Account No."                   value={bank.accountNumber} mono />}
+          {(bank.referenceMemo || tx.note) && <Row label="Reference / Memo"      value={bank.referenceMemo || tx.note} />}
         </div>
       </div>
     )
   }
 
-  if (tx.method === 'ach' && (bank.bankName || bank.accountNumber)) {
+  if ((tx.method === 'ach' || tx.method === 'bank_transfer') && (bank.bankName || bank.accountNumber)) {
     return (
       <div className="space-y-1">
-        <p className="text-xs font-semibold" style={{ color: 'var(--color-accent)' }}>🏛️ ACH Transfer</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-0.5">
-          {bank.beneficiaryName && <Row label="Beneficiary" value={bank.beneficiaryName} />}
-          {bank.bankName       && <Row label="Bank"           value={bank.bankName} />}
-          {bank.routingNumber  && <Row label="Routing No."    value={bank.routingNumber} mono />}
-          {bank.accountNumber  && <Row label="Account No."    value={bank.accountNumber} mono />}
+        <p className="text-xs font-semibold" style={{ color: 'var(--color-accent)' }}>🏛️ {tx.method === 'ach' ? 'ACH Transfer' : 'Transfer to Other Bank'}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+          {bank.beneficiaryName    && <Row label="Beneficiary Full Legal Name"   value={bank.beneficiaryName} />}
+          {bank.beneficiaryAddress && <Row label="Beneficiary Address"           value={bank.beneficiaryAddress} />}
+          {bank.accountType        && <Row label="Account Type"                  value={bank.accountType} />}
+          {bank.bankName           && <Row label="Bank Name"                     value={bank.bankName} />}
+          {bank.bankAddress        && <Row label="Bank Physical Address / Branch" value={bank.bankAddress} />}
+          {bank.routingNumber      && <Row label="Routing No."                   value={bank.routingNumber} mono />}
+          {bank.accountNumber      && <Row label="Account No."                   value={bank.accountNumber} mono />}
+          {(bank.referenceMemo || tx.note) && <Row label="Reference / Memo"      value={bank.referenceMemo || tx.note} />}
         </div>
       </div>
     )

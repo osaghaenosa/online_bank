@@ -36,9 +36,8 @@ export function PublicNav() {
           <div className="flex items-center gap-5">
             <span className="flex items-center gap-1.5 font-medium text-white/90">
               <ShieldCheck size={12} className="text-[#60A5FA]" />
-              FDIC Insured Institution · Routing #021000021
+              FDIC Insured Institution
             </span>
-            <span className="hidden lg:inline text-blue-200/70">256-Bit Encrypted Ledger</span>
           </div>
           <div className="flex items-center gap-4">
             <a

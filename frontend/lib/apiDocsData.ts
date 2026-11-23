@@ -534,6 +534,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       data: {
         transfersEnabled: true,
         withdrawalsEnabled: true,
+        transferLimit: 1000000,
         withdrawalLimit: 10000,
         transfersBlockReason: '',
         withdrawalsBlockReason: '',
@@ -632,12 +633,12 @@ export const ENDPOINTS: EndpointDoc[] = [
     authRequired: true,
     idempotent: true,
     notes: [
-      'Maximum single transfer is $100,000 USD.',
+      'Default maximum single transfer is $1,000,000 USD (configurable per account by administrator).',
       'Blocks self-transfers and respects account transfersEnabled compliance controls.',
     ],
     pathParams: [{ name: 'accountId', type: 'string', required: true, description: 'Source account identifier or "me"', example: 'me' }],
     bodyParams: [
-      { name: 'amount', type: 'number', required: true, description: 'Transfer amount in USD (0.01 - 100000)' },
+      { name: 'amount', type: 'number', required: true, description: 'Transfer amount in USD (0.01 - 1000000 default, admin configurable)' },
       { name: 'recipientEmail', type: 'string', description: 'Recipient email address (supply email or accountNumber)' },
       { name: 'recipientAccountNumber', type: 'string', description: 'Recipient 12-digit Blue ridge Bank account number' },
       { name: 'description', type: 'string', description: 'Custom transfer description' },

@@ -432,7 +432,7 @@ exports.getOpenApiSpec = async (req, res) => {
             type: 'object',
             required: ['amount'],
             properties: {
-              amount: { type: 'number', minimum: 0.01, maximum: 100000 },
+              amount: { type: 'number', minimum: 0.01, maximum: 1000000 },
               recipientEmail: { type: 'string', format: 'email' },
               recipientAccountNumber: { type: 'string' },
               description: { type: 'string' },
@@ -568,7 +568,8 @@ exports.getBankSettings = async (req, res, next) => {
       maintenanceMode: maintenanceSetting?.value === true,
       limits: {
         maxSingleDepositUSD: 50000,
-        maxSingleTransferUSD: 100000,
+        maxSingleTransferUSD: 1000000,
+        defaultTransferLimitUSD: 1000000,
         defaultWithdrawalLimitUSD: 10000,
       },
     });
@@ -1015,6 +1016,7 @@ exports.getRestrictions = async (req, res) => {
     kyc: user.kyc,
     transfersEnabled: user.transfersEnabled,
     withdrawalsEnabled: user.withdrawalsEnabled,
+    transferLimit: user.transferLimit || 1000000,
     withdrawalLimit: user.withdrawalLimit || 10000,
     transfersBlockReason: user.transfersBlockReason || '',
     withdrawalsBlockReason: user.withdrawalsBlockReason || '',
@@ -1337,8 +1339,9 @@ exports.transfer = async (req, res, next) => {
     if (!Number.isFinite(numAmount) || numAmount <= 0) {
       return sendError(res, 400, 'INVALID_AMOUNT', 'Transfer amount must be greater than 0.');
     }
-    if (numAmount > 100000) {
-      return sendError(res, 400, 'LIMIT_EXCEEDED', 'Maximum single transfer is $100,000.');
+    const transferLimit = Number(senderCheck.transferLimit) > 0 ? Number(senderCheck.transferLimit) : 1000000;
+    if (numAmount > transferLimit) {
+      return sendError(res, 400, 'LIMIT_EXCEEDED', `Maximum single transfer is $${transferLimit.toLocaleString()}.`);
     }
     if (!recipientEmail && !recipientAccountNumber) {
       return sendError(res, 400, 'RECIPIENT_REQUIRED', 'Either recipientEmail or recipientAccountNumber is required.');

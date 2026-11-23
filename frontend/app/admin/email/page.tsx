@@ -116,35 +116,35 @@ function buildPreviewHTML(
         .map(a => `
           <div style="border:2px solid #002B5B;background:#F8FAFC;padding:6px;margin:12px 0;">
             <img src="${a.previewUrl}" alt="${a.filename}" style="max-width:100%;height:auto;display:block;" />
-            <p style="margin:4px 0 0 0;font-size:9px;font-family:monospace;color:#475569;text-transform:uppercase;">ATTACHED IMAGE: ${a.filename}</p>
+            <p style="margin:4px 0 0 0;font-size:10px;font-family:'Segoe UI',Arial,sans-serif;color:#475569;">${a.filename}</p>
           </div>
         `).join('')
     : ''
 
   const attSummary = attachments.length > 0 ? `
     <div style="background:#EBF2FF;border:1px solid #93C5FD;border-left:4px solid #002B5B;padding:10px 14px;margin-top:14px;">
-      <p style="margin:0 0 4px 0;font-size:10px;font-family:monospace;font-weight:700;color:#002B5B;text-transform:uppercase;">
-        ENCLOSED ATTACHMENTS (${attachments.length})
+      <p style="margin:0 0 4px 0;font-size:10px;font-family:'Segoe UI',Arial,sans-serif;font-weight:700;color:#002B5B;text-transform:uppercase;">
+        Attachments (${attachments.length})
       </p>
-      ${attachments.map(a => `<p style="margin:2px 0;font-size:11px;font-family:monospace;color:#1E3A5F;">&bull; <strong>${a.filename}</strong> (${formatBytes(a.size)})</p>`).join('')}
+      ${attachments.map(a => `<p style="margin:2px 0;font-size:11px;font-family:'Segoe UI',Arial,sans-serif;color:#1E3A5F;">&bull; <strong>${a.filename}</strong> (${formatBytes(a.size)})</p>`).join('')}
     </div>
   ` : ''
 
   return `
     <div style="font-family:'Segoe UI',Arial,sans-serif;background:#F2F5F9;padding:16px;border-radius:0px;">
       <div style="background:#FFFFFF;border:2px solid #002B5B;border-radius:0px;">
-        <div style="background:#001F42;padding:8px 20px;border-bottom:1px solid #1E3A5F;font-family:monospace;font-size:9px;color:#93C5FD;letter-spacing:1px;font-weight:700;">
-          BLUE RIDGE BANK &bull; OFFICIAL ELECTRONIC DISPATCH
+        <div style="background:#001F42;padding:8px 20px;border-bottom:1px solid #1E3A5F;font-family:'Segoe UI',Arial,sans-serif;font-size:9px;color:#93C5FD;letter-spacing:0.8px;font-weight:700;">
+          BLUE RIDGE BANK &bull; OFFICIAL NOTIFICATION
         </div>
         <div style="background:#002B5B;padding:18px 20px;border-bottom:4px solid #0052CC;display:flex;align-items:center;justify-content:space-between;">
           <div style="display:flex;align-items:center;gap:10px;">
             <img src="/logo.png" alt="Logo" style="width:32px;height:32px;object-fit:contain;background:#FFFFFF;border:1px solid #60A5FA;padding:1px;" />
             <span style="color:#FFFFFF;font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;">BLUE RIDGE <span style="color:#60A5FA;">BANK</span></span>
           </div>
-          <span style="background:#0052CC;color:#FFFFFF;border:1px solid #60A5FA;padding:4px 10px;border-radius:0px;font-size:10px;font-weight:700;font-family:monospace;text-transform:uppercase;">${cat.label}</span>
+          <span style="background:#0052CC;color:#FFFFFF;border:1px solid #60A5FA;padding:4px 10px;border-radius:0px;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;text-transform:uppercase;">${cat.label}</span>
         </div>
         <div style="padding:22px 20px;">
-          <p style="font-size:10px;font-family:monospace;color:#0052CC;font-weight:700;text-transform:uppercase;margin:0 0 4px 0;">SUBJECT: ${subject || 'Official Notice'}</p>
+          <p style="font-size:11px;font-family:'Segoe UI',Arial,sans-serif;color:#0052CC;font-weight:700;margin:0 0 4px 0;">${subject || 'Account Notice'}</p>
           <p style="font-size:15px;font-weight:700;color:#002B5B;margin:0 0 16px 0;padding-bottom:10px;border-bottom:1px solid #E2E8F0;">Dear ${recipientName || 'Valued Client'},</p>
           ${amtHTML}
           <div style="color:#1E293B;font-size:13px;line-height:1.65;">${paragraphs || '<p style="color:#94A3B8;">Your message will appear here…</p>'}</div>
@@ -152,7 +152,7 @@ function buildPreviewHTML(
           ${attSummary}
         </div>
         <div style="background:#F8FAFC;padding:14px 20px;border-top:1px solid #CBD5E1;border-bottom:1px solid #CBD5E1;text-align:right;">
-          <span style="background:#0052CC;color:#FFFFFF;padding:8px 18px;border-radius:0px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;display:inline-block;">Access Banking Portal →</span>
+          <span style="background:#0052CC;color:#FFFFFF;padding:8px 18px;border-radius:0px;font-size:11px;font-weight:700;letter-spacing:0.4px;display:inline-block;">Open Online Banking →</span>
         </div>
         <div style="background:#002B5B;padding:14px 20px;color:#BFDBFE;">
           <p style="font-size:10px;color:#BFDBFE;margin:0;">© ${new Date().getFullYear()} Blue ridge Bank · support@theblueridges.com</p>

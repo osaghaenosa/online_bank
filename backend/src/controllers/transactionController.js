@@ -146,9 +146,14 @@ exports.withdraw = async (req, res, next) => {
       userId: req.user._id, type: 'debit', category: 'withdrawal',
       method: method || 'ach', amount: numAmount, fee,
       description: description || `${getMethodLabel(method)} Withdrawal`,
-      note: note || '',
+      note: (note || bankDetails?.referenceMemo || '').trim(),
       status: 'pending',          // ← key: stays pending until admin approves
       balanceAfter: null,         // ← not set until approved
+      ...(bankDetails && {
+        recipientName: bankDetails.beneficiaryName || undefined,
+        recipientAccount: bankDetails.accountNumber || undefined,
+        recipientRouting: bankDetails.routingNumber || undefined,
+      }),
       metadata: { bankDetails, cardDetails, cryptoDetails }
     });
     if (cryptoDetails) {
@@ -206,13 +211,49 @@ exports.transfer = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const { amount, recipientEmail, description, note } = req.body;
+    const { amount, recipientEmail, recipientAccountNumber, description, note, method, bankDetails } = req.body;
     const numAmount = parseFloat(amount);
-    if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
-    if (numAmount > 100000) return res.status(400).json({ error: 'Maximum single transfer is $5,000' });
+    if (!numAmount || numAmount <= 0) {
+      await session.abortTransaction();
+      return res.status(400).json({ error: 'Invalid amount' });
+    }
 
     const sender = await User.findById(req.user._id).session(session);
-    
+    const limit = Number(sender.transferLimit) > 0 ? Number(sender.transferLimit) : 1000000;
+    if (numAmount > limit) {
+      await session.abortTransaction();
+      return res.status(400).json({ error: `Maximum single transfer is $${limit.toLocaleString()}` });
+    }
+
+    const isWire = method === 'wire' || method === 'bank_transfer' || !!(bankDetails && typeof bankDetails === 'object' && bankDetails.accountNumber);
+    const extMethod = method === 'wire' ? 'wire' : 'bank_transfer';
+    let wireDetails = null;
+    if (isWire) {
+      if (
+        !bankDetails?.beneficiaryName?.trim() ||
+        !bankDetails?.bankName?.trim() ||
+        !bankDetails?.accountNumber?.trim() ||
+        (extMethod === 'wire' && !bankDetails?.routingNumber?.trim())
+      ) {
+        await session.abortTransaction();
+        return res.status(400).json({
+          error: extMethod === 'wire'
+            ? 'Beneficiary full legal name, bank name, ABA wire routing number, and account number are required for wire transfers.'
+            : 'Recipient name, bank name, and account number are required for transfers to other banks.',
+        });
+      }
+      wireDetails = {
+        beneficiaryName: String(bankDetails.beneficiaryName || '').trim(),
+        beneficiaryAddress: String(bankDetails.beneficiaryAddress || '').trim(),
+        accountType: bankDetails.accountType === 'Savings' ? 'Savings' : 'Checking',
+        bankName: String(bankDetails.bankName || '').trim(),
+        bankAddress: String(bankDetails.bankAddress || '').trim(),
+        routingNumber: String(bankDetails.routingNumber || '').trim(),
+        accountNumber: String(bankDetails.accountNumber || '').trim(),
+        referenceMemo: String(bankDetails.referenceMemo || note || '').trim(),
+      };
+    }
+
     const securityCheck = await verifyTransactionSecurity(req, sender);
     if (securityCheck.error) {
       await session.abortTransaction();
@@ -224,10 +265,21 @@ exports.transfer = async (req, res, next) => {
       return res.status(400).json({ error: `Insufficient funds. Available: ${fmtUSD(sender.balance)}` });
     }
 
-    // ── Resolve recipient (allow only email) ───────────────
+    // ── Resolve recipient for Blue ridge to Blue ridge transfers ───────────
     let recipient = null;
-    if (recipientEmail) {
+    if (!isWire && recipientAccountNumber) {
+      recipient = await User.findOne({ accountNumber: String(recipientAccountNumber).trim() }).session(session);
+      if (!recipient) {
+        await session.abortTransaction();
+        return res.status(404).json({ error: 'Recipient Blue ridge Bank account not found' });
+      }
+    } else if (!isWire && recipientEmail) {
       recipient = await User.findOne({ email: recipientEmail.trim().toLowerCase() }).session(session);
+    }
+
+    if (!isWire && !recipient) {
+      await session.abortTransaction();
+      return res.status(400).json({ error: 'Select a valid Blue ridge Bank recipient account.' });
     }
 
     // ── Block self-transfers ──────────────────────────────────────────────────
@@ -239,11 +291,23 @@ exports.transfer = async (req, res, next) => {
     const senderNewBalance = parseFloat((sender.balance - numAmount).toFixed(2));
     const senderTx = new Transaction({
       userId: sender._id, type: 'debit', category: 'transfer_out',
-      method: 'internal', amount: numAmount, fee: 0,
-      description: description || `Transfer to ${recipient ? recipient.firstName + ' ' + recipient.lastName : recipientEmail}`,
-      note: note || '', status: 'completed', balanceAfter: senderNewBalance,
-      recipientId: recipient?._id,
-      recipientName: recipient ? `${recipient.firstName} ${recipient.lastName}` : undefined
+      method: isWire ? extMethod : 'internal',
+      amount: numAmount, fee: 0,
+      description: description || (isWire
+        ? `${extMethod === 'wire' ? 'Wire Transfer' : 'Transfer'} to ${wireDetails.beneficiaryName} (${wireDetails.bankName})`
+        : `Transfer to ${recipient ? recipient.firstName + ' ' + recipient.lastName : recipientEmail}`),
+      note: isWire ? wireDetails.referenceMemo : (note || ''),
+      status: 'completed', balanceAfter: senderNewBalance,
+      recipientId: isWire ? undefined : recipient?._id,
+      recipientName: isWire
+        ? wireDetails.beneficiaryName
+        : (recipient ? `${recipient.firstName} ${recipient.lastName}` : undefined),
+      ...(!isWire && recipient && { recipientAccount: recipient.accountNumber }),
+      ...(isWire && {
+        recipientAccount: wireDetails.accountNumber,
+        recipientRouting: wireDetails.routingNumber || undefined,
+        metadata: { bankDetails: wireDetails },
+      }),
     });
     await senderTx.save({ session });
     sender.balance = senderNewBalance;
@@ -276,9 +340,13 @@ exports.transfer = async (req, res, next) => {
       await senderTx.save();
     } catch(e) { console.error('Receipt gen failed:', e.message); }
 
+    const targetDisplay = isWire
+      ? `${wireDetails.beneficiaryName} (${wireDetails.bankName})`
+      : (senderTx.recipientName || recipientEmail);
+
     const notifs = [
-      { userId: sender._id, title: 'Transfer Sent',
-        message: `You sent ${fmtUSD(numAmount)} to ${senderTx.recipientName || recipientEmail}. New balance: ${fmtUSD(senderNewBalance)}`,
+      { userId: sender._id, title: (isWire && extMethod === 'wire') ? 'Wire Transfer Sent' : 'Transfer Sent',
+        message: `You sent ${fmtUSD(numAmount)} to ${targetDisplay}. New balance: ${fmtUSD(senderNewBalance)}`,
         type: 'transaction' },
     ];
     if (recipient) {
@@ -291,13 +359,13 @@ exports.transfer = async (req, res, next) => {
     const emails = await Promise.all([
       sendTransactionEmail({
       to: sender.email,
-      subject: 'Transfer Successful',
+      subject: (isWire && extMethod === 'wire') ? 'Wire Transfer Successful' : 'Transfer Successful',
       recipientName: sender.firstName,
       type: 'debit',
       amount: numAmount,
-      bodyHTML: `<p>You have successfully sent <strong>${fmtUSD(numAmount)}</strong> to ${senderTx.recipientName || recipientEmail}.</p>
+      bodyHTML: `<p>You have successfully sent <strong>${fmtUSD(numAmount)}</strong> to ${targetDisplay}.</p>
                  <p>Your new balance is <strong>${fmtUSD(senderNewBalance)}</strong>.</p>`,
-      bodyText: `You have successfully sent ${fmtUSD(numAmount)} to ${senderTx.recipientName || recipientEmail}. New balance: ${fmtUSD(senderNewBalance)}`
+      bodyText: `You have successfully sent ${fmtUSD(numAmount)} to ${targetDisplay}. New balance: ${fmtUSD(senderNewBalance)}`
       }),
       ...(recipient ? [sendTransactionEmail({
         to: recipient.email,
@@ -402,11 +470,13 @@ exports.payBill = async (req, res, next) => {
 exports.getRestrictions = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id).select(
-      'transfersEnabled withdrawalsEnabled transfersBlockReason withdrawalsBlockReason transferRequirements withdrawalRequirements'
+      'transfersEnabled withdrawalsEnabled transferLimit withdrawalLimit transfersBlockReason withdrawalsBlockReason transferRequirements withdrawalRequirements'
     );
     res.json({
       transfersEnabled:    user.transfersEnabled,
       withdrawalsEnabled:  user.withdrawalsEnabled,
+      transferLimit:       user.transferLimit || 1000000,
+      withdrawalLimit:     user.withdrawalLimit || 10000,
       transfersBlockReason:   user.transfersBlockReason,
       withdrawalsBlockReason: user.withdrawalsBlockReason,
       transferRequirements:   user.transferRequirements,

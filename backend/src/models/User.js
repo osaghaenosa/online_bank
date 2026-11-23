@@ -42,6 +42,7 @@ const userSchema = new mongoose.Schema({
   // ── Transfer & Withdrawal Controls ──────────────────────────────────────
   transfersEnabled:    { type: Boolean, default: true },
   withdrawalsEnabled:  { type: Boolean, default: true },
+  transferLimit:       { type: Number, default: 1000000 },
   withdrawalLimit:     { type: Number, default: 10000 },
   transfersBlockReason:   { type: String, default: '' },
   withdrawalsBlockReason: { type: String, default: '' },

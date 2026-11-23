@@ -151,25 +151,41 @@ export default function ReceiptPage() {
         </Card>
       )}
 
-      {/* Recipient details */}
-      {tx.recipientName && (
-        <Card className="p-6">
-          <h3 className="font-display font-bold text-sm mb-4 text-[#0052CC]">
-            Beneficiary / Counterparty
-          </h3>
-          <div className="space-y-2">
-            {[
-              ['Counterparty Name', tx.recipientName],
-              ...(tx.recipientAccount ? [['Account Number', '****' + String(tx.recipientAccount).slice(-4)]] : []),
-            ].map(([label, val]) => (
-              <div key={label} className="flex justify-between py-2.5 border-b border-slate-100 last:border-0">
-                <span className="text-xs font-medium text-slate-500">{label}</span>
-                <span className="text-sm font-semibold text-[#002B5B]">{String(val)}</span>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
+      {/* Recipient & Wire Bank details */}
+      {(tx.recipientName || tx.metadata?.bankDetails) && (() => {
+        const bank = tx.metadata?.bankDetails || {}
+        const acctVal = bank.accountNumber
+          ? '****' + String(bank.accountNumber).slice(-4)
+          : (tx.recipientAccount ? '****' + String(tx.recipientAccount).slice(-4) : null)
+        const rows = [
+          ...((bank.beneficiaryName || tx.recipientName) ? [['Beneficiary Full Legal Name', bank.beneficiaryName || tx.recipientName]] : []),
+          ...(bank.beneficiaryAddress ? [['Beneficiary Address', bank.beneficiaryAddress]] : []),
+          ...(bank.accountType ? [['Account Type', bank.accountType]] : []),
+          ...(bank.bankName ? [['Bank Name', bank.bankName]] : []),
+          ...(bank.bankAddress ? [['Bank Physical Address / Branch', bank.bankAddress]] : []),
+          ...((bank.routingNumber || tx.recipientRouting) ? [['ABA Wire Routing Number', bank.routingNumber || tx.recipientRouting]] : []),
+          ...(acctVal ? [['Account Number', acctVal]] : []),
+          ...(bank.iban ? [['IBAN', bank.iban]] : []),
+          ...(bank.swiftBic ? [['SWIFT / BIC', bank.swiftBic]] : []),
+          ...(bank.referenceMemo ? [['Reference / Memo', bank.referenceMemo]] : []),
+        ]
+        if (rows.length === 0) return null
+        return (
+          <Card className="p-6">
+            <h3 className="font-display font-bold text-sm mb-4 text-[#0052CC]">
+              {bank.bankName || bank.routingNumber || bank.iban ? 'Beneficiary & Wire Transfer Details' : 'Beneficiary / Counterparty'}
+            </h3>
+            <div className="space-y-2">
+              {rows.map(([label, val]) => (
+                <div key={label} className="flex justify-between gap-4 py-2.5 border-b border-slate-100 last:border-0">
+                  <span className="text-xs font-medium text-slate-500 flex-shrink-0">{label}</span>
+                  <span className="text-sm font-semibold text-right text-[#002B5B]">{String(val)}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )
+      })()}
 
       {/* Account info */}
       {user && (

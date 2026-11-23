@@ -147,6 +147,24 @@ exports.setWithdrawalAccess = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// ── Set Transfer Limit ────────────────────────────────────────────────────────
+exports.setTransferLimit = async (req, res, next) => {
+  try {
+    const { limit } = req.body;
+    const num = Number(limit);
+    if (!Number.isFinite(num) || num <= 0) {
+      return res.status(400).json({ error: 'Invalid transfer limit' });
+    }
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.transferLimit = num;
+    await user.save({ validateBeforeSave: false });
+
+    res.json({ user: user.toPublicJSON() });
+  } catch (err) { next(err); }
+};
+
 // ── Set Withdrawal Limit ──────────────────────────────────────────────────────
 exports.setWithdrawalLimit = async (req, res, next) => {
   try {

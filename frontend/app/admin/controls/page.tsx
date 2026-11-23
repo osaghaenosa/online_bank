@@ -100,6 +100,24 @@ export default function AdminControlsPage() {
     } catch (err: any) { toast(err.message, 'error') }
   }
 
+  const handleTransferLimitEdit = async (u: any) => {
+    const current = u.transferLimit || 1000000;
+    const newVal = window.prompt(`Set new transfer limit for ${u.firstName} (Current: $${current.toLocaleString()})`, String(current));
+    if (newVal === null) return;
+    const num = parseFloat(newVal.replace(/,/g, ''));
+    if (isNaN(num) || num <= 0) {
+      toast('Invalid amount', 'error');
+      return;
+    }
+    try {
+      await api.admin.setTransferLimit(u._id, { limit: num });
+      toast(`Transfer limit updated to ${fmtUSD(num)} for ${u.firstName}`, 'success');
+      await refreshUser(u._id);
+    } catch (err: any) {
+      toast(err.message, 'error');
+    }
+  }
+
   const handleLimitEdit = async (u: any) => {
     const current = u.withdrawalLimit || 10000;
     const newVal = window.prompt(`Set new withdrawal limit for ${u.firstName} (Current: $${current})`, String(current));
@@ -131,7 +149,7 @@ export default function AdminControlsPage() {
       <Card className="p-6">
         <SectionHeader
           title="Transfer & Withdrawal Controls"
-          sub="Block or restore transfer/withdrawal capabilities per account. Set requirements before re-enabling."
+          sub="Block or restore transfer/withdrawal capabilities and configure per-account transfer and withdrawal limits."
         />
 
         <div className="relative mb-5">
@@ -180,7 +198,7 @@ export default function AdminControlsPage() {
                     {/* Transfer control */}
                     <div className="p-4 border-r" style={{ borderColor: 'var(--color-border)' }}>
                       <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           {txBlocked
                             ? <ShieldAlert size={15} className="text-red-500" />
                             : <ShieldCheck size={15} className="text-emerald-500" />
@@ -188,6 +206,9 @@ export default function AdminControlsPage() {
                           <span className="text-xs font-semibold">Transfers</span>
                           <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${txBlocked ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}>
                             {txBlocked ? 'BLOCKED' : 'ACTIVE'}
+                          </span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-100 text-blue-600 cursor-pointer hover:bg-blue-200 transition-colors" onClick={() => handleTransferLimitEdit(u)}>
+                            Limit: {fmtUSD(u.transferLimit || 1000000)} ✎
                           </span>
                         </div>
                         {txBlocked

@@ -66,10 +66,13 @@ export default function WithdrawPage() {
   const [ibanNumber,   setIbanNumber]   = useState('')
   const [swiftBic,     setSwiftBic]     = useState('')
   const [beneficiary,  setBeneficiary]  = useState('')
+  const [beneficiaryAddress, setBeneficiaryAddress] = useState('')
+  const [accountType,  setAccountType]  = useState<'Checking' | 'Savings'>('Checking')
   const [bankName,     setBankName]     = useState('')
   const [bankAddress,  setBankAddress]  = useState('')
   const [routingNumber, setRoutingNumber] = useState('')
   const [accountNumber, setAccountNumber] = useState('')
+  const [referenceMemo, setReferenceMemo] = useState('')
 
   const [restrictions,        setRestrictions]        = useState<any>(null)
   const [loadingRestrictions, setLoadingRestrictions] = useState(true)
@@ -115,11 +118,20 @@ export default function WithdrawPage() {
       if (!beneficiary) { toast('Enter the beneficiary name', 'error'); return }
     }
 
-    if (method === 'ach' || method === 'wire') {
-      if (!beneficiary)   { toast('Enter the beneficiary name', 'error'); return }
-      if (!bankName)      { toast('Enter the recipient bank name', 'error'); return }
-      if (!routingNumber) { toast('Enter the routing number', 'error'); return }
-      if (!accountNumber) { toast('Enter the account number', 'error'); return }
+    if (method === 'ach') {
+      if (!beneficiary.trim())   { toast('Enter the beneficiary name', 'error'); return }
+      if (!bankName.trim())      { toast('Enter the recipient bank name', 'error'); return }
+      if (!routingNumber.trim()) { toast('Enter the routing number', 'error'); return }
+      if (!accountNumber.trim()) { toast('Enter the account number', 'error'); return }
+    }
+
+    if (method === 'wire') {
+      if (!beneficiary.trim())        { toast('Enter Beneficiary Full Legal Name', 'error'); return }
+      if (!beneficiaryAddress.trim()) { toast('Enter Beneficiary Address', 'error'); return }
+      if (!bankName.trim())           { toast('Enter Bank Name', 'error'); return }
+      if (!bankAddress.trim())        { toast('Enter Bank physical address or branch', 'error'); return }
+      if (!routingNumber.trim())      { toast('Enter ABA Wire Routing Number', 'error'); return }
+      if (!accountNumber.trim())      { toast('Enter Account Number', 'error'); return }
     }
 
     setShowAuthModal(true)
@@ -138,11 +150,18 @@ export default function WithdrawPage() {
         bankAddress,
         country: ibanCountry,
       }
-      if (method === 'ach' || method === 'wire') body.bankDetails = {
-        beneficiaryName: beneficiary,
-        bankName,
-        routingNumber,
-        accountNumber,
+      if (method === 'ach' || method === 'wire') {
+        body.note = referenceMemo.trim() || undefined
+        body.bankDetails = {
+          beneficiaryName: beneficiary.trim(),
+          beneficiaryAddress: beneficiaryAddress.trim(),
+          accountType,
+          bankName: bankName.trim(),
+          bankAddress: bankAddress.trim(),
+          routingNumber: routingNumber.trim(),
+          accountNumber: accountNumber.trim(),
+          referenceMemo: referenceMemo.trim(),
+        }
       }
       const data = await api.tx.withdraw(body)
       setResult(data)
@@ -196,17 +215,43 @@ export default function WithdrawPage() {
                 <span className="text-xs font-semibold text-[#002B5B]">{method === 'ach' ? 'ACH Transfer' : 'Wire Transfer'}</span>
               </div>
               <div className="flex justify-between gap-3">
+                <span className="text-xs text-slate-500">Beneficiary</span>
+                <span className="text-xs font-semibold truncate max-w-[180px] text-[#002B5B]">{beneficiary}</span>
+              </div>
+              {beneficiaryAddress && (
+                <div className="flex justify-between gap-3">
+                  <span className="text-xs text-slate-500">Beneficiary Address</span>
+                  <span className="text-xs text-right max-w-[190px] text-[#002B5B]">{beneficiaryAddress}</span>
+                </div>
+              )}
+              <div className="flex justify-between gap-3">
+                <span className="text-xs text-slate-500">Account Type</span>
+                <span className="text-xs font-semibold text-[#002B5B]">{accountType}</span>
+              </div>
+              <div className="flex justify-between gap-3">
                 <span className="text-xs text-slate-500">Bank</span>
                 <span className="text-xs font-semibold truncate max-w-[180px] text-[#002B5B]">{bankName}</span>
+              </div>
+              {bankAddress && (
+                <div className="flex justify-between gap-3">
+                  <span className="text-xs text-slate-500">Bank Branch / Address</span>
+                  <span className="text-xs text-right max-w-[190px] text-[#002B5B]">{bankAddress}</span>
+                </div>
+              )}
+              <div className="flex justify-between gap-3">
+                <span className="text-xs text-slate-500">{method === 'wire' ? 'ABA Wire Routing' : 'Routing Number'}</span>
+                <span className="font-mono text-xs text-[#002B5B]">{routingNumber}</span>
               </div>
               <div className="flex justify-between gap-3">
                 <span className="text-xs text-slate-500">Account No.</span>
                 <span className="font-mono text-xs text-[#002B5B]">•••{accountNumber.slice(-4)}</span>
               </div>
-              <div className="flex justify-between gap-3">
-                <span className="text-xs text-slate-500">Beneficiary</span>
-                <span className="text-xs font-semibold truncate max-w-[180px] text-[#002B5B]">{beneficiary}</span>
-              </div>
+              {referenceMemo && (
+                <div className="flex justify-between gap-3">
+                  <span className="text-xs text-slate-500">Reference / Memo</span>
+                  <span className="text-xs text-right max-w-[190px] text-[#002B5B]">{referenceMemo}</span>
+                </div>
+              )}
               <Divider />
             </>
           )}
@@ -260,7 +305,9 @@ export default function WithdrawPage() {
             onClick={() => {
               setResult(null); setAmount(''); setWallet('')
               setIbanNumber(''); setSwiftBic(''); setBeneficiary('')
+              setBeneficiaryAddress(''); setAccountType('Checking')
               setBankName(''); setBankAddress('')
+              setRoutingNumber(''); setAccountNumber(''); setReferenceMemo('')
             }}>
             New Withdrawal <ArrowRight size={14} />
           </Button>
@@ -401,12 +448,80 @@ export default function WithdrawPage() {
 
             {(method === 'ach' || method === 'wire') && (
               <div className="space-y-4 mb-5">
-                <Input label="Beneficiary Full Name" placeholder="Full legal name" value={beneficiary} onChange={e => setBeneficiary(e.target.value)} />
-                <Input label="Bank Name" placeholder="Recipient bank" value={bankName} onChange={e => setBankName(e.target.value)} />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Input label="Routing Number" placeholder="021000021" className="font-mono" value={routingNumber} onChange={e => setRoutingNumber(e.target.value)} />
-                  <Input label="Account Number" placeholder="••••••••••" className="font-mono" value={accountNumber} onChange={e => setAccountNumber(e.target.value)} />
+                <div className="rounded-2xl border border-slate-200/80 p-4 space-y-3 bg-[#F4F7FC]/60">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#0052CC]">
+                    Beneficiary Information
+                  </p>
+                  <Input
+                    label={method === 'wire' ? 'Beneficiary Full Legal Name' : 'Beneficiary Full Name'}
+                    placeholder="Full legal name"
+                    value={beneficiary}
+                    onChange={e => setBeneficiary(e.target.value)}
+                  />
+                  <div className={`grid grid-cols-1 gap-3 ${method === 'wire' ? 'sm:grid-cols-3' : 'sm:grid-cols-1'}`}>
+                    {method === 'wire' && (
+                      <div className="sm:col-span-2">
+                        <Input
+                          label="Beneficiary Address"
+                          placeholder="Street address, city, state, postal code"
+                          value={beneficiaryAddress}
+                          onChange={e => setBeneficiaryAddress(e.target.value)}
+                        />
+                      </div>
+                    )}
+                    <Select
+                      label="Account Type"
+                      value={accountType}
+                      onChange={e => setAccountType(e.target.value as 'Checking' | 'Savings')}
+                    >
+                      <option value="Checking">Checking</option>
+                      <option value="Savings">Savings</option>
+                    </Select>
+                  </div>
                 </div>
+
+                <div className="rounded-2xl border border-slate-200/80 p-4 space-y-3 bg-[#F4F7FC]/60">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#0052CC]">
+                    Receiving Bank Information
+                  </p>
+                  <Input
+                    label="Bank Name"
+                    placeholder="Recipient bank"
+                    value={bankName}
+                    onChange={e => setBankName(e.target.value)}
+                  />
+                  {method === 'wire' && (
+                    <Input
+                      label="Bank Physical Address / Branch"
+                      placeholder="Branch street address, city, state"
+                      value={bankAddress}
+                      onChange={e => setBankAddress(e.target.value)}
+                    />
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Input
+                      label={method === 'wire' ? 'ABA Wire Routing Number' : 'Routing Number'}
+                      placeholder="021000021"
+                      className="font-mono"
+                      value={routingNumber}
+                      onChange={e => setRoutingNumber(e.target.value)}
+                    />
+                    <Input
+                      label="Account Number"
+                      placeholder="••••••••••"
+                      className="font-mono"
+                      value={accountNumber}
+                      onChange={e => setAccountNumber(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <Input
+                  label="Reference / Memo"
+                  placeholder={method === 'wire' ? 'Payment reference or memo (if requested)' : 'Payment reference or memo'}
+                  value={referenceMemo}
+                  onChange={e => setReferenceMemo(e.target.value)}
+                />
               </div>
             )}
 

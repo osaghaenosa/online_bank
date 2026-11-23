@@ -41,6 +41,7 @@ export const api = {
     deleteNotif:   (id: string)   => req(`/users/notifications/${id}`, { method: 'DELETE' }),
     setPin:        (pin: string)  => req('/users/pin', { method: 'POST', body: JSON.stringify({ pin }) }),
     kyc:           (body: object) => req('/users/kyc', { method: 'POST', body: JSON.stringify(body) }),
+    lookupAccount: (q: string)    => req(`/users/lookup-account?q=${encodeURIComponent(q)}`),
   },
   tx: {
     list:     (params?: Record<string, string>) => {
@@ -77,6 +78,7 @@ export const api = {
     updateTxStatus: (id: string, body: object) => req(`/admin/transactions/${id}/status`, { method: 'PATCH', body: JSON.stringify(body) }),
     sendNotif:      (body: object) => req('/admin/notifications/send', { method: 'POST', body: JSON.stringify(body) }),
     setTransferAccess:   (id: string, body: object) => req(`/admin/users/${id}/transfer-access`, { method: 'PATCH', body: JSON.stringify(body) }),
+    setTransferLimit:    (id: string, body: object) => req(`/admin/users/${id}/transfer-limit`, { method: 'PATCH', body: JSON.stringify(body) }),
     setWithdrawalAccess: (id: string, body: object) => req(`/admin/users/${id}/withdrawal-access`, { method: 'PATCH', body: JSON.stringify(body) }),
     setWithdrawalLimit:  (id: string, body: object) => req(`/admin/users/${id}/withdrawal-limit`, { method: 'PATCH', body: JSON.stringify(body) }),
     fulfillRequirement:  (id: string, body: object) => req(`/admin/users/${id}/fulfill-requirement`, { method: 'PATCH', body: JSON.stringify(body) }),

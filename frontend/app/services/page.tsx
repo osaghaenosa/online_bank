@@ -246,9 +246,9 @@ export default function ServicesPage() {
             {[
               { label: 'Daily Deposit Limit', value: '$50,000', note: 'Per day across all settlement rails' },
               { label: 'Single Withdrawal', value: '$10,000', note: 'Standard single disbursement limit' },
-              { label: 'Daily Transfer Limit', value: '$10,000', note: 'Combined internal & external daily' },
+              { label: 'Daily Transfer Limit', value: '$1,000,000', note: 'Combined internal & external daily' },
               { label: 'Monthly Deposit Volume', value: '$250,000', note: 'Rolling 30-day clearing threshold' },
-              { label: 'Single Transfer', value: '$5,000', note: 'Standard individual transfer cap' },
+              { label: 'Single Transfer', value: '$1,000,000', note: 'Default internal transfer cap (admin configurable)' },
               { label: 'FDIC Coverage', value: '$250,000', note: 'Per depositor institutional insurance' },
             ].map(({ label, value, note }) => (
               <div

@@ -243,6 +243,7 @@ export default function ProfilePage() {
                 ['ABA Routing Number', user.routingNumber || '021000021'],
                 ['Linked Debit Card', maskCard(user.cardNumber || '0000000000000000')],
                 ['Card Expiration', user.cardExpiry || 'N/A'],
+                ['Single Transfer Cap', fmtUSD(user?.transferLimit || 1000000)],
                 ['Daily Withdrawal Cap', fmtUSD(user?.withdrawalLimit || 10000)],
                 ['FDIC Coverage', 'Up to $250,000'],
               ].map(([l, v], i) => (

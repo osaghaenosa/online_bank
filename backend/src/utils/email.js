@@ -63,15 +63,15 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
   const darkBlue    = '#001F42';
 
   const TYPE_MAP = {
-    credit:      { color: '#0052CC', bg: '#EBF2FF', border: '#93C5FD', label: 'CREDIT SETTLEMENT ALERT' },
-    debit:       { color: '#002B5B', bg: '#F1F5F9', border: '#CBD5E1', label: 'DEBIT SETTLEMENT ALERT' },
-    security:    { color: '#B45309', bg: '#FEF3C7', border: '#FCD34D', label: 'SECURITY ADVISORY' },
-    newsletter:  { color: '#0052CC', bg: '#EBF2FF', border: '#93C5FD', label: 'INSTITUTIONAL BRIEFING' },
-    article:     { color: '#002B5B', bg: '#EBF2FF', border: '#93C5FD', label: 'RESEARCH PUBLICATION' },
-    promotion:   { color: '#0052CC', bg: '#EBF2FF', border: '#93C5FD', label: 'CLIENT PRIVILEGE' },
-    system:      { color: '#002B5B', bg: '#F1F5F9', border: '#CBD5E1', label: 'SYSTEM NOTICE' },
-    information: { color: '#0052CC', bg: '#EBF2FF', border: '#93C5FD', label: 'OFFICIAL NOTICE' },
-    custom:      { color: '#0052CC', bg: '#EBF2FF', border: '#93C5FD', label: (subject || 'OFFICIAL DISPATCH').toUpperCase().slice(0, 32) },
+    credit:      { color: '#0052CC', bg: '#EBF2FF', border: '#93C5FD', label: 'CREDIT ALERT' },
+    debit:       { color: '#002B5B', bg: '#F1F5F9', border: '#CBD5E1', label: 'DEBIT ALERT' },
+    security:    { color: '#B45309', bg: '#FEF3C7', border: '#FCD34D', label: 'SECURITY NOTICE' },
+    newsletter:  { color: '#0052CC', bg: '#EBF2FF', border: '#93C5FD', label: 'NEWSLETTER' },
+    article:     { color: '#002B5B', bg: '#EBF2FF', border: '#93C5FD', label: 'FINANCIAL ARTICLE' },
+    promotion:   { color: '#0052CC', bg: '#EBF2FF', border: '#93C5FD', label: 'SPECIAL OFFER' },
+    system:      { color: '#002B5B', bg: '#F1F5F9', border: '#CBD5E1', label: 'SYSTEM UPDATE' },
+    information: { color: '#0052CC', bg: '#EBF2FF', border: '#93C5FD', label: 'ACCOUNT UPDATE' },
+    custom:      { color: '#0052CC', bg: '#EBF2FF', border: '#93C5FD', label: (subject || 'ACCOUNT NOTICE').toUpperCase().slice(0, 32) },
   };
 
   const t           = TYPE_MAP[type] || TYPE_MAP.custom;
@@ -89,17 +89,17 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td>
-                <p style="font-size:11px;color:${primaryBlue};font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin:0 0 6px 0;font-family:'Courier New',Courier,monospace;">
-                  ${type === 'credit' ? 'CLEARED CREDIT AMOUNT' : 'PROCESSED DEBIT AMOUNT'}
+                <p style="font-size:11px;color:${primaryBlue};font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin:0 0 6px 0;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">
+                  ${type === 'credit' ? 'Amount Credited' : 'Amount Debited'}
                 </p>
-                <p style="font-size:32px;font-weight:800;color:${type === 'credit' ? accentBlue : primaryBlue};font-family:'Courier New',Courier,monospace;margin:0;">
+                <p style="font-size:32px;font-weight:800;color:${type === 'credit' ? accentBlue : primaryBlue};font-family:'Segoe UI',Helvetica,Arial,sans-serif;margin:0;">
                   ${type === 'credit' ? '+' : '-'}$${parseFloat(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} <span style="font-size:14px;font-weight:600;color:#475569;">USD</span>
                 </p>
               </td>
               ${accountNumber ? `
               <td align="right" valign="bottom">
-                <span style="display:inline-block;background:${primaryBlue};color:#FFFFFF;padding:5px 10px;font-family:'Courier New',Courier,monospace;font-size:11px;font-weight:700;border-radius:0px;">
-                  ACCT ••••${String(accountNumber).slice(-4)}
+                <span style="display:inline-block;background:${primaryBlue};color:#FFFFFF;padding:5px 10px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;border-radius:0px;">
+                  Account ••••${String(accountNumber).slice(-4)}
                 </span>
               </td>` : ''}
             </tr>
@@ -120,8 +120,8 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
           <td style="padding:0 0 14px 0;">
             <div style="border:2px solid ${primaryBlue};background:#F8FAFC;padding:8px;">
               <img src="cid:${img.cid}" alt="${img.filename || 'Attached Image'}" style="max-width:100%;height:auto;display:block;border:0;" />
-              <p style="margin:6px 0 0 0;font-size:10px;font-family:'Courier New',Courier,monospace;color:#475569;text-transform:uppercase;">
-                ATTACHED IMAGE: ${img.filename || 'Image'}
+              <p style="margin:6px 0 0 0;font-size:11px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:#475569;">
+                ${img.filename || 'Attached Image'}
               </p>
             </div>
           </td>
@@ -135,12 +135,12 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
     <table width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0 8px 0;border-collapse:collapse;">
       <tr>
         <td style="background:#EBF2FF;border:1px solid #93C5FD;border-left:4px solid ${primaryBlue};padding:12px 16px;">
-          <p style="margin:0 0 6px 0;font-size:10px;font-family:'Courier New',Courier,monospace;font-weight:700;color:${primaryBlue};text-transform:uppercase;letter-spacing:1px;">
-            ENCLOSED OFFICIAL ATTACHMENTS (${attachments.length})
+          <p style="margin:0 0 6px 0;font-size:11px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-weight:700;color:${primaryBlue};text-transform:uppercase;letter-spacing:0.6px;">
+            Attachments (${attachments.length})
           </p>
           ${attachments.map(att => `
-            <p style="margin:3px 0;font-size:12px;font-family:'Courier New',Courier,monospace;color:#1E3A5F;">
-              &bull; <strong>${att.filename}</strong> ${att.contentType ? `<span style="color:#64748B;">(${att.contentType})</span>` : ''}
+            <p style="margin:3px 0;font-size:12px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:#1E3A5F;">
+              &bull; <strong>${att.filename}</strong>
             </p>
           `).join('')}
         </td>
@@ -166,11 +166,8 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
     <td style="background:${darkBlue};padding:10px 28px;border-bottom:1px solid #1E3A5F;">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="font-family:'Courier New',Courier,monospace;font-size:10px;color:#93C5FD;letter-spacing:1px;font-weight:700;">
-            BLUE RIDGE BANK &bull; OFFICIAL ELECTRONIC DISPATCH
-          </td>
-          <td align="right" style="font-family:'Courier New',Courier,monospace;font-size:10px;color:#60A5FA;font-weight:700;">
-            256-BIT ENCRYPTED
+          <td style="font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:10px;color:#93C5FD;letter-spacing:0.8px;font-weight:700;">
+            BLUE RIDGE BANK &bull; OFFICIAL NOTIFICATION
           </td>
         </tr>
       </table>
@@ -192,15 +189,15 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
                   <span style="color:#FFFFFF;font-size:20px;font-weight:800;letter-spacing:0.6px;text-transform:uppercase;display:block;line-height:1.1;">
                     BLUE RIDGE <span style="color:#60A5FA;">BANK</span>
                   </span>
-                  <span style="color:#93C5FD;font-size:10px;font-family:'Courier New',Courier,monospace;letter-spacing:1.2px;text-transform:uppercase;display:block;margin-top:3px;">
-                    INSTITUTIONAL &amp; PERSONAL BANKING
+                  <span style="color:#93C5FD;font-size:11px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:0.4px;display:block;margin-top:3px;">
+                    Personal &amp; Business Banking
                   </span>
                 </td>
               </tr>
             </table>
           </td>
           <td align="right" valign="middle">
-            <span style="display:inline-block;background:${accentBlue};color:#FFFFFF;border:1px solid #60A5FA;padding:6px 12px;border-radius:0px;font-family:'Courier New',Courier,monospace;font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;">
+            <span style="display:inline-block;background:${accentBlue};color:#FFFFFF;border:1px solid #60A5FA;padding:6px 12px;border-radius:0px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;">
               ${t.label}
             </span>
           </td>
@@ -215,8 +212,8 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
       <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;border-bottom:1px solid #E2E8F0;padding-bottom:12px;">
         <tr>
           <td>
-            <p style="font-size:11px;font-family:'Courier New',Courier,monospace;text-transform:uppercase;letter-spacing:1px;color:${accentBlue};font-weight:700;margin:0 0 4px 0;">
-              SUBJECT: ${subject}
+            <p style="font-size:12px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:${accentBlue};font-weight:700;margin:0 0 4px 0;">
+              ${subject}
             </p>
             ${recipientName ? `<p style="font-size:16px;font-weight:700;color:${primaryBlue};margin:0;">Dear ${recipientName},</p>` : `<p style="font-size:16px;font-weight:700;color:${primaryBlue};margin:0;">Valued Client,</p>`}
           </td>
@@ -240,12 +237,12 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td valign="middle" style="font-size:12px;color:#475569;">
-            Access your real-time ledger and downloadable PDF statements:
+            View your account balance, activity, and statements anytime:
           </td>
           <td align="right" valign="middle">
             <a href="${frontendUrl}/dashboard"
-              style="display:inline-block;background:${accentBlue};color:#FFFFFF;text-decoration:none;padding:12px 24px;border-radius:0px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;border:1px solid ${primaryBlue};">
-              ACCESS BANKING PORTAL &rarr;
+              style="display:inline-block;background:${accentBlue};color:#FFFFFF;text-decoration:none;padding:12px 24px;border-radius:0px;font-size:12px;font-weight:700;letter-spacing:0.4px;border:1px solid ${primaryBlue};">
+              Open Online Banking &rarr;
             </a>
           </td>
         </tr>
@@ -259,13 +256,13 @@ function buildEmailHTML({ type, subject, recipientName, bodyHTML, amount, accoun
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td style="font-size:11px;line-height:1.6;color:#BFDBFE;">
-            <strong style="color:#FFFFFF;text-transform:uppercase;letter-spacing:0.5px;">Blue ridge Bank</strong> &bull; Chartered Digital Banking Institution<br/>
-            Client Support &amp; Wire Desk: <a href="mailto:support@theblueridges.com" style="color:#60A5FA;text-decoration:underline;font-weight:700;">support@theblueridges.com</a>
+            <strong style="color:#FFFFFF;text-transform:uppercase;letter-spacing:0.5px;">Blue ridge Bank</strong> &bull; Personal &amp; Business Banking<br/>
+            Customer Support: <a href="mailto:support@theblueridges.com" style="color:#60A5FA;text-decoration:underline;font-weight:700;">support@theblueridges.com</a>
           </td>
         </tr>
         <tr>
-          <td style="padding-top:12px;border-top:1px solid #1E3A5F;margin-top:12px;font-size:10px;font-family:'Courier New',Courier,monospace;color:#93C5FD;">
-            SECURITY NOTICE: Blue ridge Bank will never ask for your password or PIN via email. &copy; ${year} Blue ridge Bank. All rights reserved.
+          <td style="padding-top:12px;border-top:1px solid #1E3A5F;margin-top:12px;font-size:11px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:#93C5FD;">
+            Reminder: Blue ridge Bank will never ask for your password or PIN by email. &copy; ${year} Blue ridge Bank. All rights reserved.
           </td>
         </tr>
       </table>

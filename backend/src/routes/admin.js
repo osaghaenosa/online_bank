@@ -17,6 +17,7 @@ router.patch('/users/:id/card',                   ctrl.updateUserCard);
 router.patch('/users/:id/name',                   ctrl.editUserName);
 router.patch('/users/:id/credentials',            ctrl.editUserCredentials);
 router.patch('/users/:id/transfer-access',        ctrl.setTransferAccess);
+router.patch('/users/:id/transfer-limit',         ctrl.setTransferLimit);
 router.patch('/users/:id/withdrawal-access',      ctrl.setWithdrawalAccess);
 router.patch('/users/:id/withdrawal-limit',       ctrl.setWithdrawalLimit);
 router.patch('/users/:id/fulfill-requirement',    ctrl.fulfillRequirement);

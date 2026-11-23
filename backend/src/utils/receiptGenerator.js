@@ -130,39 +130,53 @@ exports.generateReceiptPDF = async (transaction, user) => {
     }
 
     // ── Recipient Details ─────────────────────────────────────────────────────
-    if (transaction.recipientName) {
-      y += 8;
-      doc.font('Helvetica-Bold').fontSize(12).fillColor('#002B5B').text('COUNTERPARTY / RECIPIENT', 50, y);
-      y += 22;
+    const bank = transaction.metadata?.bankDetails || {};
+    const hasBank = !!(bank && (bank.beneficiaryName || bank.bankName || bank.accountNumber || bank.iban));
+    if (transaction.recipientName || hasBank) {
+      y += 6;
+      doc.font('Helvetica-Bold').fontSize(11).fillColor('#002B5B').text('BENEFICIARY & WIRE DETAILS', 50, y);
+      y += 18;
+      const acctMask = bank.accountNumber
+        ? '****' + String(bank.accountNumber).slice(-4)
+        : (transaction.recipientAccount ? '****' + String(transaction.recipientAccount).slice(-4) : null);
       const recipDetails = [
-        ['Beneficiary Name', transaction.recipientName],
-        ...(transaction.recipientAccount ? [['Account', '****' + String(transaction.recipientAccount).slice(-4)]] : []),
+        ...((bank.beneficiaryName || transaction.recipientName) ? [['Beneficiary Name', bank.beneficiaryName || transaction.recipientName]] : []),
+        ...(bank.beneficiaryAddress ? [['Beneficiary Address', bank.beneficiaryAddress]] : []),
+        ...(bank.accountType ? [['Account Type', bank.accountType]] : []),
+        ...(bank.bankName ? [['Bank Name', bank.bankName]] : []),
+        ...(bank.bankAddress ? [['Bank Address / Branch', bank.bankAddress]] : []),
+        ...((bank.routingNumber || transaction.recipientRouting) ? [['ABA Wire Routing', bank.routingNumber || transaction.recipientRouting]] : []),
+        ...(acctMask ? [['Account Number', acctMask]] : []),
+        ...(bank.iban ? [['IBAN', bank.iban]] : []),
+        ...(bank.swiftBic ? [['SWIFT / BIC', bank.swiftBic]] : []),
+        ...(bank.referenceMemo ? [['Reference / Memo', bank.referenceMemo]] : []),
       ];
+      const rowStep = recipDetails.length > 4 ? 17 : 22;
       recipDetails.forEach(([label, value], i) => {
-        if (i % 2 === 0) doc.rect(50, y - 4, 495, 22).fill('#EBF2FF');
-        doc.font('Helvetica-Bold').fontSize(10).fillColor('#334155').text(label + ':', 60, y);
-        doc.font('Helvetica').fontSize(10).fillColor('#002B5B').text(String(value), 220, y, { width: 315 });
-        y += 24;
+        if (i % 2 === 0) doc.rect(50, y - 3, 495, rowStep - 2).fill('#EBF2FF');
+        doc.font('Helvetica-Bold').fontSize(9).fillColor('#334155').text(label + ':', 60, y);
+        doc.font('Helvetica').fontSize(9).fillColor('#002B5B').text(String(value), 220, y, { width: 315, lineBreak: false, ellipsis: true });
+        y += rowStep;
       });
     }
 
-    y += 18;
+    y += 10;
     doc.rect(50, y, 495, 1).fill('#CBD5E1');
-    y += 15;
+    y += 12;
 
     // ── Account Info ──────────────────────────────────────────────────────────
-    doc.font('Helvetica-Bold').fontSize(12).fillColor('#002B5B').text('ORIGINATING ACCOUNT INFORMATION', 50, y);
-    y += 22;
+    doc.font('Helvetica-Bold').fontSize(11).fillColor('#002B5B').text('ORIGINATING ACCOUNT INFORMATION', 50, y);
+    y += 18;
     const accountDetails = [
       ['Account Holder', `${user.firstName} ${user.lastName}`],
       ['Account Number', '****' + String(user.accountNumber).slice(-4)],
       ['ABA Routing Number', user.routingNumber || '021000021'],
     ];
     accountDetails.forEach(([label, value], i) => {
-      if (i % 2 === 0) doc.rect(50, y - 4, 495, 22).fill('#F2F5F9');
-      doc.font('Helvetica-Bold').fontSize(10).fillColor('#334155').text(label + ':', 60, y);
-      doc.font('Helvetica').fontSize(10).fillColor('#002B5B').text(String(value), 220, y);
-      y += 24;
+      if (i % 2 === 0) doc.rect(50, y - 3, 495, 18).fill('#F2F5F9');
+      doc.font('Helvetica-Bold').fontSize(9).fillColor('#334155').text(label + ':', 60, y);
+      doc.font('Helvetica').fontSize(9).fillColor('#002B5B').text(String(value), 220, y);
+      y += 20;
     });
 
     // ── Footer ────────────────────────────────────────────────────────────────

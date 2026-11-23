@@ -6,6 +6,23 @@ const Notification = require('../models/Notification');
 
 router.use(protect);
 
+// Resolve an exact Blue ridge Bank account number for internal transfers.
+router.get('/lookup-account', async (req, res, next) => {
+  try {
+    const raw = String(req.query.q || '').trim();
+    if (!/^\d{12}$/.test(raw)) {
+      return res.json({ users: [] });
+    }
+    const user = await User.findOne({
+      _id: { $ne: req.user._id },
+      accountNumber: raw,
+    })
+      .select('_id firstName lastName accountNumber profilePicture')
+      .lean();
+    res.json({ users: user ? [user] : [] });
+  } catch (err) { next(err); }
+});
+
 // Get notifications
 router.get('/notifications', async (req, res, next) => {
   try {

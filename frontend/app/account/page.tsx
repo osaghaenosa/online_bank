@@ -39,6 +39,7 @@ export default function AccountPage() {
     { label: 'Card Expiration',        value: <span className="font-mono font-bold">{user.cardExpiry}</span> },
     { label: 'KYC Compliance',         value: <StatusBadge status={user.kyc} /> },
     { label: 'Overdraft Protection',   value: <Badge variant="blue">Active</Badge> },
+    { label: 'Transfer Limit',         value: <span className="font-mono font-bold">{fmtUSD(user?.transferLimit || 1000000)}</span> },
     { label: 'Withdrawal Limit',       value: <span className="font-mono font-bold">{fmtUSD(user?.withdrawalLimit || 10000)}</span> },
     { label: 'Daily ATM Limit',        value: <span className="font-mono font-bold">{fmtUSD(1500)}</span> },
     { label: 'FDIC Insurance',         value: <Badge variant="green">Up to $250,000</Badge> },
