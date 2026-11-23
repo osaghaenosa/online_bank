@@ -7,17 +7,6 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    borderRadius: {
-      none: '0px',
-      sm: '0px',
-      DEFAULT: '0px',
-      md: '0px',
-      lg: '0px',
-      xl: '0px',
-      '2xl': '0px',
-      '3xl': '0px',
-      full: '0px',
-    },
     extend: {
       fontFamily: {
         sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
@@ -25,6 +14,14 @@ module.exports = {
         display: ['"Plus Jakarta Sans"', '"Inter"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       colors: {
+        brand: {
+          navy: '#002B5B',
+          navyDark: '#001F42',
+          blue: '#0052CC',
+          blueDark: '#003D99',
+          sky: '#60A5FA',
+          ice: '#EBF2FF',
+        },
         emerald: {
           50: '#EBF2FF',
           100: '#D6E4FF',
@@ -37,6 +34,12 @@ module.exports = {
           800: '#001F42',
           900: '#00142B',
         },
+      },
+      boxShadow: {
+        card: '0 4px 24px rgba(0, 43, 91, 0.045)',
+        'card-hover': '0 10px 32px rgba(0, 43, 91, 0.09)',
+        float: '0 14px 40px rgba(0, 43, 91, 0.12)',
+        brand: '0 8px 22px rgba(0, 82, 204, 0.28)',
       },
     },
   },

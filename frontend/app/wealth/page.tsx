@@ -86,25 +86,25 @@ export default function WealthPage() {
   const pct = (val: number) => netWorth > 0 ? ((val / netWorth) * 100).toFixed(1) : '0'
 
   return (
-    <div className="max-w-6xl space-y-5 sm:space-y-6 fade-up">
+    <div className="max-w-6xl space-y-6 fade-up">
       {/* ── Header & Currency switcher ─────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: '#0052CC' }}>
-            PRIVATE WEALTH &amp; TREASURY
-          </p>
-          <h2 className="font-display text-lg sm:text-2xl font-bold mt-0.5" style={{ color: '#002B5B' }}>
+          <span className="inline-block px-3 py-1 rounded-full text-[11px] font-semibold bg-[#EBF2FF] text-[#0052CC] mb-1.5">
+            Private Wealth &amp; Treasury
+          </span>
+          <h2 className="font-display text-xl sm:text-2xl font-bold text-[#002B5B]">
             Consolidated Portfolio Valuation
           </h2>
         </div>
-        <div className="inline-flex self-start sm:self-auto border" style={{ background: '#FFFFFF', borderColor: '#CBD5E1' }}>
+        <div className="inline-flex self-start sm:self-auto rounded-full p-1 bg-white border border-slate-200/80 shadow-sm">
           {CURRENCIES.map(c => (
             <button
               key={c}
               onClick={() => setCur(c)}
-              className="px-3.5 py-2 text-xs font-bold uppercase transition-all"
+              className="px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer"
               style={{
-                background: cur === c ? '#002B5B' : 'transparent',
+                background: cur === c ? '#0052CC' : 'transparent',
                 color: cur === c ? '#FFFFFF' : '#475569',
               }}
             >
@@ -115,74 +115,62 @@ export default function WealthPage() {
       </div>
 
       {/* ── Net worth hero ─────────────────────────────────────────── */}
-      <div
-        className="p-4 sm:p-7 border-2"
-        style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
-      >
-        <p className="text-[11px] uppercase tracking-widest font-bold mb-1.5" style={{ color: '#93C5FD' }}>
-          TOTAL CONSOLIDATED NET WORTH
+      <div className="p-6 sm:p-8 rounded-3xl brand-card-gradient text-white shadow-brand relative overflow-hidden">
+        <div className="absolute -top-20 -right-16 w-64 h-64 rounded-full bg-[#3B82F6]/25 blur-2xl pointer-events-none" />
+        <p className="text-xs font-medium text-blue-200 mb-1.5">
+          Total Consolidated Net Worth
         </p>
-        <p className="font-mono text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-1 truncate">
+        <p className="font-mono text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-1 truncate">
           {fmt(netWorth, cur)}
         </p>
         {cur !== 'USD' && (
-          <p className="text-xs font-mono" style={{ color: '#BFDBFE' }}>Equivalent to {fmtUSD(netWorth)} USD</p>
+          <p className="text-xs font-mono text-blue-100">Equivalent to {fmtUSD(netWorth)} USD</p>
         )}
-        <div className="flex flex-wrap gap-2 mt-4 sm:mt-6 pt-4 border-t" style={{ borderColor: '#1E3A5F' }}>
-          <span
-            className="px-2.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase"
-            style={{ background: '#0052CC', color: '#FFFFFF' }}
-          >
-            ✓ KYC VERIFIED
+        <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-white/15">
+          <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/15 text-white">
+            ✓ KYC Verified
           </span>
-          <span
-            className="px-2.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase border"
-            style={{ background: '#001F42', borderColor: '#60A5FA', color: '#93C5FD' }}
-          >
-            FIDUCIARY CUSTODY ACTIVE
+          <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/10 border border-white/15 text-blue-100">
+            Fiduciary Custody Active
           </span>
-          <span
-            className="px-2.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase border"
-            style={{ background: '#001F42', borderColor: '#60A5FA', color: '#93C5FD' }}
-          >
-            MULTI-ASSET LEDGER
+          <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/10 border border-white/15 text-blue-100">
+            Multi-Asset Ledger
           </span>
         </div>
       </div>
 
       {/* ── Breakdown grid ─────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {SECTIONS.map(({ href, icon: Icon, color, label, value, sub }) => (
           <Link key={label} href={href}>
-            <Card className="p-4 sm:p-5 cursor-pointer hover:bg-blue-50/30 transition-all group">
-              <div className="flex items-start justify-between mb-3">
+            <Card className="p-5 cursor-pointer hover:shadow-card-hover transition-all group">
+              <div className="flex items-start justify-between mb-3.5">
                 <div
-                  className="w-10 h-10 flex items-center justify-center text-white flex-shrink-0"
+                  className="w-11 h-11 rounded-2xl flex items-center justify-center text-white flex-shrink-0 shadow-sm"
                   style={{ background: color }}
                 >
-                  <Icon size={18} />
+                  <Icon size={19} />
                 </div>
                 <ArrowRight
-                  size={15}
-                  className="opacity-40 group-hover:opacity-100 transition-opacity mt-1 flex-shrink-0"
-                  style={{ color: '#0052CC' }}
+                  size={16}
+                  className="opacity-40 group-hover:opacity-100 transition-opacity mt-1 flex-shrink-0 text-[#0052CC]"
                 />
               </div>
-              <p className="text-[11px] font-bold uppercase tracking-wider mb-1 truncate" style={{ color: 'var(--color-muted)' }}>
+              <p className="text-xs font-semibold mb-1 truncate text-slate-500">
                 {label}
               </p>
-              <p className="text-lg sm:text-xl font-bold font-mono truncate" style={{ color: '#002B5B' }}>
+              <p className="text-xl font-bold font-mono truncate text-[#002B5B]">
                 {fmt(value, cur)}
               </p>
               <div className="flex items-center justify-between gap-2 mt-2">
-                <p className="text-xs truncate" style={{ color: 'var(--color-muted)' }}>{sub}</p>
-                <span className="text-xs font-mono font-bold whitespace-nowrap flex-shrink-0" style={{ color: '#0052CC' }}>
+                <p className="text-xs truncate text-slate-400">{sub}</p>
+                <span className="text-xs font-mono font-bold whitespace-nowrap flex-shrink-0 text-[#0052CC]">
                   {pct(value)}%
                 </span>
               </div>
-              <div className="mt-2 h-1.5 border" style={{ background: '#F1F5F9', borderColor: '#CBD5E1' }}>
+              <div className="mt-2.5 h-2 rounded-full bg-[#F4F7FC] overflow-hidden">
                 <div
-                  className="h-full transition-all"
+                  className="h-full rounded-full transition-all"
                   style={{ width: `${Math.min(100, parseFloat(pct(value)))}%`, background: '#0052CC' }}
                 />
               </div>
@@ -193,7 +181,7 @@ export default function WealthPage() {
 
       {/* ── Linked accounts ────────────────────────────────────────── */}
       <div id="linked">
-        <Card className="p-4 sm:p-6">
+        <Card className="p-5 sm:p-6">
           <SectionHeader
             title="Linked External Institutions"
             sub={`${(u.linkedAccounts || []).length} connected accounts · ${fmt(linked, cur)} total`}
@@ -204,30 +192,26 @@ export default function WealthPage() {
               return (
                 <div
                   key={i}
-                  className="flex items-center justify-between gap-3 p-3.5 sm:p-4 border"
-                  style={{ background: '#F8FAFC', borderColor: '#CBD5E1' }}
+                  className="flex items-center justify-between gap-3 p-4 rounded-2xl bg-[#F4F7FC]"
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div
-                      className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-base sm:text-lg flex-shrink-0 border"
-                      style={{ background: '#FFFFFF', borderColor: '#CBD5E1' }}
-                    >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 bg-white shadow-sm">
                       {info.icon}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs sm:text-sm font-bold truncate" style={{ color: '#002B5B' }}>
+                      <p className="text-xs sm:text-sm font-bold truncate text-[#002B5B]">
                         {acc.label || info.label}
                       </p>
-                      <p className="text-[11px] font-mono truncate" style={{ color: 'var(--color-muted)' }}>
+                      <p className="text-[11px] font-mono truncate text-slate-400">
                         {acc.accountId}
                       </p>
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0 flex flex-col items-end gap-1">
-                    <p className="text-xs sm:text-sm font-bold font-mono whitespace-nowrap" style={{ color: '#002B5B' }}>
+                    <p className="text-xs sm:text-sm font-bold font-mono whitespace-nowrap text-[#002B5B]">
                       {fmt(acc.balance || 0, cur)}
                     </p>
-                    <Badge variant="blue">Connected</Badge>
+                    <Badge variant="green">Connected</Badge>
                   </div>
                 </div>
               )
@@ -237,23 +221,23 @@ export default function WealthPage() {
       </div>
 
       {/* ── Allocation bar ─────────────────────────────────────────── */}
-      <Card className="p-4 sm:p-6">
+      <Card className="p-5 sm:p-6">
         <SectionHeader title="Asset Class Allocation" />
-        <div className="space-y-3.5">
+        <div className="space-y-4">
           {SECTIONS.map(({ label, value }) => value > 0 && (
             <div key={label}>
               <div className="flex items-center justify-between gap-2 mb-1.5">
-                <span className="text-xs font-bold uppercase tracking-wider truncate" style={{ color: '#002B5B' }}>
+                <span className="text-xs font-semibold truncate text-[#002B5B]">
                   {label}
                 </span>
-                <span className="text-xs font-mono font-bold whitespace-nowrap flex-shrink-0" style={{ color: '#0052CC' }}>
+                <span className="text-xs font-mono font-bold whitespace-nowrap flex-shrink-0 text-[#0052CC]">
                   {fmt(value, cur)} · {pct(value)}%
                 </span>
               </div>
-              <div className="h-2.5 border" style={{ background: '#F1F5F9', borderColor: '#CBD5E1' }}>
+              <div className="h-2.5 rounded-full bg-[#F4F7FC] overflow-hidden">
                 <div
-                  className="h-full transition-all duration-700"
-                  style={{ width: `${Math.min(100, parseFloat(pct(value)))}%`, background: '#0052CC' }}
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{ width: `${Math.min(100, parseFloat(pct(value)))}%`, background: 'linear-gradient(90deg, #0052CC 0%, #60A5FA 100%)' }}
                 />
               </div>
             </div>

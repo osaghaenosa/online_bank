@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/store/auth'
 import { api, fmtUSD } from '@/lib/api'
 import { Card, Button, SectionHeader, Divider } from '@/components/ui'
-import { CreditCard, Clock, ShieldAlert, Eye, Landmark } from 'lucide-react'
+import { CreditCard, Clock, ShieldAlert, Eye, EyeOff, Landmark, Wifi } from 'lucide-react'
 import { TransactionAuthModal } from '@/components/shared/TransactionAuthModal'
 
 export default function DebitCardPage() {
@@ -23,21 +23,18 @@ export default function DebitCardPage() {
   const kyc = (user as any)?.kyc
   if (kyc === 'Pending') {
     return (
-      <div className="max-w-2xl mx-auto mt-12">
-        <Card className="p-8 text-center">
-          <div
-            className="w-16 h-16 flex items-center justify-center text-white mx-auto mb-5"
-            style={{ background: '#0052CC' }}
-          >
-            <Clock size={32} />
+      <div className="max-w-xl mx-auto mt-8 fade-up">
+        <Card className="p-8 text-center rounded-3xl shadow-float">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center bg-amber-50 text-amber-600 mx-auto mb-5">
+            <Clock size={30} />
           </div>
-          <h2 className="text-2xl font-bold font-display mb-3" style={{ color: '#002B5B' }}>
+          <h2 className="text-2xl font-bold font-display mb-2 text-[#002B5B]">
             KYC Verification Under Review
           </h2>
           <p className="text-sm text-slate-600 mb-2">
             Your KYC compliance documents are currently under review by our onboarding team.
           </p>
-          <p className="text-xs text-slate-500 mb-6">
+          <p className="text-xs text-slate-400 mb-6">
             Card issuance will unlock automatically once verification completes (1–2 business days).
           </p>
           <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>
@@ -50,23 +47,20 @@ export default function DebitCardPage() {
 
   if (kyc !== 'Verified') {
     return (
-      <div className="max-w-2xl mx-auto mt-12">
-        <Card className="p-8 text-center">
-          <div
-            className="w-16 h-16 flex items-center justify-center text-white mx-auto mb-5"
-            style={{ background: '#002B5B' }}
-          >
-            <ShieldAlert size={32} />
+      <div className="max-w-xl mx-auto mt-8 fade-up">
+        <Card className="p-8 text-center rounded-3xl shadow-float">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center bg-[#EBF2FF] text-[#0052CC] mx-auto mb-5">
+            <ShieldAlert size={30} />
           </div>
-          <h2 className="text-2xl font-bold font-display mb-3" style={{ color: '#002B5B' }}>
+          <h2 className="text-2xl font-bold font-display mb-2 text-[#002B5B]">
             {kyc === 'Rejected' ? 'KYC Verification Declined' : 'Identity Verification Required'}
           </h2>
-          <p className="text-sm text-slate-600 mb-8">
+          <p className="text-sm text-slate-500 mb-8">
             {kyc === 'Rejected'
               ? 'Your previous KYC submission was declined. Please re-submit your verification documents to request a commercial debit card.'
               : 'You must complete KYC compliance verification before requesting a virtual or commercial debit card.'}
           </p>
-          <div className="flex gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>
               Return to Overview
             </Button>
@@ -107,67 +101,64 @@ export default function DebitCardPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-in">
+    <div className="max-w-2xl mx-auto space-y-6 fade-up">
       <SectionHeader
         title="Virtual & Commercial Debit Card"
         sub="Manage your Blue ridge Bank debit card for online and international settlements"
       />
 
       {user.cardStatus === 'Not Requested' && (
-        <Card className="p-6 md:p-8">
+        <Card className="p-6 md:p-8 rounded-3xl">
           <div className="flex flex-col items-center text-center space-y-6">
-            <div
-              className="w-20 h-20 flex items-center justify-center mb-1 text-white"
-              style={{ background: '#002B5B' }}
-            >
-              <CreditCard size={40} />
+            <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center text-white brand-card-gradient shadow-brand">
+              <CreditCard size={34} />
             </div>
             <div>
-              <h3 className="text-2xl font-bold font-display" style={{ color: '#002B5B' }}>
+              <h3 className="text-2xl font-bold font-display text-[#002B5B]">
                 Issue a Blue ridge Bank Virtual Card
               </h3>
-              <p className="text-sm text-slate-600 mt-2 max-w-md">
+              <p className="text-sm text-slate-500 mt-2 max-w-md">
                 Provision a Visa or Mastercard commercial debit card linked directly to your USD checking balance.
               </p>
             </div>
 
             <div className="w-full space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-left" style={{ color: '#002B5B' }}>
+              <p className="text-xs font-semibold text-left text-[#002B5B]">
                 Select Settlement Network
               </p>
               <div className="grid grid-cols-2 gap-4">
-                {['Visa', 'Mastercard'].map(type => (
-                  <button
-                    key={type}
-                    onClick={() => setSelectedType(type)}
-                    className="p-4 border-2 flex flex-col items-center gap-2 transition-all cursor-pointer"
-                    style={{
-                      borderColor: selectedType === type ? '#0052CC' : '#CBD5E1',
-                      background: selectedType === type ? '#EBF2FF' : '#FFFFFF',
-                      color: '#002B5B',
-                    }}
-                  >
-                    <span className="font-bold uppercase tracking-wider text-sm">{type} Commercial</span>
-                  </button>
-                ))}
+                {['Visa', 'Mastercard'].map(type => {
+                  const active = selectedType === type
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => setSelectedType(type)}
+                      className="p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all cursor-pointer"
+                      style={{
+                        borderColor: active ? '#0052CC' : '#E2E8F0',
+                        background: active ? '#EBF2FF' : '#F8FAFC',
+                        color: '#002B5B',
+                      }}
+                    >
+                      <span className="font-bold text-sm">{type} Commercial</span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
             <Divider className="w-full" />
 
-            <div
-              className="w-full flex justify-between items-center p-4 border"
-              style={{ background: '#F8FAFC', borderColor: '#CBD5E1' }}
-            >
-              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#475569' }}>
+            <div className="w-full flex justify-between items-center p-4 rounded-2xl bg-[#F4F7FC] border border-slate-200/80">
+              <span className="text-xs font-semibold text-slate-500">
                 One-Time Provisioning Fee
               </span>
-              <span className="text-lg font-mono font-bold" style={{ color: '#002B5B' }}>{fmtUSD(cardFee)}</span>
+              <span className="text-lg font-mono font-bold text-[#002B5B]">{fmtUSD(cardFee)}</span>
             </div>
 
             <Button
               variant="primary"
-              className="w-full py-4"
+              className="w-full py-4 rounded-full"
               loading={loading}
               onClick={handleRequest}
             >
@@ -178,28 +169,28 @@ export default function DebitCardPage() {
       )}
 
       {user.cardStatus === 'Pending Approval' && (
-        <Card className="p-8 text-center flex flex-col items-center">
-          <div className="w-16 h-16 flex items-center justify-center mb-5 text-white" style={{ background: '#0052CC' }}>
-            <Clock size={32} />
+        <Card className="p-8 text-center flex flex-col items-center rounded-3xl">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5 bg-[#EBF2FF] text-[#0052CC]">
+            <Clock size={30} />
           </div>
-          <h3 className="text-xl font-bold font-display mb-2" style={{ color: '#002B5B' }}>
+          <h3 className="text-xl font-bold font-display mb-2 text-[#002B5B]">
             Card Provisioning Pending Approval
           </h3>
-          <p className="text-sm text-slate-600 max-w-md">
+          <p className="text-sm text-slate-500 max-w-md">
             Your request for a {user.cardType} commercial debit card has been logged and is currently awaiting authorization by our card desk.
           </p>
         </Card>
       )}
 
       {user.cardStatus === 'Blocked' && (
-        <Card className="p-8 text-center flex flex-col items-center">
-          <div className="w-16 h-16 flex items-center justify-center mb-5 bg-red-600 text-white">
-            <ShieldAlert size={32} />
+        <Card className="p-8 text-center flex flex-col items-center rounded-3xl">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5 bg-red-50 text-red-600">
+            <ShieldAlert size={30} />
           </div>
-          <h3 className="text-xl font-bold font-display mb-2" style={{ color: '#002B5B' }}>
+          <h3 className="text-xl font-bold font-display mb-2 text-[#002B5B]">
             Card Suspended
           </h3>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-500">
             Your debit card is currently restricted. Please contact support@theblueridges.com for assistance.
           </p>
         </Card>
@@ -207,63 +198,59 @@ export default function DebitCardPage() {
 
       {user.cardStatus === 'Active' && (
         <div className="space-y-6">
-          {/* Solid Blue Institutional Card */}
-          <div
-            className="relative w-full max-w-md mx-auto min-h-[205px] sm:aspect-[1.586/1] p-4 sm:p-6 text-white flex flex-col justify-between shadow-xl border-2"
-            style={{
-              background: '#002B5B',
-              borderColor: '#0052CC',
-            }}
-          >
-            <div className="flex justify-between items-center pb-2.5 sm:pb-3 border-b gap-2" style={{ borderColor: '#1E3A5F' }}>
+          {/* Luminous Brand Debit Card */}
+          <div className="relative w-full max-w-md mx-auto min-h-[215px] sm:aspect-[1.586/1] p-5 sm:p-7 rounded-3xl brand-card-gradient text-white flex flex-col justify-between shadow-float overflow-hidden">
+            <svg
+              className="absolute inset-0 w-full h-full opacity-20 pointer-events-none"
+              viewBox="0 0 400 240"
+              fill="none"
+              preserveAspectRatio="none"
+            >
+              <circle cx="340" cy="30" r="110" fill="#60A5FA" fillOpacity="0.35" />
+              <circle cx="60" cy="210" r="95" fill="#FFFFFF" fillOpacity="0.18" />
+              <path d="M-20 175 C 90 120, 210 220, 420 105" stroke="#93C5FD" strokeWidth="1.5" strokeOpacity="0.55" />
+            </svg>
+
+            <div className="relative z-10 flex justify-between items-center pb-3 border-b border-white/15 gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                <Landmark size={15} className="flex-shrink-0" style={{ color: '#60A5FA' }} />
-                <span className="text-xs font-bold uppercase tracking-wider truncate">
-                  BLUE RIDGE BANK
+                <Landmark size={15} className="flex-shrink-0 text-[#60A5FA]" />
+                <span className="text-xs font-bold tracking-wide truncate">
+                  Blue ridge Bank
                 </span>
               </div>
-              <div
-                className="px-2 py-0.5 text-[10px] sm:text-xs font-bold uppercase flex-shrink-0"
-                style={{ background: '#0052CC', color: '#FFFFFF' }}
-              >
-                {user.cardType} DEBIT
-              </div>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-white/15 text-white flex-shrink-0">
+                {user.cardType} Debit
+              </span>
             </div>
 
-            <div className="space-y-2 my-3">
-              <div
-                className="w-10 h-6 sm:w-11 sm:h-7 border flex items-center justify-center text-[9px] font-bold"
-                style={{ background: '#001F42', borderColor: '#60A5FA', color: '#93C5FD' }}
-              >
-                EMV
+            <div className="relative z-10 space-y-3 my-3">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-6 sm:w-11 sm:h-7 rounded-md bg-white/15 border border-white/25 flex items-center justify-center text-[9px] font-bold text-blue-100">
+                  EMV
+                </div>
+                <Wifi size={16} className="text-blue-200 rotate-90" />
               </div>
               <div className="text-base sm:text-2xl font-mono tracking-wider sm:tracking-widest font-bold text-white whitespace-nowrap">
                 {revealed ? (user.cardNumber || '#### #### #### ####') : '•••• •••• •••• ' + String(user.cardNumber || '0000').slice(-4)}
               </div>
             </div>
 
-            <div className="flex justify-between items-end pt-2.5 sm:pt-3 border-t gap-3" style={{ borderColor: '#1E3A5F' }}>
+            <div className="relative z-10 flex justify-between items-end pt-3 border-t border-white/15 gap-3">
               <div className="min-w-0 flex-1">
-                <div className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: '#93C5FD' }}>
-                  CARDHOLDER
-                </div>
-                <div className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white truncate">
+                <div className="text-[10px] text-blue-200">Cardholder</div>
+                <div className="text-xs sm:text-sm font-semibold text-white truncate">
                   {user.firstName} {user.lastName}
                 </div>
               </div>
               <div className="flex gap-4 sm:gap-5 flex-shrink-0">
                 <div>
-                  <div className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: '#93C5FD' }}>
-                    EXPIRES
-                  </div>
+                  <div className="text-[10px] text-blue-200">Expires</div>
                   <div className="font-mono text-xs sm:text-sm font-bold text-white">
                     {revealed ? (user.cardExpiry || '##/##') : '••/••'}
                   </div>
                 </div>
                 <div>
-                  <div className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: '#93C5FD' }}>
-                    CVV
-                  </div>
+                  <div className="text-[10px] text-blue-200">CVV</div>
                   <div className="font-mono text-xs sm:text-sm font-bold text-white">
                     {revealed ? (user.cvv || '###') : '•••'}
                   </div>
@@ -273,12 +260,12 @@ export default function DebitCardPage() {
           </div>
 
           {!revealed ? (
-            <Button variant="primary" className="w-full max-w-md mx-auto flex items-center justify-center gap-2" onClick={handleReveal}>
+            <Button variant="primary" className="w-full max-w-md mx-auto rounded-full flex items-center justify-center gap-2" onClick={handleReveal}>
               <Eye size={16} /> Reveal Full Card Credentials
             </Button>
           ) : (
-            <Button variant="secondary" className="w-full max-w-md mx-auto flex items-center justify-center gap-2" onClick={() => setRevealed(false)}>
-              Mask Card Credentials
+            <Button variant="secondary" className="w-full max-w-md mx-auto rounded-full flex items-center justify-center gap-2" onClick={() => setRevealed(false)}>
+              <EyeOff size={16} /> Mask Card Credentials
             </Button>
           )}
         </div>

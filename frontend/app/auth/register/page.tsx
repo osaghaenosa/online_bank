@@ -104,113 +104,118 @@ export default function RegisterPage() {
   }
   const pw = strength(form.password)
   const STRENGTH_LABELS = ['', 'Weak', 'Fair', 'Good', 'Strong']
-  const STRENGTH_COLORS = ['', '#DC2626', '#D97706', '#2563EB', '#0052CC']
+  const STRENGTH_COLORS = ['', '#DC2626', '#D97706', '#2563EB', '#059669']
+
+  const inputCls =
+    'w-full px-3.5 py-2.5 rounded-xl text-sm outline-none font-sans border border-slate-200 bg-[#F8FAFC] focus:bg-white focus:border-[#0052CC] focus:ring-4 focus:ring-blue-500/10 transition-all text-[#0A192F]'
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#F2F5F9' }}>
-      {/* Left Institutional Panel */}
-      <div
-        className="hidden lg:flex flex-col justify-between w-5/12 p-12 border-r-4"
-        style={{ background: '#002B5B', borderColor: '#0052CC' }}
-      >
-        <div>
+    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#F4F7FC' }}>
+      {/* ── Desktop Left Brand Panel ──────────────────────────────────────── */}
+      <div className="hidden lg:flex flex-col justify-between w-5/12 p-12 brand-card-gradient text-white relative overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-[#3B82F6]/20 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+
+        <div className="relative z-10">
           <Link href="/home" className="inline-block">
             <BrandLogo variant="light" size="lg" showTagline />
           </Link>
         </div>
 
-        <div className="my-12">
-          <div
-            className="inline-block px-3 py-1 mb-5 text-xs font-mono uppercase tracking-widest font-bold"
-            style={{ background: '#0052CC', color: '#FFFFFF' }}
-          >
+        <div className="relative z-10 my-10">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full mb-5 text-xs font-semibold bg-white/15 border border-white/20 text-blue-100">
             New Account Enrollment
-          </div>
-          <h2 className="font-display text-4xl font-bold text-white mb-6 leading-tight">
+          </span>
+          <h2 className="font-display text-4xl font-bold text-white mb-4 leading-tight">
             Establish Your Institutional &amp; Personal Account
           </h2>
-          <p className="text-sm mb-8 leading-relaxed" style={{ color: '#BFDBFE' }}>
+          <p className="text-sm mb-6 leading-relaxed text-blue-100/90">
             Experience precision banking with direct ledger clearing, instant multi-channel funding, and full cryptographic protection.
           </p>
 
-          <div className="space-y-0 border-t" style={{ borderColor: '#1E3A5F' }}>
+          <div className="relative mb-6 animate-reveal">
+            <div className="rounded-3xl overflow-hidden border-2 border-white/20 shadow-float aspect-[16/9] bg-[#001F42]">
+              <img
+                src="/images/about-institution.png"
+                alt="Blue ridge Bank institutional headquarters"
+                className="w-full h-full object-cover animate-ken-burns"
+              />
+            </div>
+            <div className="absolute bottom-3 left-3 rounded-2xl px-3.5 py-2 glass shadow-float animate-float">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#60A5FA] animate-live-dot flex-shrink-0" />
+                <span className="text-xs font-semibold text-white">Instant Account Provisioning</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2.5 rounded-3xl p-5 glass">
             {[
               { icon: Building2, title: 'Instant Account Provisioning', text: 'Immediate USD checking & savings ledger with routing credentials' },
               { icon: ShieldCheck, title: 'FDIC & 256-Bit Protection', text: 'Institutional-grade security protocols and multi-factor verification' },
               { icon: Globe, title: 'Global Settlement Network', text: 'Access 12+ international & domestic transfer rails immediately' },
               { icon: Lock, title: 'Verified Audit Receipts', text: 'Official downloadable PDF statements generated for every transaction' },
             ].map(({ icon: Icon, title, text }) => (
-              <div
-                key={title}
-                className="flex items-start gap-4 py-4 border-b"
-                style={{ borderColor: '#1E3A5F' }}
-              >
-                <div
-                  className="w-9 h-9 flex items-center justify-center flex-shrink-0 mt-0.5"
-                  style={{ background: '#0052CC', color: '#FFFFFF' }}
-                >
+              <div key={title} className="flex items-start gap-3.5 py-2">
+                <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0 mt-0.5 text-blue-200">
                   <Icon size={16} />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-white">{title}</p>
-                  <p className="text-xs mt-0.5" style={{ color: '#93C5FD' }}>{text}</p>
+                  <p className="text-sm font-semibold text-white">{title}</p>
+                  <p className="text-xs mt-0.5 text-blue-200/90">{text}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="pt-6 border-t flex items-center justify-between text-xs font-mono" style={{ borderColor: '#1E3A5F', color: '#93C5FD' }}>
-          <span>MEMBER FDIC · EQUAL HOUSING LENDER</span>
-          <span>SUPPORT@THEBLUERIDGES.COM</span>
+        <div className="relative z-10 pt-6 border-t border-white/15 flex items-center justify-between text-xs text-blue-200">
+          <span>Member FDIC · Equal Housing Lender</span>
+          <span>support@theblueridges.com</span>
         </div>
       </div>
 
-      {/* Top Mobile Banner */}
-      <div
-        className="lg:hidden px-5 py-4 flex items-center justify-between border-b-2"
-        style={{ background: '#002B5B', borderColor: '#0052CC' }}
-      >
-        <Link href="/home">
-          <BrandLogo variant="light" size="sm" />
-        </Link>
-        <Link
-          href="/auth/login"
-          className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white border"
-          style={{ background: '#0052CC', borderColor: '#60A5FA' }}
-        >
-          Sign In
-        </Link>
+      {/* ── Mobile Curved Splash Banner ─────────────────────────────────────── */}
+      <div className="lg:hidden brand-card-gradient text-white px-5 pt-6 pb-20 rounded-b-[2.25rem]">
+        <div className="flex items-center justify-between mb-6">
+          <Link href="/home">
+            <BrandLogo variant="light" size="sm" />
+          </Link>
+          <Link
+            href="/auth/login"
+            className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-white bg-white/15 border border-white/25"
+          >
+            Sign In
+          </Link>
+        </div>
+        <div className="text-center">
+          <h1 className="font-display text-2xl font-bold text-white">Open a Bank Account</h1>
+          <p className="text-xs text-blue-200 mt-1">Fast digital enrollment with instant provisioning</p>
+        </div>
       </div>
 
-      {/* Right Form Container */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 lg:p-12 overflow-y-auto">
-        <div
-          className="w-full max-w-xl bg-white border border-slate-300 p-6 sm:p-10"
-          style={{ borderTop: '4px solid #002B5B', boxShadow: '0 2px 6px rgba(0, 43, 91, 0.06)' }}
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 mb-6 border-b border-slate-200 gap-2">
+      {/* ── Right Form Card ─────────────────────────────────────────────────── */}
+      <div className="flex-1 flex items-start lg:items-center justify-center px-4 pb-10 -mt-12 lg:mt-0 lg:p-10 overflow-y-auto relative z-20">
+        <div className="w-full max-w-xl bg-white rounded-3xl border border-slate-200/80 shadow-float p-6 sm:p-9">
+          <div className="hidden lg:flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 mb-6 border-b border-slate-100 gap-2">
             <div>
-              <p className="text-[11px] font-mono uppercase tracking-widest font-bold" style={{ color: '#0052CC' }}>
-                FORM BRB-101 · ENROLLMENT
-              </p>
-              <h1 className="font-display text-2xl sm:text-3xl font-bold mt-1" style={{ color: '#002B5B' }}>
+              <span className="inline-block px-3 py-1 rounded-full text-[11px] font-semibold bg-[#EBF2FF] text-[#0052CC] mb-2">
+                Online Account Enrollment
+              </span>
+              <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#002B5B]">
                 Open a Bank Account
               </h1>
             </div>
-            <div className="text-xs sm:text-right" style={{ color: '#475569' }}>
+            <div className="text-xs sm:text-right text-slate-500">
               Already enrolled?{' '}
-              <Link href="/auth/login" className="font-bold underline" style={{ color: '#0052CC' }}>
+              <Link href="/auth/login" className="font-semibold text-[#0052CC] hover:underline">
                 Sign In Here
               </Link>
             </div>
           </div>
 
           {error && (
-            <div
-              className="mb-6 p-4 text-sm font-medium border-l-4"
-              style={{ background: '#FEF2F2', borderColor: '#DC2626', color: '#991B1B' }}
-            >
+            <div className="mb-5 p-3.5 rounded-2xl text-xs sm:text-sm font-medium bg-red-50 border border-red-200 text-red-700">
               {error}
             </div>
           )}
@@ -222,8 +227,8 @@ export default function RegisterPage() {
                 { k: 'lastName', label: 'Legal Last Name', ph: 'Mitchell', type: 'text' },
               ].map(({ k, label, ph, type }) => (
                 <div key={k}>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
-                    {label} <span className="text-red-600">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    {label} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type={type}
@@ -231,10 +236,7 @@ export default function RegisterPage() {
                     placeholder={ph}
                     value={form[k as keyof typeof form]}
                     onChange={f(k as keyof typeof form)}
-                    className="w-full px-3.5 py-2.5 text-sm outline-none font-sans border transition-colors"
-                    style={{ background: '#FFFFFF', borderColor: '#CBD5E1', color: '#0A192F' }}
-                    onFocus={e => (e.target.style.borderColor = '#0052CC')}
-                    onBlur={e => (e.target.style.borderColor = '#CBD5E1')}
+                    className={inputCls}
                   />
                 </div>
               ))}
@@ -242,8 +244,8 @@ export default function RegisterPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
-                  Email Address <span className="text-red-600">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -251,15 +253,12 @@ export default function RegisterPage() {
                   placeholder="name@domain.com"
                   value={form.email}
                   onChange={f('email')}
-                  className="w-full px-3.5 py-2.5 text-sm outline-none font-sans border transition-colors"
-                  style={{ background: '#FFFFFF', borderColor: '#CBD5E1', color: '#0A192F' }}
-                  onFocus={e => (e.target.style.borderColor = '#0052CC')}
-                  onBlur={e => (e.target.style.borderColor = '#CBD5E1')}
+                  className={inputCls}
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Telephone Number
                 </label>
                 <input
@@ -267,10 +266,7 @@ export default function RegisterPage() {
                   placeholder="+1 (555) 010-0200"
                   value={form.phone}
                   onChange={f('phone')}
-                  className="w-full px-3.5 py-2.5 text-sm outline-none font-sans border transition-colors"
-                  style={{ background: '#FFFFFF', borderColor: '#CBD5E1', color: '#0A192F' }}
-                  onFocus={e => (e.target.style.borderColor = '#0052CC')}
-                  onBlur={e => (e.target.style.borderColor = '#CBD5E1')}
+                  className={inputCls}
                 />
               </div>
             </div>
@@ -278,8 +274,8 @@ export default function RegisterPage() {
             {/* Searchable Country Dropdown & City/Location */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div ref={countryRef} className="relative">
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
-                  Country of Residence <span className="text-red-600">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Country of Residence <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -290,40 +286,28 @@ export default function RegisterPage() {
                     onChange={handleCountryInput}
                     onFocus={() => setCountryOpen(true)}
                     autoComplete="off"
-                    className="w-full pl-3.5 pr-9 py-2.5 text-sm outline-none font-sans border transition-colors"
-                    style={{
-                      background: '#FFFFFF',
-                      borderColor: countryOpen ? '#0052CC' : '#CBD5E1',
-                      color: '#0A192F',
-                    }}
+                    className="w-full pl-3.5 pr-9 py-2.5 rounded-xl text-sm outline-none font-sans border border-slate-200 bg-[#F8FAFC] focus:bg-white focus:border-[#0052CC] focus:ring-4 focus:ring-blue-500/10 transition-all text-[#0A192F]"
                   />
                   <button
                     type="button"
                     tabIndex={-1}
                     onClick={() => setCountryOpen(!countryOpen)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1"
-                    style={{ color: '#002B5B' }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#002B5B]"
                   >
                     <ChevronDown size={15} className={`transition-transform ${countryOpen ? 'rotate-180' : ''}`} />
                   </button>
                 </div>
 
                 {countryOpen && (
-                  <div
-                    className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto border-2 bg-white"
-                    style={{ borderColor: '#002B5B', boxShadow: '0 8px 20px rgba(0, 43, 91, 0.15)' }}
-                  >
-                    <div
-                      className="sticky top-0 px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider flex items-center justify-between border-b"
-                      style={{ background: '#EBF2FF', color: '#002B5B', borderColor: '#CBD5E1' }}
-                    >
+                  <div className="absolute left-0 right-0 z-50 mt-1.5 max-h-56 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-float">
+                    <div className="sticky top-0 px-3 py-2 text-[11px] font-semibold flex items-center justify-between border-b border-slate-100 bg-[#F4F7FC] text-[#002B5B]">
                       <span className="flex items-center gap-1.5">
-                        <Search size={11} /> {filteredCountries.length} Countries Available
+                        <Search size={11} /> {filteredCountries.length} Countries
                       </span>
-                      <span>Click to Select</span>
+                      <span className="text-slate-400">Select</span>
                     </div>
                     {filteredCountries.length === 0 ? (
-                      <div className="px-3.5 py-3 text-xs" style={{ color: '#64748B' }}>
+                      <div className="px-3.5 py-3 text-xs text-slate-500">
                         No country matching &ldquo;{countrySearch}&rdquo;
                       </div>
                     ) : (
@@ -334,23 +318,10 @@ export default function RegisterPage() {
                             type="button"
                             key={c}
                             onClick={() => selectCountry(c)}
-                            className="w-full text-left px-3.5 py-2 text-sm flex items-center justify-between border-b last:border-b-0 transition-colors"
+                            className="w-full text-left px-3.5 py-2 text-sm flex items-center justify-between border-b border-slate-50 last:border-b-0 transition-colors cursor-pointer"
                             style={{
                               background: isSelected ? '#0052CC' : '#FFFFFF',
                               color: isSelected ? '#FFFFFF' : '#0A192F',
-                              borderColor: '#F1F5F9',
-                            }}
-                            onMouseEnter={e => {
-                              if (!isSelected) {
-                                e.currentTarget.style.background = '#EBF2FF'
-                                e.currentTarget.style.color = '#002B5B'
-                              }
-                            }}
-                            onMouseLeave={e => {
-                              if (!isSelected) {
-                                e.currentTarget.style.background = '#FFFFFF'
-                                e.currentTarget.style.color = '#0A192F'
-                              }
                             }}
                           >
                             <span className="font-medium">{c}</span>
@@ -364,8 +335,8 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
-                  City / State / Province <span className="text-red-600">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  City / State / Province <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -374,18 +345,15 @@ export default function RegisterPage() {
                   value={form.location}
                   onChange={f('location')}
                   autoComplete="address-level2"
-                  className="w-full px-3.5 py-2.5 text-sm outline-none font-sans border transition-colors"
-                  style={{ background: '#FFFFFF', borderColor: '#CBD5E1', color: '#0A192F' }}
-                  onFocus={e => (e.target.style.borderColor = '#0052CC')}
-                  onBlur={e => (e.target.style.borderColor = '#CBD5E1')}
+                  className={inputCls}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
-                  Create Password <span className="text-red-600">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Create Password <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -394,32 +362,28 @@ export default function RegisterPage() {
                     placeholder="Min. 8 characters"
                     value={form.password}
                     onChange={f('password')}
-                    className="w-full px-3.5 py-2.5 pr-10 text-sm outline-none font-sans border transition-colors"
-                    style={{ background: '#FFFFFF', borderColor: '#CBD5E1', color: '#0A192F' }}
-                    onFocus={e => (e.target.style.borderColor = '#0052CC')}
-                    onBlur={e => (e.target.style.borderColor = '#CBD5E1')}
+                    className="w-full pl-3.5 pr-10 py-2.5 rounded-xl text-sm outline-none font-sans border border-slate-200 bg-[#F8FAFC] focus:bg-white focus:border-[#0052CC] focus:ring-4 focus:ring-blue-500/10 transition-all text-[#0A192F]"
                   />
                   <button
                     type="button"
                     onClick={() => setShow(!show)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2"
-                    style={{ color: '#64748B' }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                   >
                     {show ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
                 {form.password && (
                   <div className="mt-2 flex items-center gap-2">
-                    <div className="flex gap-1 flex-1">
+                    <div className="flex gap-1.5 flex-1">
                       {[1, 2, 3, 4].map(i => (
                         <div
                           key={i}
-                          className="h-1.5 flex-1 transition-all"
+                          className="h-1.5 rounded-full flex-1 transition-all"
                           style={{ background: i <= pw ? STRENGTH_COLORS[pw] : '#E2E8F0' }}
                         />
                       ))}
                     </div>
-                    <span className="text-[11px] font-bold uppercase" style={{ color: STRENGTH_COLORS[pw] }}>
+                    <span className="text-[11px] font-semibold" style={{ color: STRENGTH_COLORS[pw] }}>
                       {STRENGTH_LABELS[pw]}
                     </span>
                   </div>
@@ -427,8 +391,8 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
-                  Confirm Password <span className="text-red-600">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Confirm Password <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="password"
@@ -436,20 +400,18 @@ export default function RegisterPage() {
                   placeholder="Repeat password"
                   value={form.confirm}
                   onChange={f('confirm')}
-                  className="w-full px-3.5 py-2.5 text-sm outline-none font-sans border transition-colors"
+                  className={inputCls}
                   style={{
-                    background: '#FFFFFF',
                     borderColor:
                       form.confirm && form.confirm !== form.password
                         ? '#DC2626'
                         : form.confirm
                         ? '#0052CC'
-                        : '#CBD5E1',
-                    color: '#0A192F',
+                        : '#DDE5F0',
                   }}
                 />
                 {form.confirm && form.confirm === form.password && (
-                  <p className="text-xs mt-1.5 flex items-center gap-1 font-semibold" style={{ color: '#0052CC' }}>
+                  <p className="text-xs mt-1.5 flex items-center gap-1 font-semibold text-[#059669]">
                     <CheckCircle size={12} /> Passwords verified
                   </p>
                 )}
@@ -460,13 +422,11 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 text-sm font-bold uppercase tracking-wider text-white flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-                style={{ background: '#0052CC' }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#002B5B')}
-                onMouseLeave={e => (e.currentTarget.style.background = '#0052CC')}
+                className="w-full py-3.5 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-2 shadow-brand transition-all hover:opacity-95 active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+                style={{ background: 'linear-gradient(135deg, #0052CC 0%, #003D99 100%)' }}
               >
                 {loading ? (
-                  <span className="w-4 h-4 border-2 border-white/40 border-t-white animate-spin" />
+                  <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
                 ) : (
                   <>
                     <span>Complete Account Enrollment</span>
@@ -477,19 +437,19 @@ export default function RegisterPage() {
             </div>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs" style={{ color: '#64748B' }}>
+          <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
             <span>
               By enrolling you agree to our{' '}
-              <Link href="/about" className="underline font-semibold" style={{ color: '#002B5B' }}>
+              <Link href="/about" className="font-semibold text-[#0052CC] hover:underline">
                 Terms of Service
               </Link>{' '}
               &amp;{' '}
-              <Link href="/about" className="underline font-semibold" style={{ color: '#002B5B' }}>
+              <Link href="/about" className="font-semibold text-[#0052CC] hover:underline">
                 Privacy Policy
               </Link>
             </span>
-            <span className="font-mono text-[11px]" style={{ color: '#002B5B' }}>
-              256-BIT TLS ENCRYPTED
+            <span className="font-mono text-[11px] text-[#002B5B]">
+              256-Bit TLS Encrypted
             </span>
           </div>
         </div>

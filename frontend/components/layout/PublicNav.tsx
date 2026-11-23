@@ -2,16 +2,19 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { Menu, X, PhoneCall, ShieldCheck } from 'lucide-react'
+import { Menu, X, ShieldCheck, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/store/auth'
 import { BrandLogo } from '@/components/shared/BrandLogo'
+import { WhatsAppIcon } from '@/components/shared/WhatsAppIcon'
+import clsx from 'clsx'
 
 const LINKS = [
   { href: '/home',     label: 'Overview' },
   { href: '/services', label: 'Banking Services' },
+  { href: '/docs',     label: 'API Docs' },
   { href: '/about',    label: 'Institution' },
   { href: '/blog',     label: 'Market Insights' },
-  { href: '/contact',  label: 'Client Support' },
+  { href: '/contact',  label: 'Support' },
 ]
 
 export function PublicNav() {
@@ -24,46 +27,41 @@ export function PublicNav() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      {/* Top Institutional Utility Bar */}
+      {/* Top Trust Bar */}
       <div
-        className="hidden sm:block border-b text-[11px] font-mono"
-        style={{ background: '#001F42', borderColor: '#1E3A5F', color: '#BFDBFE' }}
+        className="hidden sm:block border-b border-white/10 text-[11px]"
+        style={{ background: '#001F42', color: '#BFDBFE' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-8 flex items-center justify-between">
           <div className="flex items-center gap-5">
-            <span className="flex items-center gap-1.5 font-semibold text-white">
-              <ShieldCheck size={12} style={{ color: '#60A5FA' }} />
-              FDIC INSURED INSTITUTION · ROUTING #021000021
+            <span className="flex items-center gap-1.5 font-medium text-white/90">
+              <ShieldCheck size={12} className="text-[#60A5FA]" />
+              FDIC Insured Institution · Routing #021000021
             </span>
-            <span className="hidden lg:inline">256-BIT ENCRYPTED LEDGER</span>
+            <span className="hidden lg:inline text-blue-200/70">256-Bit Encrypted Ledger</span>
           </div>
           <div className="flex items-center gap-4">
-            <a href="tel:+12488346313" className="hover:text-white flex items-center gap-1 font-bold text-white">
-              <PhoneCall size={11} style={{ color: '#60A5FA' }} /> +1 (248) 834-6313
-            </a>
             <a
               href="https://wa.me/12488346313"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white underline text-[10px] uppercase font-bold"
-              style={{ color: '#93C5FD' }}
+              className="px-2.5 py-0.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold inline-flex items-center gap-1.5 transition-colors"
+              title="Chat with Blue ridge Bank on WhatsApp"
             >
-              WhatsApp
+              <WhatsAppIcon size={14} />
+              <span>+1 (248) 834-6313</span>
             </a>
-            <a href="mailto:support@theblueridges.com" className="hover:text-white flex items-center gap-1">
+            <a href="mailto:support@theblueridges.com" className="hover:text-white">
               support@theblueridges.com
             </a>
           </div>
         </div>
       </div>
 
-      {/* Main Navigation Bar */}
+      {/* Main Frosted Navigation Bar */}
       <nav
-        className="border-b-2"
-        style={{
-          background: '#002B5B',
-          borderColor: '#0052CC',
-        }}
+        className="border-b border-white/10 backdrop-blur-xl"
+        style={{ background: 'rgba(0, 43, 91, 0.94)' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* Logo */}
@@ -72,19 +70,19 @@ export function PublicNav() {
           </Link>
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center h-full">
+          <div className="hidden md:flex items-center gap-1">
             {LINKS.map(l => {
               const active = pathname === l.href
               return (
                 <Link
                   key={l.href}
                   href={l.href}
-                  className="h-full flex items-center px-4 text-xs font-bold uppercase tracking-wider transition-colors border-b-4"
-                  style={{
-                    color: active ? '#FFFFFF' : '#BFDBFE',
-                    borderColor: active ? '#60A5FA' : 'transparent',
-                    background: active ? '#001F42' : 'transparent',
-                  }}
+                  className={clsx(
+                    'px-3.5 py-2 rounded-full text-xs font-semibold transition-all',
+                    active
+                      ? 'bg-white/15 text-white'
+                      : 'text-blue-100/85 hover:text-white hover:bg-white/10'
+                  )}
                 >
                   {l.label}
                 </Link>
@@ -98,15 +96,14 @@ export function PublicNav() {
               <>
                 <Link
                   href="/auth/login"
-                  className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white border transition-colors"
-                  style={{ borderColor: '#60A5FA', background: 'transparent' }}
+                  className="px-4 py-2 rounded-full text-xs font-semibold text-white border border-white/25 hover:bg-white/10 transition-colors"
                 >
-                  Client Sign In
+                  Sign In
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white border transition-colors"
-                  style={{ background: '#0052CC', borderColor: '#0052CC' }}
+                  className="px-5 py-2 rounded-full text-xs font-semibold text-white shadow-brand transition-transform hover:scale-[1.02]"
+                  style={{ background: 'linear-gradient(135deg, #0052CC 0%, #003D99 100%)' }}
                 >
                   Open Account
                 </Link>
@@ -114,24 +111,24 @@ export function PublicNav() {
             ) : user ? (
               <Link
                 href="/dashboard"
-                className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white"
-                style={{ background: '#0052CC' }}
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full text-xs font-semibold text-white shadow-brand transition-transform hover:scale-[1.02]"
+                style={{ background: 'linear-gradient(135deg, #0052CC 0%, #003D99 100%)' }}
               >
-                Banking Portal →
+                <span>Banking Portal</span>
+                <ArrowRight size={13} />
               </Link>
             ) : (
               <>
                 <Link
                   href="/auth/login"
-                  className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white border transition-colors hover:bg-white/10"
-                  style={{ borderColor: '#60A5FA' }}
+                  className="px-4 py-2 rounded-full text-xs font-semibold text-white border border-white/25 hover:bg-white/10 transition-colors"
                 >
-                  Client Sign In
+                  Sign In
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white border transition-colors"
-                  style={{ background: '#0052CC', borderColor: '#0052CC' }}
+                  className="px-5 py-2 rounded-full text-xs font-semibold text-white shadow-brand transition-transform hover:scale-[1.02]"
+                  style={{ background: 'linear-gradient(135deg, #0052CC 0%, #003D99 100%)' }}
                 >
                   Open Account
                 </Link>
@@ -141,20 +138,19 @@ export function PublicNav() {
 
           {/* Mobile Hamburger */}
           <button
-            className="md:hidden p-2 text-white border"
-            style={{ borderColor: '#1E3A5F', background: '#001F42' }}
+            className="md:hidden w-10 h-10 rounded-full text-white bg-white/10 border border-white/15 flex items-center justify-center cursor-pointer"
             onClick={() => setOpen(!open)}
             aria-label="Toggle Menu"
           >
-            {open ? <X size={20} /> : <Menu size={20} />}
+            {open ? <X size={19} /> : <Menu size={19} />}
           </button>
         </div>
 
         {/* Mobile menu */}
         {open && (
           <div
-            className="md:hidden border-t px-4 py-4 space-y-1"
-            style={{ background: '#001F42', borderColor: '#1E3A5F' }}
+            className="md:hidden border-t border-white/10 px-4 py-4 space-y-1.5 rounded-b-3xl shadow-2xl"
+            style={{ background: '#001F42' }}
           >
             {LINKS.map(l => {
               const active = pathname === l.href
@@ -163,23 +159,21 @@ export function PublicNav() {
                   key={l.href}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block px-3 py-2.5 text-xs font-bold uppercase tracking-wider border-l-4"
-                  style={{
-                    color: active ? '#FFFFFF' : '#BFDBFE',
-                    borderColor: active ? '#0052CC' : 'transparent',
-                    background: active ? '#002B5B' : 'transparent',
-                  }}
+                  className={clsx(
+                    'block px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors',
+                    active ? 'bg-[#0052CC] text-white' : 'text-blue-100 hover:bg-white/10'
+                  )}
                 >
                   {l.label}
                 </Link>
               )
             })}
-            <div className="pt-3 mt-2 border-t grid grid-cols-2 gap-2" style={{ borderColor: '#1E3A5F' }}>
+            <div className="pt-3 mt-2 border-t border-white/10 grid grid-cols-2 gap-2.5">
               {mounted && user ? (
                 <Link
                   href="/dashboard"
                   onClick={() => setOpen(false)}
-                  className="col-span-2 text-center py-2.5 text-xs font-bold uppercase tracking-wider text-white"
+                  className="col-span-2 text-center py-2.5 rounded-full text-xs font-semibold text-white shadow-brand"
                   style={{ background: '#0052CC' }}
                 >
                   Banking Portal →
@@ -189,21 +183,34 @@ export function PublicNav() {
                   <Link
                     href="/auth/login"
                     onClick={() => setOpen(false)}
-                    className="text-center py-2.5 border text-xs font-bold uppercase tracking-wider text-white"
-                    style={{ borderColor: '#60A5FA' }}
+                    className="text-center py-2.5 rounded-full border border-white/25 text-xs font-semibold text-white"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/auth/register"
                     onClick={() => setOpen(false)}
-                    className="text-center py-2.5 text-xs font-bold uppercase tracking-wider text-white"
+                    className="text-center py-2.5 rounded-full text-xs font-semibold text-white shadow-brand"
                     style={{ background: '#0052CC' }}
                   >
                     Open Account
                   </Link>
                 </>
               )}
+            </div>
+            <div className="pt-2.5 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-blue-100">
+              <a
+                href="https://wa.me/12488346313"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 text-white font-semibold"
+              >
+                <WhatsAppIcon size={14} />
+                <span>+1 (248) 834-6313</span>
+              </a>
+              <a href="mailto:support@theblueridges.com" className="text-blue-200 hover:text-white truncate ml-2">
+                support@theblueridges.com
+              </a>
             </div>
           </div>
         )}

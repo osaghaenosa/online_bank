@@ -38,24 +38,20 @@ export function TxRow({ tx, showRef, showUser, compact }: TxRowProps) {
   const isCredit = tx.type === 'credit'
 
   return (
-    <Link href={`/receipts/${tx.transactionId}`}>
-      <div
-        className="flex items-center justify-between gap-2.5 sm:gap-3.5 py-3 sm:py-3.5 border-b last:border-b-0 cursor-pointer hover:bg-blue-50/40 px-2 -mx-2 transition-colors"
-        style={{ borderColor: 'var(--color-border)' }}
-      >
-        <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
+    <Link href={`/receipts/${tx.transactionId}`} className="block group">
+      <div className="flex items-center justify-between gap-3 py-3 px-2.5 sm:px-3 -mx-2 sm:-mx-3 rounded-2xl cursor-pointer transition-all hover:bg-[#F4F7FC]">
+        <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
           <div
-            className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center flex-shrink-0 border"
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-105"
             style={{
-              background: isCredit ? '#EBF2FF' : '#F8FAFC',
-              borderColor: isCredit ? '#93C5FD' : '#CBD5E1',
+              background: isCredit ? '#EBF2FF' : '#F1F5F9',
               color: isCredit ? '#0052CC' : '#002B5B',
             }}
           >
-            <Icon size={16} />
+            <Icon size={17} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs sm:text-sm font-semibold truncate" style={{ color: '#002B5B' }}>
+            <p className="text-xs sm:text-sm font-semibold truncate text-[#002B5B] group-hover:text-[#0052CC] transition-colors">
               {tx.description}
             </p>
 
@@ -80,16 +76,16 @@ export function TxRow({ tx, showRef, showUser, compact }: TxRowProps) {
 
               if (!destInfo) return null
               return (
-                <p className="text-[11px] mt-0.5 truncate font-medium" style={{ color: '#0052CC' }}>
+                <p className="text-[11px] mt-0.5 truncate font-medium text-[#0052CC]">
                   {destInfo}
                 </p>
               )
             })()}
 
-            <p className="text-[11px] mt-0.5 truncate" style={{ color: 'var(--color-muted)' }}>
+            <p className="text-[11px] mt-0.5 truncate text-slate-400">
               {fmtDateTime(tx.createdAt)}
               {showUser ? ` · ${showUser}` : ''}
-              {showRef ? <span className="hidden sm:inline">{` · REF: ${tx.transactionId}`}</span> : ''}
+              {showRef ? <span className="hidden sm:inline">{` · Ref: ${tx.transactionId}`}</span> : ''}
             </p>
           </div>
         </div>
@@ -97,7 +93,7 @@ export function TxRow({ tx, showRef, showUser, compact }: TxRowProps) {
         <div className="text-right flex-shrink-0 flex flex-col items-end gap-1">
           <p
             className="font-mono text-xs sm:text-sm font-bold whitespace-nowrap"
-            style={{ color: isCredit ? '#0052CC' : '#0A192F' }}
+            style={{ color: isCredit ? '#059669' : '#0A192F' }}
           >
             {isCredit ? '+' : '-'}{fmtUSD(tx.amount)}
           </p>

@@ -1,8 +1,7 @@
 'use client'
-import Link from 'next/link'
 import { PublicNav } from '@/components/layout/PublicNav'
 import { BrandLogo } from '@/components/shared/BrandLogo'
-import { Shield, Users, Globe, Award, ArrowRight, CheckCircle, TrendingUp, Lock, Zap } from 'lucide-react'
+import { Shield, Users, Globe, Award, CheckCircle, TrendingUp, Lock, Zap } from 'lucide-react'
 
 const TIMELINE = [
   { year: '2020', title: 'Institutional Founding', desc: 'Blue ridge Bank was established with a clear mandate: bring institutional-grade banking precision to personal and business accounts.' },
@@ -30,58 +29,80 @@ const TEAM = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen" style={{ background: '#F2F5F9', color: '#0A192F' }}>
+    <div className="min-h-screen" style={{ background: '#F4F7FC', color: '#0A192F' }}>
       <PublicNav />
 
-      {/* Hero Header */}
-      <section
-        className="pt-28 sm:pt-36 pb-16 sm:pb-20 px-4 sm:px-6 border-b-4"
-        style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
-      >
-        <div className="max-w-7xl mx-auto">
-          <div
-            className="inline-block px-3 py-1 mb-5 text-xs font-mono uppercase tracking-widest font-bold"
-            style={{ background: '#0052CC', color: '#FFFFFF' }}
-          >
-            INSTITUTIONAL PROFILE · CHARTER &amp; GOVERNANCE
+      {/* Split Hero with Architectural Headquarters Photo */}
+      <section className="pt-28 sm:pt-36 pb-16 sm:pb-24 px-4 sm:px-6 brand-card-gradient text-white overflow-hidden">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="lg:col-span-7 animate-reveal">
+            <span className="inline-block px-3.5 py-1.5 rounded-full mb-5 text-xs font-semibold bg-white/15 text-blue-100">
+              Institutional Profile · Charter &amp; Governance
+            </span>
+            <h1 className="font-display text-3xl sm:text-5xl font-bold text-white mb-5 leading-tight">
+              Built on Banking Discipline, Transparency, and Security.
+            </h1>
+            <p className="text-base sm:text-lg max-w-2xl leading-relaxed text-blue-100/90">
+              Blue ridge Bank combines traditional institutional banking standards with modern real-time clearing infrastructure for individuals and global enterprises.
+            </p>
           </div>
-          <h1 className="font-display text-3xl sm:text-5xl font-bold text-white mb-6 max-w-3xl leading-tight">
-            Built on Banking Discipline, Transparency, and Security.
-          </h1>
-          <p className="text-base sm:text-lg max-w-2xl leading-relaxed" style={{ color: '#BFDBFE' }}>
-            Blue ridge Bank combines traditional institutional banking standards with modern real-time clearing infrastructure for individuals and global enterprises.
-          </p>
+
+          <div className="lg:col-span-5 relative">
+            <div className="rounded-3xl overflow-hidden shadow-float border-4 border-white/20 aspect-[4/3] bg-[#001F42]">
+              <img
+                src="/images/about-institution.png"
+                alt="Blue ridge Bank contemporary institutional headquarters"
+                className="w-full h-full object-cover animate-ken-burns"
+              />
+            </div>
+            <div className="animate-float absolute bottom-3 left-3 sm:-left-3 sm:bottom-5 px-4 py-2.5 rounded-2xl bg-white/95 backdrop-blur-md text-[#002B5B] shadow-float">
+              <p className="text-[11px] font-medium text-slate-500">Chartered Trust</p>
+              <p className="text-xs font-bold text-[#002B5B]">500K+ Verified Accounts · FDIC Insured</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Mission Statement */}
-      <section className="py-16 px-4 sm:px-6">
+      {/* Mission Statement + Leadership Team Split */}
+      <section className="py-12 sm:py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div
-            className="bg-white p-8 sm:p-12 border"
-            style={{ borderColor: '#CBD5E1', borderLeft: '6px solid #0052CC' }}
-          >
-            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-3" style={{ color: '#0052CC' }}>
-              INSTITUTIONAL MANDATE
-            </p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold mb-4 leading-snug" style={{ color: '#002B5B' }}>
-              &ldquo;To deliver institutional-grade financial custody, multi-rail settlement, and verifiable transparency to every account holder.&rdquo;
-            </h2>
-            <p className="text-sm sm:text-base leading-relaxed max-w-4xl" style={{ color: '#475569' }}>
-              From cross-border corporate settlements to personal checking and high-yield reserve management, Blue ridge Bank is engineered to execute every transaction with uncompromising accuracy and complete auditability.
-            </p>
+          <div className="bg-white rounded-3xl p-6 sm:p-10 lg:p-12 border border-slate-200/80 shadow-card grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-7">
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[#EBF2FF] text-[#0052CC] mb-4">
+                Institutional Mandate
+              </span>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold mb-4 leading-snug text-[#002B5B]">
+                &ldquo;To deliver institutional-grade financial custody, multi-rail settlement, and verifiable transparency to every account holder.&rdquo;
+              </h2>
+              <p className="text-sm sm:text-base leading-relaxed text-slate-500">
+                From cross-border corporate settlements to personal checking and high-yield reserve management, Blue ridge Bank is engineered to execute every transaction with uncompromising accuracy and complete auditability.
+              </p>
+            </div>
+
+            <div className="lg:col-span-5 relative group">
+              <div className="rounded-2xl overflow-hidden shadow-card aspect-[16/10] bg-[#EBF2FF]">
+                <img
+                  src="/images/about-team.png"
+                  alt="Blue ridge Bank leadership governance board collaborating"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+              </div>
+              <div className="animate-float-delayed absolute bottom-3 right-3 px-3.5 py-2 rounded-xl bg-[#002B5B]/90 backdrop-blur-md text-white shadow-float">
+                <p className="text-[11px] font-semibold">Global Governance Board</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Core Values */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6">
+      <section className="py-10 sm:py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-10 pb-4 border-b-2" style={{ borderColor: '#002B5B' }}>
-            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-1" style={{ color: '#0052CC' }}>
-              OPERATING PRINCIPLES
-            </p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#002B5B' }}>
+          <div className="mb-10">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[#EBF2FF] text-[#0052CC] mb-2">
+              Operating Principles
+            </span>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#002B5B]">
               What Blue ridge Bank Stands For
             </h2>
           </div>
@@ -89,18 +110,14 @@ export default function AboutPage() {
             {VALUES.map(({ icon: Icon, title, desc }) => (
               <div
                 key={title}
-                className="bg-white p-6 sm:p-8 border flex gap-5"
-                style={{ borderColor: '#CBD5E1', borderTop: '3px solid #002B5B' }}
+                className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-card flex gap-5"
               >
-                <div
-                  className="w-12 h-12 flex items-center justify-center flex-shrink-0"
-                  style={{ background: '#0052CC', color: '#FFFFFF' }}
-                >
+                <div className="w-12 h-12 rounded-2xl bg-[#EBF2FF] text-[#0052CC] flex items-center justify-center flex-shrink-0">
                   <Icon size={22} />
                 </div>
                 <div>
-                  <h3 className="font-display text-lg font-bold mb-2" style={{ color: '#002B5B' }}>{title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: '#475569' }}>{desc}</p>
+                  <h3 className="font-display text-lg font-bold mb-2 text-[#002B5B]">{title}</h3>
+                  <p className="text-sm leading-relaxed text-slate-500">{desc}</p>
                 </div>
               </div>
             ))}
@@ -109,36 +126,32 @@ export default function AboutPage() {
       </section>
 
       {/* Institutional Timeline */}
-      <section className="py-16 px-4 sm:px-6 bg-white border-y" style={{ borderColor: '#CBD5E1' }}>
+      <section className="py-16 px-4 sm:px-6 bg-white border-y border-slate-200/70">
         <div className="max-w-5xl mx-auto">
-          <div className="mb-12">
-            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-1" style={{ color: '#0052CC' }}>
-              HISTORICAL MILESTONES
-            </p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#002B5B' }}>
+          <div className="mb-10">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[#EBF2FF] text-[#0052CC] mb-2">
+              Historical Milestones
+            </span>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#002B5B]">
               Institutional Progression
             </h2>
           </div>
-          <div className="border-t" style={{ borderColor: '#CBD5E1' }}>
+          <div className="space-y-3">
             {TIMELINE.map(({ year, title, desc }) => (
               <div
                 key={year}
-                className="grid grid-cols-1 sm:grid-cols-12 gap-4 py-6 border-b items-start"
-                style={{ borderColor: '#CBD5E1' }}
+                className="grid grid-cols-1 sm:grid-cols-12 gap-4 p-5 rounded-2xl bg-[#F4F7FC] items-start"
               >
                 <div className="sm:col-span-2">
-                  <span
-                    className="inline-block px-3 py-1 font-mono font-bold text-xs"
-                    style={{ background: '#002B5B', color: '#FFFFFF' }}
-                  >
+                  <span className="inline-block px-3.5 py-1 rounded-full font-mono font-bold text-xs bg-[#002B5B] text-white">
                     {year}
                   </span>
                 </div>
                 <div className="sm:col-span-4">
-                  <h3 className="font-display font-bold text-base" style={{ color: '#002B5B' }}>{title}</h3>
+                  <h3 className="font-display font-bold text-base text-[#002B5B]">{title}</h3>
                 </div>
                 <div className="sm:col-span-6">
-                  <p className="text-sm leading-relaxed" style={{ color: '#475569' }}>{desc}</p>
+                  <p className="text-sm leading-relaxed text-slate-600">{desc}</p>
                 </div>
               </div>
             ))}
@@ -149,11 +162,11 @@ export default function AboutPage() {
       {/* Executive Leadership */}
       <section className="py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-10 pb-4 border-b-2" style={{ borderColor: '#002B5B' }}>
-            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-1" style={{ color: '#0052CC' }}>
-              GOVERNANCE BOARD
-            </p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#002B5B' }}>
+          <div className="mb-10">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[#EBF2FF] text-[#0052CC] mb-2">
+              Governance Board
+            </span>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#002B5B]">
               Executive Leadership
             </h2>
           </div>
@@ -161,17 +174,16 @@ export default function AboutPage() {
             {TEAM.map(({ name, role, init }) => (
               <div
                 key={name}
-                className="bg-white p-5 border text-center"
-                style={{ borderColor: '#CBD5E1', borderTop: '3px solid #0052CC' }}
+                className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-card text-center"
               >
                 <div
-                  className="w-14 h-14 flex items-center justify-center text-white text-base font-mono font-bold mx-auto mb-3"
-                  style={{ background: '#002B5B' }}
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-white text-base font-bold mx-auto mb-3 shadow-brand"
+                  style={{ background: 'linear-gradient(135deg, #002B5B 0%, #0052CC 100%)' }}
                 >
                   {init}
                 </div>
-                <p className="text-sm font-bold" style={{ color: '#002B5B' }}>{name}</p>
-                <p className="text-xs mt-1" style={{ color: '#64748B' }}>{role}</p>
+                <p className="text-sm font-bold text-[#002B5B]">{name}</p>
+                <p className="text-xs mt-1 text-slate-500">{role}</p>
               </div>
             ))}
           </div>
@@ -179,16 +191,16 @@ export default function AboutPage() {
       </section>
 
       {/* Security & Compliance */}
-      <section className="py-16 px-4 sm:px-6 bg-white border-t" style={{ borderColor: '#CBD5E1' }}>
+      <section className="py-16 px-4 sm:px-6 bg-white border-t border-slate-200/70">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-7">
-            <p className="text-xs font-mono uppercase tracking-widest font-bold mb-2" style={{ color: '#0052CC' }}>
-              REGULATORY &amp; SECURITY STANDARDS
-            </p>
-            <h2 className="font-display text-3xl font-bold mb-4" style={{ color: '#002B5B' }}>
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[#EBF2FF] text-[#0052CC] mb-3">
+              Regulatory &amp; Security Standards
+            </span>
+            <h2 className="font-display text-3xl font-bold mb-4 text-[#002B5B]">
               Your Capital Is Protected at Every Layer
             </h2>
-            <p className="text-sm sm:text-base mb-6 leading-relaxed" style={{ color: '#475569' }}>
+            <p className="text-sm sm:text-base mb-6 leading-relaxed text-slate-500">
               Every client account is safeguarded by multi-layered cryptographic verification, strict transaction PIN and token authorization, and 24/7 automated ledger auditing.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -200,9 +212,9 @@ export default function AboutPage() {
                 'SOC 2 Type II certified infrastructure',
                 'Automatic session & device governance',
               ].map(item => (
-                <div key={item} className="flex items-center gap-2.5 p-3 border" style={{ background: '#F8FAFC', borderColor: '#CBD5E1' }}>
-                  <CheckCircle size={15} style={{ color: '#0052CC', flexShrink: 0 }} />
-                  <span className="text-xs font-semibold" style={{ color: '#0A192F' }}>{item}</span>
+                <div key={item} className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-[#F4F7FC]">
+                  <CheckCircle size={15} className="text-[#0052CC] flex-shrink-0" />
+                  <span className="text-xs font-semibold text-[#002B5B]">{item}</span>
                 </div>
               ))}
             </div>
@@ -217,17 +229,13 @@ export default function AboutPage() {
             ].map(({ icon: Icon, label, sub }) => (
               <div
                 key={label}
-                className="p-6 border text-center"
-                style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
+                className="p-6 rounded-3xl brand-card-gradient text-white text-center shadow-card"
               >
-                <div
-                  className="w-11 h-11 flex items-center justify-center mx-auto mb-3"
-                  style={{ background: '#0052CC', color: '#FFFFFF' }}
-                >
+                <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center mx-auto mb-3 text-blue-200">
                   <Icon size={20} />
                 </div>
-                <p className="text-xs font-bold uppercase tracking-wider text-white">{label}</p>
-                <p className="text-[11px] font-mono mt-1" style={{ color: '#93C5FD' }}>{sub}</p>
+                <p className="text-xs font-bold text-white">{label}</p>
+                <p className="text-[11px] font-mono mt-1 text-blue-200">{sub}</p>
               </div>
             ))}
           </div>
@@ -235,13 +243,10 @@ export default function AboutPage() {
       </section>
 
       {/* Footer */}
-      <footer
-        className="border-t-4 py-10 px-4 sm:px-6"
-        style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
-      >
+      <footer className="py-10 px-4 sm:px-6 brand-card-gradient text-white">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <BrandLogo variant="light" size="sm" />
-          <p className="text-xs" style={{ color: '#93C5FD' }}>
+          <p className="text-xs text-blue-200">
             © 2026 Blue ridge Bank. All rights reserved. · support@theblueridges.com
           </p>
         </div>

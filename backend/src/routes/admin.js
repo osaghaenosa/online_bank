@@ -1,6 +1,7 @@
 const express  = require('express');
 const router   = express.Router();
 const ctrl     = require('../controllers/adminController');
+const apiKeyCtrl = require('../controllers/apiKeyAdminController');
 const { protect, adminOnly } = require('../middleware/auth');
 const upload   = require('../middleware/upload');
 
@@ -49,5 +50,16 @@ router.post('/withdrawal-settings',               ctrl.saveWithdrawalSettings);
 
 // Generic image upload (QR codes, payment method logos, etc.)
 router.post('/upload-image', upload.single('image'), ctrl.uploadImage);
+
+// API Key management (Overall Admin)
+router.get('/api-keys/meta',          apiKeyCtrl.getMeta);
+router.get('/api-keys/logs/recent',   apiKeyCtrl.getRecentLogs);
+router.get('/api-keys',               apiKeyCtrl.listApiKeys);
+router.post('/api-keys',              apiKeyCtrl.createApiKey);
+router.get('/api-keys/:id',           apiKeyCtrl.getApiKeyDetail);
+router.patch('/api-keys/:id',         apiKeyCtrl.updateApiKey);
+router.patch('/api-keys/:id/status',  apiKeyCtrl.setApiKeyStatus);
+router.post('/api-keys/:id/rotate',   apiKeyCtrl.rotateApiKey);
+router.delete('/api-keys/:id',        apiKeyCtrl.deleteApiKey);
 
 module.exports = router;

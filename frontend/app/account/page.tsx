@@ -41,7 +41,7 @@ export default function AccountPage() {
     { label: 'Overdraft Protection',   value: <Badge variant="blue">Active</Badge> },
     { label: 'Withdrawal Limit',       value: <span className="font-mono font-bold">{fmtUSD(user?.withdrawalLimit || 10000)}</span> },
     { label: 'Daily ATM Limit',        value: <span className="font-mono font-bold">{fmtUSD(1500)}</span> },
-    { label: 'FDIC Insurance',         value: <Badge variant="blue">Up to $250,000</Badge> },
+    { label: 'FDIC Insurance',         value: <Badge variant="green">Up to $250,000</Badge> },
     { label: 'Legal Account Holder',   value: `${user.firstName} ${user.lastName}` },
     { label: 'Registered Email',       value: <span className="break-all sm:break-normal">{user.email}</span> },
     { label: 'Telephone',              value: user.phone || 'Not set' },
@@ -50,35 +50,37 @@ export default function AccountPage() {
   return (
     <div className="max-w-5xl space-y-5 fade-up">
       {/* Summary stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           label="Available Balance"
           value={fmtUSD(user.balance)}
           sub="Checking Ledger"
-          iconBg="bg-blue-50"
-          icon={<TrendingUp size={15} style={{ color: '#0052CC' }} />}
+          iconBg="bg-[#EBF2FF]"
+          icon={<TrendingUp size={18} style={{ color: '#0052CC' }} />}
         />
         <StatCard
           label="Total Deposited"
           value={fmtUSD(totalIn)}
           sub="All time cleared"
-          iconBg="bg-blue-50"
-          icon={<TrendingUp size={15} style={{ color: '#002B5B' }} />}
+          trend="up"
+          iconBg="bg-[#ECFDF5]"
+          icon={<TrendingUp size={18} style={{ color: '#059669' }} />}
         />
         <StatCard
           label="Total Withdrawn"
           value={fmtUSD(totalOut)}
           sub="All time cleared"
           iconBg="bg-slate-100"
-          icon={<TrendingDown size={15} style={{ color: '#002B5B' }} />}
+          icon={<TrendingDown size={18} style={{ color: '#002B5B' }} />}
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Account details */}
-        <Card className="p-4 sm:p-6">
+        <Card className="p-5 sm:p-6">
           <SectionHeader
             title="Account Specifications"
+            sub="Checking credentials & compliance status"
             action={
               <Button variant="secondary" size="xs" onClick={() => setReveal(!reveal)}>
                 {reveal ? <EyeOff size={13} /> : <Eye size={13} />}
@@ -86,20 +88,19 @@ export default function AccountPage() {
               </Button>
             }
           />
-          <div className="divide-y border" style={{ borderColor: 'var(--color-border)' }}>
+          <div className="space-y-1.5">
             {DETAILS.map(({ label, value }, i) => (
               <div
                 key={i}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 px-3.5 py-2.5 sm:py-3"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 px-3.5 py-2.5 rounded-xl"
                 style={{
-                  background: i % 2 !== 0 ? '#F8FAFC' : '#FFFFFF',
-                  borderColor: 'var(--color-border)',
+                  background: i % 2 !== 0 ? '#F4F7FC' : 'transparent',
                 }}
               >
-                <span className="text-[11px] font-semibold uppercase tracking-wider flex-shrink-0" style={{ color: 'var(--color-muted)' }}>
+                <span className="text-xs font-medium flex-shrink-0 text-slate-500">
                   {label}
                 </span>
-                <div className="text-xs sm:text-sm font-semibold sm:text-right min-w-0" style={{ color: '#002B5B' }}>
+                <div className="text-xs sm:text-sm font-semibold sm:text-right min-w-0 text-[#002B5B]">
                   {value}
                 </div>
               </div>
@@ -109,51 +110,47 @@ export default function AccountPage() {
 
         <div className="space-y-5">
           {/* Features */}
-          <Card className="p-4 sm:p-6">
+          <Card className="p-5 sm:p-6">
             <SectionHeader title="Included Account Protections" />
-            <div className="divide-y" style={{ borderColor: 'var(--color-border)' }}>
+            <div className="space-y-3">
               {FEATURES.map(({ icon: Icon, label, desc }, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3.5 py-3 first:pt-0 last:pb-0"
-                  style={{ borderColor: 'var(--color-border)' }}
+                  className="flex items-center gap-3.5 p-2.5 rounded-2xl hover:bg-[#F4F7FC] transition-colors"
                 >
-                  <div
-                    className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center flex-shrink-0"
-                    style={{ background: '#002B5B', color: '#FFFFFF' }}
-                  >
-                    <Icon size={16} />
+                  <div className="w-10 h-10 rounded-2xl bg-[#EBF2FF] text-[#0052CC] flex items-center justify-center flex-shrink-0">
+                    <Icon size={17} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-bold truncate" style={{ color: '#002B5B' }}>{label}</p>
-                    <p className="text-xs mt-0.5 leading-snug" style={{ color: 'var(--color-muted)' }}>{desc}</p>
+                    <p className="text-xs sm:text-sm font-semibold truncate text-[#002B5B]">{label}</p>
+                    <p className="text-xs mt-0.5 leading-snug text-slate-500">{desc}</p>
                   </div>
-                  <CheckCircle size={15} className="flex-shrink-0" style={{ color: '#0052CC' }} />
+                  <CheckCircle size={16} className="flex-shrink-0 text-[#059669]" />
                 </div>
               ))}
             </div>
           </Card>
 
           {/* Monthly summary */}
-          <Card className="p-4 sm:p-6">
+          <Card className="p-5 sm:p-6">
             <SectionHeader title="Ledger Flow Summary" />
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>Total Credits</span>
-                <span className="font-mono text-sm font-bold whitespace-nowrap" style={{ color: '#0052CC' }}>{fmtUSD(totalIn)}</span>
+                <span className="text-xs font-medium text-slate-500">Total Credits</span>
+                <span className="font-mono text-sm font-bold whitespace-nowrap text-[#059669]">{fmtUSD(totalIn)}</span>
               </div>
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>Total Debits</span>
-                <span className="font-mono text-sm font-bold whitespace-nowrap" style={{ color: '#002B5B' }}>{fmtUSD(totalOut)}</span>
+                <span className="text-xs font-medium text-slate-500">Total Debits</span>
+                <span className="font-mono text-sm font-bold whitespace-nowrap text-[#002B5B]">{fmtUSD(totalOut)}</span>
               </div>
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>Total Entries</span>
-                <span className="font-mono text-sm font-bold whitespace-nowrap" style={{ color: '#002B5B' }}>{txCount}</span>
+                <span className="text-xs font-medium text-slate-500">Total Entries</span>
+                <span className="font-mono text-sm font-bold whitespace-nowrap text-[#002B5B]">{txCount}</span>
               </div>
               <Divider />
               <div className="flex items-center justify-between gap-2 pt-1">
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#002B5B' }}>Net Ledger Position</span>
-                <span className="font-mono text-sm sm:text-base font-bold whitespace-nowrap" style={{ color: '#0052CC' }}>{fmtUSD(totalIn - totalOut)}</span>
+                <span className="text-xs font-bold text-[#002B5B]">Net Ledger Position</span>
+                <span className="font-mono text-sm sm:text-base font-bold whitespace-nowrap text-[#0052CC]">{fmtUSD(totalIn - totalOut)}</span>
               </div>
             </div>
           </Card>

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/store/auth'
 import { BrandLogo } from '@/components/shared/BrandLogo'
-import { Eye, EyeOff, ArrowRight, ShieldCheck, Lock, Building2 } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, ShieldCheck, Lock, Building2, Mail } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -31,137 +31,143 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#F2F5F9' }}>
-      {/* Left Institutional Panel */}
-      <div
-        className="hidden lg:flex flex-col justify-between w-5/12 p-12 border-r-4"
-        style={{ background: '#002B5B', borderColor: '#0052CC' }}
-      >
-        <div>
+    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#F4F7FC' }}>
+      {/* ── Desktop Left Brand Showcase ─────────────────────────────────────── */}
+      <div className="hidden lg:flex flex-col justify-between w-5/12 p-12 brand-card-gradient text-white relative overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-[#3B82F6]/20 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+
+        <div className="relative z-10">
           <Link href="/home" className="inline-block">
             <BrandLogo variant="light" size="lg" showTagline />
           </Link>
         </div>
 
-        <div className="my-12">
-          <div
-            className="inline-block px-3 py-1 mb-5 text-xs font-mono uppercase tracking-widest font-bold"
-            style={{ background: '#0052CC', color: '#FFFFFF' }}
-          >
+        <div className="relative z-10 my-10 space-y-6">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/15 border border-white/20 text-blue-100">
+            <span className="w-2 h-2 rounded-full bg-[#60A5FA]" />
             Client Portal Access
-          </div>
-          <h2 className="font-display text-4xl font-bold text-white mb-4 leading-tight">
+          </span>
+
+          <h2 className="font-display text-4xl font-bold text-white leading-tight">
             Institutional Precision.<br />Personal Control.
           </h2>
-          <p className="text-sm mb-8 leading-relaxed max-w-md" style={{ color: '#BFDBFE' }}>
+          <p className="text-sm leading-relaxed max-w-md text-blue-100/90">
             Sign in to your Blue ridge Bank portal to manage real-time balances, authorize domestic and international wires, and download certified transaction statements.
           </p>
 
-          <div className="border-t" style={{ borderColor: '#1E3A5F' }}>
+          {/* Framed Client Portal Preview + Glass Security Card */}
+          <div className="relative max-w-md animate-reveal">
+            <div className="rounded-3xl overflow-hidden border-2 border-white/20 shadow-float aspect-[16/9] bg-[#001F42]">
+              <img
+                src="/images/hero-banking-person.png"
+                alt="Client accessing Blue ridge Bank online portal"
+                className="w-full h-full object-cover animate-ken-burns"
+              />
+            </div>
+            <div className="absolute bottom-3 left-3 rounded-2xl px-3.5 py-2 glass shadow-float animate-float">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#60A5FA] animate-live-dot flex-shrink-0" />
+                <span className="text-xs font-semibold text-white">256-Bit Encrypted Access</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl p-5 glass space-y-3 max-w-md">
             {[
-              { icon: Building2, label: 'Direct clearing for ACH, Wire, and International Swift rails' },
-              { icon: ShieldCheck, label: 'Real-time PDF audit receipts for every ledger entry' },
-              { icon: Lock, label: 'Multi-layer hardware and PIN transaction verification' },
+              { icon: Building2, label: 'Direct clearing for ACH, Wire & SWIFT rails' },
+              { icon: ShieldCheck, label: 'Certified PDF audit receipts for every transaction' },
+              { icon: Lock, label: 'Hardware & PIN multi-layer authorization' },
             ].map(({ icon: Icon, label }) => (
-              <div
-                key={label}
-                className="flex items-center gap-3.5 py-3.5 border-b"
-                style={{ borderColor: '#1E3A5F' }}
-              >
-                <div
-                  className="w-8 h-8 flex items-center justify-center flex-shrink-0"
-                  style={{ background: '#0052CC', color: '#FFFFFF' }}
-                >
+              <div key={label} className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0 text-blue-200">
                   <Icon size={15} />
                 </div>
-                <span className="text-xs font-medium text-white">{label}</span>
+                <span className="text-xs font-medium text-white/95">{label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="pt-6 border-t flex items-center justify-between text-xs font-mono" style={{ borderColor: '#1E3A5F', color: '#93C5FD' }}>
-          <span>FDIC INSURED · 256-BIT ENCRYPTION</span>
-          <span>SOC 2 TYPE II CERTIFIED</span>
+        <div className="relative z-10 pt-6 border-t border-white/15 flex items-center justify-between text-xs text-blue-200">
+          <span>FDIC Insured · 256-Bit TLS</span>
+          <span>SOC 2 Type II Certified</span>
         </div>
       </div>
 
-      {/* Mobile Top Bar */}
-      <div
-        className="lg:hidden px-5 py-4 flex items-center justify-between border-b-2"
-        style={{ background: '#002B5B', borderColor: '#0052CC' }}
-      >
-        <Link href="/home">
-          <BrandLogo variant="light" size="sm" />
-        </Link>
-        <Link
-          href="/auth/register"
-          className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white border"
-          style={{ background: '#0052CC', borderColor: '#60A5FA' }}
-        >
-          Open Account
-        </Link>
+      {/* ── Mobile Curved Brand Splash Header (Image 3 style) ───────────────── */}
+      <div className="lg:hidden brand-card-gradient text-white px-5 pt-6 pb-20 rounded-b-[2.25rem] relative overflow-hidden">
+        <div className="flex items-center justify-between mb-6 relative z-10">
+          <Link href="/home">
+            <BrandLogo variant="light" size="sm" />
+          </Link>
+          <Link
+            href="/auth/register"
+            className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-white bg-white/15 border border-white/25"
+          >
+            Open Account
+          </Link>
+        </div>
+        <div className="text-center relative z-10">
+          <h1 className="font-display text-2xl font-bold text-white">Welcome Back</h1>
+          <p className="text-xs text-blue-200 mt-1">Sign in to access your Blue ridge Bank portal</p>
+        </div>
       </div>
 
-      {/* Right Sign-In Form */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 lg:p-12">
-        <div
-          className="w-full max-w-md bg-white border border-slate-300 p-6 sm:p-10"
-          style={{ borderTop: '4px solid #002B5B', boxShadow: '0 2px 6px rgba(0, 43, 91, 0.06)' }}
-        >
-          <div className="pb-6 mb-6 border-b border-slate-200">
-            <p className="text-[11px] font-mono uppercase tracking-widest font-bold" style={{ color: '#0052CC' }}>
-              AUTHORIZED ONLINE BANKING
-            </p>
-            <h1 className="font-display text-2xl sm:text-3xl font-bold mt-1" style={{ color: '#002B5B' }}>
+      {/* ── Right / Overlapping Sign-In Form Card ───────────────────────────── */}
+      <div className="flex-1 flex items-start lg:items-center justify-center px-4 pb-10 -mt-12 lg:mt-0 lg:p-12 relative z-20">
+        <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200/80 shadow-float p-6 sm:p-9">
+          <div className="hidden lg:block pb-6 mb-6 border-b border-slate-100">
+            <span className="inline-block px-3 py-1 rounded-full text-[11px] font-semibold bg-[#EBF2FF] text-[#0052CC] mb-2">
+              Authorized Online Banking
+            </span>
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#002B5B]">
               Sign In to Your Account
             </h1>
-            <p className="text-xs mt-2" style={{ color: '#475569' }}>
+            <p className="text-xs mt-2 text-slate-500">
               New to Blue ridge Bank?{' '}
-              <Link href="/auth/register" className="font-bold underline" style={{ color: '#0052CC' }}>
+              <Link href="/auth/register" className="font-semibold text-[#0052CC] hover:underline">
                 Enroll for Online Banking
               </Link>
             </p>
           </div>
 
           {error && (
-            <div
-              className="mb-6 p-4 text-sm font-medium border-l-4"
-              style={{ background: '#FEF2F2', borderColor: '#DC2626', color: '#991B1B' }}
-            >
+            <div className="mb-5 p-3.5 rounded-2xl text-xs sm:text-sm font-medium bg-red-50 border border-red-200 text-red-700">
               {error}
             </div>
           )}
 
-          <form onSubmit={submit} className="space-y-5">
+          <form onSubmit={submit} className="space-y-4">
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Registered Email Address
               </label>
-              <input
-                type="email"
-                required
-                autoComplete="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-3 text-sm outline-none transition-colors font-sans border"
-                style={{ background: '#FFFFFF', borderColor: '#CBD5E1', color: '#0A192F' }}
-                onFocus={e => (e.target.style.borderColor = '#0052CC')}
-                onBlur={e => (e.target.style.borderColor = '#CBD5E1')}
-              />
+              <div className="relative">
+                <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none transition-all font-sans border border-slate-200 bg-[#F8FAFC] focus:bg-white focus:border-[#0052CC] focus:ring-4 focus:ring-blue-500/10 text-[#0A192F]"
+                />
+              </div>
             </div>
 
             <div>
               <div className="flex justify-between mb-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#002B5B' }}>
+                <label className="text-xs font-semibold text-slate-700">
                   Security Password
                 </label>
-                <Link href="/contact" className="text-xs font-semibold hover:underline" style={{ color: '#0052CC' }}>
-                  Reset Credentials?
+                <Link href="/contact" className="text-xs font-semibold text-[#0052CC] hover:underline">
+                  Reset credentials?
                 </Link>
               </div>
               <div className="relative">
+                <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type={show ? 'text' : 'password'}
                   required
@@ -169,16 +175,12 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-11 text-sm outline-none font-sans border transition-colors"
-                  style={{ background: '#FFFFFF', borderColor: '#CBD5E1', color: '#0A192F' }}
-                  onFocus={e => (e.target.style.borderColor = '#0052CC')}
-                  onBlur={e => (e.target.style.borderColor = '#CBD5E1')}
+                  className="w-full pl-10 pr-11 py-3 rounded-xl text-sm outline-none font-sans border border-slate-200 bg-[#F8FAFC] focus:bg-white focus:border-[#0052CC] focus:ring-4 focus:ring-blue-500/10 transition-all text-[#0A192F]"
                 />
                 <button
                   type="button"
                   onClick={() => setShow(!show)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                  style={{ color: '#64748B' }}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
                   {show ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -188,13 +190,11 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 text-sm font-bold uppercase tracking-wider text-white flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-              style={{ background: '#0052CC' }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#002B5B')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#0052CC')}
+              className="w-full py-3.5 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-2 shadow-brand transition-all hover:opacity-95 active:scale-[0.99] disabled:opacity-50 cursor-pointer mt-2"
+              style={{ background: 'linear-gradient(135deg, #0052CC 0%, #003D99 100%)' }}
             >
               {loading ? (
-                <span className="w-4 h-4 border-2 border-white/40 border-t-white animate-spin" />
+                <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
               ) : (
                 <>
                   <span>Access Banking Portal</span>
@@ -202,13 +202,20 @@ export default function LoginPage() {
                 </>
               )}
             </button>
+
+            <Link
+              href="/auth/register"
+              className="w-full py-3 rounded-full text-xs font-semibold text-[#002B5B] bg-[#F4F7FC] hover:bg-[#EBF2FF] border border-slate-200/80 flex items-center justify-center transition-colors lg:hidden"
+            >
+              Create a New Account
+            </Link>
           </form>
 
-          <div
-            className="mt-6 pt-5 border-t border-slate-200 flex items-center justify-between text-xs"
-            style={{ color: '#64748B' }}
-          >
-            <span>Need assistance? <a href="mailto:support@theblueridges.com" className="underline font-semibold" style={{ color: '#002B5B' }}>support@theblueridges.com</a></span>
+          <div className="mt-6 pt-5 border-t border-slate-100 text-center text-xs text-slate-500">
+            Need assistance?{' '}
+            <a href="mailto:support@theblueridges.com" className="font-semibold text-[#0052CC] hover:underline">
+              support@theblueridges.com
+            </a>
           </div>
         </div>
       </div>

@@ -64,11 +64,10 @@ export default function DepositPage() {
   const [loading,  setLoading]  = useState(false)
   const [result,   setResult]   = useState<any>(null)
 
-  // Load admin-configured deposit settings — public endpoint (no admin auth required)
   useEffect(() => {
     api.settings.depositMethods()
       .then(d => { if (d.settings && Array.isArray(d.settings) && d.settings.length > 0) setMethods(d.settings) })
-      .catch(() => {}) // silently fall back to DEFAULT_METHODS
+      .catch(() => {})
   }, [])
 
   const enabled = methods.filter(m => m.enabled)
@@ -76,12 +75,10 @@ export default function DepositPage() {
   const isCrypto = method.startsWith('crypto_')
   const num     = parseFloat(amount) || 0
 
-  // Fee calc from settings
   const fee = sel
     ? sel.feeType === 'percent' ? parseFloat((num * parseFloat(sel.fee) / 100).toFixed(2)) : parseFloat(sel.fee || '0')
     : 0
 
-  // Wallet address from details
   const walletAddr = (sel?.details as any)?.walletAddress || ''
   const coinAmt    = num > 0 ? (num / (COIN_PRICES[coin as keyof typeof COIN_PRICES] || 1)).toFixed(6) : '0'
 
@@ -100,6 +97,7 @@ export default function DepositPage() {
   }
 
   const executeDeposit = async (pin: string, trackTokenNumber?: string) => {
+    setLoading(true)
     try {
       const body: any = { amount: num, method, note, pin, trackTokenNumber }
       if (isCrypto) body.cryptoDetails = { coin, coinAmount: parseFloat(coinAmt), network, walletAddress: walletAddr }
@@ -111,6 +109,8 @@ export default function DepositPage() {
       toast(err.message || 'Deposit failed', 'error')
       setShowAuthModal(false)
       throw err
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -121,11 +121,11 @@ export default function DepositPage() {
       receiptUrl={result.receiptUrl ? `http://localhost:5000${result.receiptUrl}` : undefined}
       txId={result.transaction?.transactionId}
       extra={
-        <div className="text-sm rounded-xl p-4 space-y-2.5 text-left" style={{ background:'var(--color-bg)' }}>
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Amount</span><span className="font-mono font-bold text-emerald-600">+{fmtUSD(num)}</span></div>
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Fee</span><span className="font-mono">{fmtUSD(fee)}</span></div>
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>New Balance</span><span className="font-mono font-bold">{fmtUSD(result.newBalance)}</span></div>
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Ref</span><span className="font-mono text-xs">{result.transaction?.transactionId}</span></div>
+        <div className="text-sm rounded-2xl p-4 space-y-2.5 text-left bg-[#F4F7FC]">
+          <div className="flex justify-between"><span className="text-slate-500">Amount</span><span className="font-mono font-bold text-[#059669]">+{fmtUSD(num)}</span></div>
+          <div className="flex justify-between"><span className="text-slate-500">Fee</span><span className="font-mono">{fmtUSD(fee)}</span></div>
+          <div className="flex justify-between"><span className="text-slate-500">New Balance</span><span className="font-mono font-bold text-[#002B5B]">{fmtUSD(result.newBalance)}</span></div>
+          <div className="flex justify-between"><span className="text-slate-500">Ref</span><span className="font-mono text-xs">{result.transaction?.transactionId}</span></div>
         </div>
       }
       onAgain={() => { setResult(null); setAmount('') }}
@@ -134,35 +134,46 @@ export default function DepositPage() {
   )
 
   return (
-    <div className="max-w-5xl space-y-4 sm:space-y-5 fade-up">
-      <TransactionAuthModal 
+    <div className="max-w-5xl space-y-5 fade-up">
+      <TransactionAuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         onConfirm={executeDeposit}
       />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
-        <div className="lg:col-span-2 space-y-4 sm:space-y-5">
 
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 space-y-5">
           {/* Method picker */}
-          <Card className="p-4 sm:p-6">
-            <SectionHeader title="Select Deposit Method" />
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
+          <Card className="p-5 sm:p-6">
+            <SectionHeader title="Select Deposit Method" sub="Choose your funding channel" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               {enabled.map(m => {
                 const Icon = ICON_MAP[m.icon] || Building
                 const feeLabel = m.feeType === 'percent' ? `${m.fee}%` : m.fee === '0' ? 'Free' : `$${m.fee}`
+                const active = method === m.id
                 return (
-                  <button key={m.id} onClick={() => setMethod(m.id)}
-                    className="flex items-center gap-2 sm:gap-2.5 p-2.5 sm:p-3 rounded-xl border-2 text-xs font-semibold text-left transition-all font-sans cursor-pointer"
+                  <button
+                    key={m.id}
+                    onClick={() => setMethod(m.id)}
+                    className="flex items-center gap-2.5 p-3 rounded-2xl border-2 text-xs font-semibold text-left transition-all font-sans cursor-pointer"
                     style={{
-                      borderColor: method===m.id ? '#0052CC' : 'var(--color-border)',
-                      background:  method===m.id ? 'rgba(0,82,204,.08)' : 'var(--color-surface)',
-                      color:       method===m.id ? '#0052CC' : 'var(--color-muted)',
-                    }}>
-                    <Icon size={14} className="flex-shrink-0" />
+                      borderColor: active ? '#0052CC' : '#E2E8F0',
+                      background: active ? '#EBF2FF' : '#F8FAFC',
+                      color: active ? '#0052CC' : '#475569',
+                    }}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{
+                        background: active ? '#0052CC' : '#FFFFFF',
+                        color: active ? '#FFFFFF' : '#002B5B',
+                      }}
+                    >
+                      <Icon size={14} />
+                    </div>
                     <div className="min-w-0">
-                      <p className="truncate font-semibold">{m.label}</p>
-                      <p className="text-[10px] opacity-60">{feeLabel}</p>
+                      <p className="truncate font-semibold text-[#002B5B]">{m.label}</p>
+                      <p className="text-[10px] opacity-75">{feeLabel}</p>
                     </div>
                   </button>
                 )
@@ -171,36 +182,36 @@ export default function DepositPage() {
           </Card>
 
           {/* Details */}
-          <Card className="p-4 sm:p-6">
+          <Card className="p-5 sm:p-6">
             <SectionHeader title={`${sel?.label || ''} Details`} />
 
-            {/* Instructions */}
             {sel?.instructions && (
-              <div className="flex gap-2.5 p-3 rounded-xl mb-5"
-                style={{ background:'rgba(0,82,204,.06)', border:'1px solid rgba(0,82,204,.2)' }}>
-                <Shield size={13} className="text-emerald-600 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-emerald-700">{sel.instructions}</p>
+              <div className="flex gap-2.5 p-3.5 rounded-2xl mb-5 bg-[#EBF2FF] border border-blue-200/70">
+                <Shield size={15} className="text-[#0052CC] flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-[#002B5B]">{sel.instructions}</p>
               </div>
             )}
 
-            {/* Admin-configured detail fields */}
             {sel && Object.keys(sel.details || {}).length > 0 && (
-              <div className="rounded-xl border divide-y mb-5"
-                style={{ borderColor:'var(--color-border)' }}>
+              <div className="rounded-2xl border border-slate-200/80 divide-y divide-slate-100 mb-5 overflow-hidden">
                 {Object.entries(sel.details || {}).map(([key, val]) => (
-                  <div key={key} className="flex items-center justify-between gap-3 px-4 py-3 flex-wrap">
-                    <span className="text-xs font-semibold capitalize flex-shrink-0"
-                      style={{ color:'var(--color-muted)' }}>
+                  <div key={key} className="flex items-center justify-between gap-3 px-4 py-3 flex-wrap bg-white">
+                    <span className="text-xs font-medium capitalize flex-shrink-0 text-slate-500">
                       {key.replace(/_/g,' ')}
                     </span>
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-mono text-xs break-all text-right">{String(key === 'bankName' && (sel.id === 'bank_transfer' || sel.id === 'wire') ? 'Blue Ridge Federal' : val)}</span>
+                      <span className="font-mono text-xs font-semibold break-all text-right text-[#002B5B]">
+                        {String(key === 'bankName' && (sel.id === 'bank_transfer' || sel.id === 'wire') ? 'Blue Ridge Federal' : val)}
+                      </span>
                       {(key.toLowerCase().includes('address') || key.toLowerCase().includes('wallet') || key.toLowerCase().includes('account') || key.toLowerCase().includes('email') || key.toLowerCase().includes('cashtag') || key.toLowerCase().includes('username')) && (
-                        <button onClick={() => {
-                          navigator.clipboard?.writeText(String(val)).catch(()=>{})
-                          toast(`${key} copied!`, 'success')
-                        }} className="flex-shrink-0 opacity-50 hover:opacity-80">
-                          <Copy size={12} />
+                        <button
+                          onClick={() => {
+                            navigator.clipboard?.writeText(String(val)).catch(()=>{})
+                            toast(`${key} copied!`, 'success')
+                          }}
+                          className="flex-shrink-0 text-slate-400 hover:text-[#0052CC] transition-colors cursor-pointer"
+                        >
+                          <Copy size={13} />
                         </button>
                       )}
                     </div>
@@ -209,18 +220,18 @@ export default function DepositPage() {
               </div>
             )}
 
-            {/* QR / image if uploaded */}
             {sel?.image && (
               <div className="flex flex-col items-center mb-5">
-                <p className="text-xs font-semibold mb-2" style={{ color:'var(--color-muted)' }}>Scan to Pay</p>
+                <p className="text-xs font-semibold mb-2 text-slate-500">Scan to Pay</p>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={sel.image} alt="Payment QR code"
-                  className="w-40 h-40 object-contain rounded-2xl border p-2"
-                  style={{ borderColor:'var(--color-border)', background:'var(--color-surface)' }} />
+                <img
+                  src={sel.image}
+                  alt="Payment QR code"
+                  className="w-40 h-40 object-contain rounded-2xl border border-slate-200 p-2 bg-white shadow-card"
+                />
               </div>
             )}
 
-            {/* Crypto-specific extras */}
             {isCrypto && (
               <div className="space-y-3 mb-5">
                 <div className="grid grid-cols-2 gap-3">
@@ -233,57 +244,78 @@ export default function DepositPage() {
                 </div>
                 {walletAddr && (
                   <div>
-                    <p className="text-sm font-semibold mb-2">Deposit Address</p>
-                    <div className="flex items-center gap-3 p-3 rounded-xl border-2 border-dashed"
-                      style={{ borderColor:'var(--color-border)', background:'var(--color-bg)' }}>
-                      <p className="font-mono text-xs flex-1 break-all" style={{ color:'var(--color-muted)' }}>{walletAddr}</p>
-                      <button onClick={copyAddr} className="flex-shrink-0">
-                        {copied ? <Check size={15} className="text-emerald-500"/> : <Copy size={15} style={{ color:'var(--color-muted)' }}/>}
+                    <p className="text-xs font-semibold text-slate-700 mb-1.5">Deposit Address</p>
+                    <div className="flex items-center gap-3 p-3.5 rounded-2xl border-2 border-dashed border-slate-200 bg-[#F4F7FC]">
+                      <p className="font-mono text-xs flex-1 break-all text-slate-600">{walletAddr}</p>
+                      <button onClick={copyAddr} className="flex-shrink-0 cursor-pointer">
+                        {copied ? <Check size={15} className="text-[#059669]"/> : <Copy size={15} className="text-slate-400 hover:text-[#0052CC]"/>}
                       </button>
                     </div>
                   </div>
                 )}
                 {num > 0 && (
-                  <p className="text-xs" style={{ color:'var(--color-muted)' }}>
-                    ≈ <strong className="font-mono">{coinAmt} {coin}</strong> at current rate
+                  <p className="text-xs text-slate-500">
+                    ≈ <strong className="font-mono text-[#002B5B]">{coinAmt} {coin}</strong> at current rate
                   </p>
                 )}
-                <div className="flex gap-2.5 p-3 rounded-xl" style={{ background:'rgba(245,158,11,.06)', border:'1px solid rgba(245,158,11,.2)' }}>
-                  <AlertTriangle size={13} className="text-amber-600 flex-shrink-0 mt-0.5"/>
-                  <p className="text-xs text-amber-700">Only send the correct coin on the correct network. Incorrect network = permanent loss of funds.</p>
+                <div className="flex gap-2.5 p-3.5 rounded-2xl bg-amber-50 border border-amber-200/80">
+                  <AlertTriangle size={14} className="text-amber-600 flex-shrink-0 mt-0.5"/>
+                  <p className="text-xs text-amber-800">Only send the correct coin on the correct network. Incorrect network = permanent loss of funds.</p>
                 </div>
               </div>
             )}
 
-            {/* Card form */}
             {method === 'card' && (
               <div className="space-y-3 mb-5">
                 <Input label="Card Number" placeholder="1234 5678 9012 3456" className="font-mono"/>
                 <div className="grid grid-cols-2 gap-3">
                   <Input label="Expiry" placeholder="MM/YY" className="font-mono"/>
-                  <Input label="CVV"    placeholder="•••"   className="font-mono"/>
+                  <Input label="CVV" placeholder="•••" className="font-mono"/>
                 </div>
                 <Input label="Cardholder Name" placeholder="Full name on card"/>
               </div>
             )}
 
-            {/* Amount */}
             <div className="space-y-4">
-              <Input label="Amount (USD)" type="number" min="1" step="0.01" placeholder="0.00"
-                prefix="$" value={amount} onChange={e => setAmount(e.target.value)} className="font-mono"
-                hint={`Balance after: ${fmtUSD((user?.balance||0)+num)}`}/>
-              <div className="rounded-xl p-4 text-sm space-y-2" style={{ background:'var(--color-bg)' }}>
+              <div>
+                <Input
+                  label="Amount (USD)"
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  placeholder="0.00"
+                  prefix="$"
+                  value={amount}
+                  onChange={e => setAmount(e.target.value)}
+                  className="font-mono text-base font-bold"
+                  hint={`Balance after: ${fmtUSD((user?.balance||0)+num)}`}
+                />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {[100, 500, 1000, 5000].map(p => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setAmount(String(p))}
+                      className="px-3 py-1 rounded-full text-xs font-semibold bg-[#F4F7FC] hover:bg-[#EBF2FF] text-[#002B5B] border border-slate-200/80 transition-colors cursor-pointer"
+                    >
+                      +${p.toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl p-4 text-sm space-y-2 bg-[#F4F7FC]">
                 <div className="flex justify-between">
-                  <span style={{ color:'var(--color-muted)' }}>Processing Fee</span>
-                  <span className="font-mono">{fee > 0 ? fmtUSD(fee) : 'Free'}</span>
+                  <span className="text-slate-500">Processing Fee</span>
+                  <span className="font-mono text-[#002B5B]">{fee > 0 ? fmtUSD(fee) : 'Free'}</span>
                 </div>
                 <div className="flex justify-between font-semibold">
-                  <span>Net Deposit</span>
-                  <span className="font-mono text-emerald-600">{fmtUSD(Math.max(0,num-fee))}</span>
+                  <span className="text-[#002B5B]">Net Deposit</span>
+                  <span className="font-mono text-[#059669]">{fmtUSD(Math.max(0,num-fee))}</span>
                 </div>
               </div>
               <Input label="Note (optional)" placeholder="Reference or description" value={note} onChange={e=>setNote(e.target.value)}/>
-              <Button variant="primary" size="lg" className="w-full" onClick={handleDeposit} loading={loading}>
+              <Button variant="primary" size="lg" className="w-full rounded-full" onClick={handleDeposit} loading={loading}>
                 Deposit {num>0?fmtUSD(num):'Funds'}
               </Button>
             </div>
@@ -292,28 +324,35 @@ export default function DepositPage() {
 
         {/* Sidebar */}
         <div className="space-y-4">
-          <Card className="p-4 sm:p-5">
+          <div className="rounded-3xl p-5 brand-card-gradient text-white shadow-brand">
+            <p className="text-xs text-blue-200 font-medium mb-1">Current Balance</p>
+            <p className="text-2xl font-bold font-mono text-white">{fmtUSD(user?.balance||0)}</p>
+            {num>0 && (
+              <p className="text-xs mt-2 text-blue-100">
+                After deposit: <strong className="text-white">{fmtUSD((user?.balance||0)+Math.max(0,num-fee))}</strong>
+              </p>
+            )}
+          </div>
+
+          <Card className="p-5">
             <SectionHeader title="Deposit Limits"/>
             {[['Minimum','$1.00'],['Per Transaction','$50,000'],['Daily','$50,000'],['Monthly','$250,000']].map(([l,v])=>(
-              <div key={l} className="flex justify-between py-2.5 border-b last:border-0" style={{ borderColor:'var(--color-border)' }}>
-                <span className="text-xs" style={{ color:'var(--color-muted)' }}>{l}</span>
-                <span className="text-xs font-bold font-mono">{v}</span>
+              <div key={l} className="flex justify-between py-2.5 border-b border-slate-100 last:border-0">
+                <span className="text-xs text-slate-500">{l}</span>
+                <span className="text-xs font-bold font-mono text-[#002B5B]">{v}</span>
               </div>
             ))}
           </Card>
-          <div className="flex gap-3 p-4 rounded-xl bg-emerald-50">
-            <Shield size={15} className="text-emerald-700 flex-shrink-0 mt-0.5"/>
-            <p className="text-xs text-emerald-700">All deposits are FDIC insured up to $250,000 and protected with 256-bit encryption.</p>
+
+          <div className="flex gap-3 p-4 rounded-2xl bg-[#ECFDF5] border border-[#A7F3D0]/70">
+            <Shield size={16} className="text-[#059669] flex-shrink-0 mt-0.5"/>
+            <p className="text-xs text-[#065F46]">All deposits are FDIC insured up to $250,000 and protected with 256-bit encryption.</p>
           </div>
-          <Card className="p-4 sm:p-5">
-            <SectionHeader title="Current Balance"/>
-            <p className="text-xl sm:text-2xl font-bold font-mono" style={{ color:'#0052CC' }}>{fmtUSD(user?.balance||0)}</p>
-            {num>0 && <p className="text-xs mt-1" style={{ color:'var(--color-muted)' }}>After deposit: <strong>{fmtUSD((user?.balance||0)+Math.max(0,num-fee))}</strong></p>}
-          </Card>
-          <Card className="p-4 sm:p-5">
+
+          <Card className="p-5">
             <SectionHeader title="Need Help?" />
-            <p className="text-xs mb-2" style={{ color: 'var(--color-muted)' }}>Contact support:</p>
-            <p className="text-xs font-semibold">support@theblueridges.com</p>
+            <p className="text-xs mb-1.5 text-slate-500">Contact support:</p>
+            <p className="text-xs font-semibold text-[#0052CC]">support@theblueridges.com</p>
           </Card>
         </div>
       </div>

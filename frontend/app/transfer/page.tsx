@@ -1,9 +1,9 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/store/auth'
 import { api, fmtUSD } from '@/lib/api'
 import { Card, Button, Input, SectionHeader, SuccessScreen, Divider } from '@/components/ui'
-import { Send, ArrowRight, Info, ShieldAlert, CheckCircle, Clock } from 'lucide-react'
+import { ArrowRight, Info, ShieldAlert, CheckCircle, Clock } from 'lucide-react'
 import { TransactionAuthModal } from '@/components/shared/TransactionAuthModal'
 
 interface Restrictions {
@@ -24,6 +24,15 @@ export default function TransferPage() {
   const [loading,    setLoading]    = useState(false)
   const [result,     setResult]     = useState<any>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const sp = new URLSearchParams(window.location.search)
+    const to = sp.get('to')
+    const amt = sp.get('amount')
+    if (to) setRecipEmail(to)
+    if (amt) setAmount(amt)
+  }, [])
 
   const num = parseFloat(amount) || 0
 
@@ -66,7 +75,6 @@ export default function TransferPage() {
       if (err.message?.includes('pending review') || err.message?.includes('blocked')) {
         toast(err.message, 'error')
 
-        // Fetch restrictions ONLY when needed
         try {
           const data = await api.restrictions.get()
           setRestrictions(data)
@@ -83,7 +91,6 @@ export default function TransferPage() {
     }
   }
 
-  // SUCCESS SCREEN
   if (result) return (
     <SuccessScreen
       title="Transfer Complete!"
@@ -91,13 +98,13 @@ export default function TransferPage() {
       receiptUrl={result.receiptUrl ? `http://localhost:5000${result.receiptUrl}` : undefined}
       txId={result.transaction?.transactionId}
       extra={
-        <div className="text-sm rounded-xl p-4 space-y-2.5 text-left" style={{ background: 'var(--color-bg)' }}>
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>To</span><span className="font-semibold">{result.transaction?.recipientName || recipEmail}</span></div>
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Amount</span><span className="font-mono font-bold text-red-500">-{fmtUSD(num)}</span></div>
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Recipient</span><span>{result.recipientFound ? '✅ Blue ridge Bank user' : '⚠ External transfer'}</span></div>
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>New Balance</span><span className="font-mono font-bold">{fmtUSD(result.newBalance)}</span></div>
-          {note && <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Note</span><span>{note}</span></div>}
-          <div className="flex justify-between"><span style={{ color:'var(--color-muted)' }}>Ref</span><span className="font-mono text-xs">{result.transaction?.transactionId}</span></div>
+        <div className="text-sm rounded-2xl p-4 space-y-2.5 text-left bg-[#F4F7FC]">
+          <div className="flex justify-between"><span className="text-slate-500">To</span><span className="font-semibold text-[#002B5B]">{result.transaction?.recipientName || recipEmail}</span></div>
+          <div className="flex justify-between"><span className="text-slate-500">Amount</span><span className="font-mono font-bold text-red-500">-{fmtUSD(num)}</span></div>
+          <div className="flex justify-between"><span className="text-slate-500">Recipient</span><span className="text-[#002B5B]">{result.recipientFound ? '✓ Blue ridge Bank user' : 'External transfer'}</span></div>
+          <div className="flex justify-between"><span className="text-slate-500">New Balance</span><span className="font-mono font-bold text-[#002B5B]">{fmtUSD(result.newBalance)}</span></div>
+          {note && <div className="flex justify-between"><span className="text-slate-500">Note</span><span className="text-[#002B5B]">{note}</span></div>}
+          <div className="flex justify-between"><span className="text-slate-500">Ref</span><span className="font-mono text-xs text-slate-600">{result.transaction?.transactionId}</span></div>
         </div>
       }
       onAgain={() => {
@@ -111,53 +118,55 @@ export default function TransferPage() {
     />
   )
 
-  // RESTRICTIONS VIEW (only shown after a blocked attempt)
   if (showRestrictions && restrictions && !restrictions.transfersEnabled) {
     const pending = restrictions.transferRequirements.filter(r => !r.fulfilled)
     const total   = restrictions.transferRequirements.length
 
     return (
       <div className="max-w-2xl mx-auto space-y-5 fade-up">
-        <div className="rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden"
-          style={{ background: '#002B5B', border: '2px solid rgba(239,68,68,.35)' }}>
-          <div className="absolute -right-10 -top-10 w-48 h-48 rounded-full opacity-10 pointer-events-none"
-            style={{ background: 'transparent' }} />
-          <div className="relative z-10">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{ background: 'rgba(239,68,68,.2)' }}>
-              <ShieldAlert size={28} style={{ color: '#EF4444' }} />
-            </div>
-            <h2 className="text-xl sm:text-2xl font-bold mb-2 text-red-300">Transfers Pending Review</h2>
-            <p className="text-sm leading-relaxed text-red-200 max-w-md mx-auto">
-              {restrictions.transfersBlockReason}
-            </p>
-            <div className="mt-3 text-xs text-red-300">
-              {total > 0 ? `${pending.length} of ${total} requirements pending` : 'Under review'}
-            </div>
+        <div className="rounded-3xl p-6 sm:p-8 text-center brand-card-gradient text-white shadow-float">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-white/15 text-red-300">
+            <ShieldAlert size={28} />
+          </div>
+          <h2 className="font-display text-xl sm:text-2xl font-bold mb-2 text-white">Transfers Pending Review</h2>
+          <p className="text-sm leading-relaxed text-blue-100 max-w-md mx-auto">
+            {restrictions.transfersBlockReason}
+          </p>
+          <div className="mt-4 inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-white/15 text-white">
+            {total > 0 ? `${pending.length} of ${total} requirements pending` : 'Under review'}
           </div>
         </div>
 
         {total > 0 && (
-          <Card className="p-4 sm:p-6">
+          <Card className="p-5 sm:p-6">
             <SectionHeader title="Requirements to Restore Transfers" />
             <div className="space-y-3">
               {restrictions.transferRequirements.map((req, i) => (
-                <div key={req._id || i} className="flex items-start gap-3 p-3 rounded-xl border"
+                <div
+                  key={req._id || i}
+                  className="flex items-start gap-3 p-3.5 rounded-2xl border"
                   style={{
-                    borderColor: req.fulfilled ? 'rgba(0,82,204,.25)' : 'var(--color-border)',
-                    background:  req.fulfilled ? 'rgba(0,82,204,.04)' : 'var(--color-bg)',
-                  }}>
+                    borderColor: req.fulfilled ? '#BFDBFE' : '#E2E8F0',
+                    background: req.fulfilled ? '#EBF2FF' : '#F4F7FC',
+                  }}
+                >
                   {req.fulfilled
-                    ? <CheckCircle size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
-                    : <Clock       size={16} className="text-amber-500  flex-shrink-0 mt-0.5" />
+                    ? <CheckCircle size={16} className="text-[#059669] flex-shrink-0 mt-0.5" />
+                    : <Clock       size={16} className="text-amber-500 flex-shrink-0 mt-0.5" />
                   }
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold">{req.label}</p>
+                    <p className="text-sm font-semibold text-[#002B5B]">{req.label}</p>
                     {req.notes && (
-                      <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--color-muted)' }}>{req.notes}</p>
+                      <p className="text-xs mt-0.5 leading-relaxed text-slate-500">{req.notes}</p>
                     )}
                   </div>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ${req.fulfilled ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                  <span
+                    className="text-xs px-2.5 py-0.5 rounded-full font-semibold flex-shrink-0"
+                    style={{
+                      background: req.fulfilled ? '#ECFDF5' : '#FFFBEB',
+                      color: req.fulfilled ? '#059669' : '#B45309',
+                    }}
+                  >
                     {req.fulfilled ? 'Done' : 'Pending'}
                   </span>
                 </div>
@@ -166,15 +175,14 @@ export default function TransferPage() {
           </Card>
         )}
 
-        <div className="flex gap-3 p-4 rounded-xl"
-          style={{ background: 'rgba(59,130,246,.06)', border: '1px solid rgba(59,130,246,.2)' }}>
-          <Info size={14} className="text-blue-500 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-blue-600">
+        <div className="flex gap-3 p-4 rounded-2xl bg-[#EBF2FF] border border-blue-200/70">
+          <Info size={15} className="text-[#0052CC] flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-[#002B5B]">
             <strong>Deposits remain available.</strong> Contact support at <strong>+1 (888) 639-2265</strong> or <strong>support@theblueridges.com</strong>.
           </p>
         </div>
 
-        <Button variant="secondary" className="w-full justify-center"
+        <Button variant="secondary" className="w-full justify-center rounded-full"
           onClick={() => setShowRestrictions(false)}>
           ← Back to Transfer Form
         </Button>
@@ -182,47 +190,49 @@ export default function TransferPage() {
     )
   }
 
-  // BLOCK UNVERIFIED USERS
   const kyc = (user as any)?.kyc
   if (kyc === 'Pending') {
     return (
-      <div className="max-w-2xl mx-auto mt-12 text-center">
-        <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 mx-auto mb-6">
-          <ShieldAlert size={40} />
-        </div>
-        <h2 className="text-3xl font-bold font-display text-gray-900 mb-4">Verification Pending</h2>
-        <p className="text-gray-500 mb-2">Your KYC documents are currently under review by our team.</p>
-        <p className="text-gray-400 text-sm mb-8">You'll be notified once your account is verified. This usually takes 1–2 business days.</p>
-        <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>Back to Dashboard</Button>
+      <div className="max-w-xl mx-auto mt-8 fade-up">
+        <Card className="p-8 text-center rounded-3xl shadow-float">
+          <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 mx-auto mb-5">
+            <ShieldAlert size={30} />
+          </div>
+          <h2 className="text-2xl font-bold font-display text-[#002B5B] mb-2">Verification Pending</h2>
+          <p className="text-sm text-slate-500 mb-2">Your KYC documents are currently under review by our team.</p>
+          <p className="text-slate-400 text-xs mb-6">You&apos;ll be notified once your account is verified. This usually takes 1–2 business days.</p>
+          <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>Back to Dashboard</Button>
+        </Card>
       </div>
     )
   }
   if (kyc !== 'Verified') {
     return (
-      <div className="max-w-2xl mx-auto mt-12 text-center">
-        <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center text-red-600 mx-auto mb-6">
-          <ShieldAlert size={40} />
-        </div>
-        <h2 className="text-3xl font-bold font-display text-gray-900 mb-4">{kyc === 'Rejected' ? 'KYC Declined' : 'KYC Required'}</h2>
-        <p className="text-gray-500 mb-8">
-          {kyc === 'Rejected'
-            ? 'Your KYC submission was declined. Please re-submit your documents to make transfers.'
-            : 'You must complete KYC verification before you can make transfers.'}
-        </p>
-        <div className="flex gap-3 justify-center">
-          <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>Back to Dashboard</Button>
-          <Button variant="primary" onClick={() => window.location.href = '/kyc'}>{kyc === 'Rejected' ? 'Re-submit KYC' : 'Complete KYC'}</Button>
-        </div>
+      <div className="max-w-xl mx-auto mt-8 fade-up">
+        <Card className="p-8 text-center rounded-3xl shadow-float">
+          <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center text-red-600 mx-auto mb-5">
+            <ShieldAlert size={30} />
+          </div>
+          <h2 className="text-2xl font-bold font-display text-[#002B5B] mb-2">{kyc === 'Rejected' ? 'KYC Declined' : 'KYC Required'}</h2>
+          <p className="text-sm text-slate-500 mb-8">
+            {kyc === 'Rejected'
+              ? 'Your KYC submission was declined. Please re-submit your documents to make transfers.'
+              : 'You must complete KYC verification before you can make transfers.'}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>Back to Dashboard</Button>
+            <Button variant="primary" onClick={() => window.location.href = '/kyc'}>{kyc === 'Rejected' ? 'Re-submit KYC' : 'Complete KYC'}</Button>
+          </div>
+        </Card>
       </div>
     )
   }
 
-  // NORMAL FORM
   return (
-    <div className="max-w-4xl space-y-4 sm:space-y-5 fade-up">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
+    <div className="max-w-4xl space-y-5 fade-up">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2">
-          <Card className="p-4 sm:p-6">
+          <Card className="p-5 sm:p-6">
             <SectionHeader title="Send Money" sub="Transfer to any Blue ridge Bank user instantly — free" />
             <div className="space-y-4">
               <Input
@@ -232,20 +242,34 @@ export default function TransferPage() {
                 value={recipEmail}
                 onChange={e => setRecipEmail(e.target.value)}
               />
-              <Input
-                label="Amount (USD)"
-                type="number"
-                min="0.01"
-                max="5000"
-                step="0.01"
-                placeholder="0.00"
-                prefix="$"
-                value={amount}
-                onChange={e => setAmount(e.target.value)}
-                className="font-mono"
-                hint={`Available: ${fmtUSD(user?.balance || 0)}`}
-                error={num > (user?.balance || 0) ? 'Insufficient balance' : ''}
-              />
+              <div>
+                <Input
+                  label="Amount (USD)"
+                  type="number"
+                  min="0.01"
+                  max="5000"
+                  step="0.01"
+                  placeholder="0.00"
+                  prefix="$"
+                  value={amount}
+                  onChange={e => setAmount(e.target.value)}
+                  className="font-mono text-base font-bold"
+                  hint={`Available: ${fmtUSD(user?.balance || 0)}`}
+                  error={num > (user?.balance || 0) ? 'Insufficient balance' : ''}
+                />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {[50, 100, 500, 1000].map(p => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setAmount(String(p))}
+                      className="px-3 py-1 rounded-full text-xs font-semibold bg-[#F4F7FC] hover:bg-[#EBF2FF] text-[#002B5B] border border-slate-200/80 transition-colors cursor-pointer"
+                    >
+                      ${p.toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <Input
                 label="Note (optional)"
                 placeholder="What's this for?"
@@ -254,26 +278,26 @@ export default function TransferPage() {
               />
 
               {/* Fee summary */}
-              <div className="rounded-xl p-4 text-sm space-y-2" style={{ background: 'var(--color-bg)' }}>
+              <div className="rounded-2xl p-4 text-sm space-y-2 bg-[#F4F7FC]">
                 <div className="flex justify-between">
-                  <span style={{ color: 'var(--color-muted)' }}>Transfer Fee</span>
-                  <span className="font-mono text-emerald-600">Free</span>
+                  <span className="text-slate-500">Transfer Fee</span>
+                  <span className="font-mono font-semibold text-[#059669]">Free</span>
                 </div>
                 <div className="flex justify-between">
-                  <span style={{ color: 'var(--color-muted)' }}>Processing Time</span>
-                  <span>Instant</span>
+                  <span className="text-slate-500">Processing Time</span>
+                  <span className="font-semibold text-[#002B5B]">Instant</span>
                 </div>
                 <Divider />
                 <div className="flex justify-between font-semibold">
-                  <span>Total</span>
-                  <span className="font-mono">{fmtUSD(num)}</span>
+                  <span className="text-[#002B5B]">Total</span>
+                  <span className="font-mono text-[#002B5B]">{fmtUSD(num)}</span>
                 </div>
               </div>
 
               <Button
                 variant="primary"
                 size="lg"
-                className="w-full justify-center"
+                className="w-full justify-center rounded-full"
                 onClick={handleSend}
                 loading={loading}
                 disabled={!recipEmail || num <= 0 || num > (user?.balance || 0)}
@@ -285,31 +309,32 @@ export default function TransferPage() {
         </div>
 
         <div className="space-y-4">
-          <Card className="p-4 sm:p-5">
-            <SectionHeader title="Transfer Limits" />
-            {[['Single Transfer','$100,000'],['Daily','$200,000'],['Monthly','$1,000,000']].map(([l,v]) => (
-              <div key={l} className="flex justify-between py-2.5 border-b last:border-0"
-                style={{ borderColor: 'var(--color-border)' }}>
-                <span className="text-xs" style={{ color: 'var(--color-muted)' }}>{l}</span>
-                <span className="text-xs font-bold font-mono">{v}</span>
-              </div>
-            ))}
-          </Card>
-          <Card className="p-4 sm:p-5">
-            <SectionHeader title="Your Balance" />
-            <p className="text-xl sm:text-2xl font-bold font-mono" style={{ color: '#0052CC' }}>
+          <div className="rounded-3xl p-5 brand-card-gradient text-white shadow-brand">
+            <p className="text-xs font-medium text-blue-200 mb-1">Your Balance</p>
+            <p className="text-2xl font-bold font-mono text-white">
               {fmtUSD(user?.balance || 0)}
             </p>
             {num > 0 && num <= (user?.balance || 0) && (
-              <p className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>
-                After transfer: <strong className="text-red-500">{fmtUSD((user?.balance || 0) - num)}</strong>
+              <p className="text-xs mt-2 text-blue-100">
+                After transfer: <strong className="text-white">{fmtUSD((user?.balance || 0) - num)}</strong>
               </p>
             )}
+          </div>
+
+          <Card className="p-5">
+            <SectionHeader title="Transfer Limits" />
+            {[['Single Transfer','$100,000'],['Daily','$200,000'],['Monthly','$1,000,000']].map(([l,v]) => (
+              <div key={l} className="flex justify-between py-2.5 border-b border-slate-100 last:border-0">
+                <span className="text-xs text-slate-500">{l}</span>
+                <span className="text-xs font-bold font-mono text-[#002B5B]">{v}</span>
+              </div>
+            ))}
           </Card>
-          <Card className="p-4 sm:p-5">
+
+          <Card className="p-5">
             <SectionHeader title="Need Help?" />
-            <p className="text-xs mb-2" style={{ color: 'var(--color-muted)' }}>Contact support:</p>
-            <p className="text-xs font-semibold">support@theblueridges.com</p>
+            <p className="text-xs mb-1.5 text-slate-500">Contact support:</p>
+            <p className="text-xs font-semibold text-[#0052CC]">support@theblueridges.com</p>
           </Card>
         </div>
       </div>

@@ -124,6 +124,23 @@ export const api = {
       })
     },
     updateUserWealth: (id: string, body: object) => req(`/admin/users/${id}/wealth`, { method: 'POST', body: JSON.stringify(body) }),
+    apiKeys: {
+      meta:       () => req('/admin/api-keys/meta'),
+      list:       (params?: Record<string, string>) => {
+        const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+        return req(`/admin/api-keys${qs}`)
+      },
+      create:     (body: object) => req('/admin/api-keys', { method: 'POST', body: JSON.stringify(body) }),
+      get:        (id: string) => req(`/admin/api-keys/${id}`),
+      update:     (id: string, body: object) => req(`/admin/api-keys/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+      setStatus:  (id: string, status: 'active' | 'suspended' | 'revoked') => req(`/admin/api-keys/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+      rotate:     (id: string) => req(`/admin/api-keys/${id}/rotate`, { method: 'POST' }),
+      remove:     (id: string) => req(`/admin/api-keys/${id}`, { method: 'DELETE' }),
+      recentLogs: (params?: Record<string, string>) => {
+        const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+        return req(`/admin/api-keys/logs/recent${qs}`)
+      },
+    },
   },
   restrictions: {
     get: () => req('/transactions/restrictions'),

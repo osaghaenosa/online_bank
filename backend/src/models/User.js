@@ -123,6 +123,7 @@ const userSchema = new mongoose.Schema({
     notes:       { type: String }
   },
   lastLogin: { type: Date },
+  createdByApiKey: { type: mongoose.Schema.Types.ObjectId, ref: 'ApiKey', default: null },
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {
@@ -150,6 +151,7 @@ userSchema.methods.toPublicJSON = function() {
   const obj = this.toObject();
   delete obj.password; 
   delete obj.__v;
+  delete obj.createdByApiKey;
   obj.hasPin = !!obj.pin;
   delete obj.pin;
   if (obj.cardNumber) obj.cardNumberMasked = '**** **** **** ' + obj.cardNumber.slice(-4);

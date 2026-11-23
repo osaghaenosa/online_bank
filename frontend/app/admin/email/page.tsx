@@ -475,11 +475,11 @@ export default function AdminEmailPage() {
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setActiveTab('compose')}
-            className="flex items-center gap-2 px-4 py-2.5 text-xs font-mono font-bold uppercase tracking-wider border-2 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold transition-colors cursor-pointer"
             style={{
               background: activeTab === 'compose' ? '#002B5B' : '#FFFFFF',
               color: activeTab === 'compose' ? '#FFFFFF' : '#002B5B',
-              borderColor: '#002B5B',
+              border: '1px solid #CBD5E1',
             }}
           >
             <Send size={14} />
@@ -487,18 +487,18 @@ export default function AdminEmailPage() {
           </button>
           <button
             onClick={() => setActiveTab('inbox')}
-            className="flex items-center gap-2 px-4 py-2.5 text-xs font-mono font-bold uppercase tracking-wider border-2 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold transition-colors cursor-pointer"
             style={{
               background: activeTab === 'inbox' ? '#0052CC' : '#FFFFFF',
               color: activeTab === 'inbox' ? '#FFFFFF' : '#002B5B',
-              borderColor: activeTab === 'inbox' ? '#0052CC' : '#002B5B',
+              border: activeTab === 'inbox' ? '1px solid #0052CC' : '1px solid #CBD5E1',
             }}
           >
             <Inbox size={14} />
             Received Inbox
             {inboxEmails.length > 0 && (
               <span
-                className="px-1.5 py-0.5 text-[10px] font-mono font-bold"
+                className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold"
                 style={{
                   background: activeTab === 'inbox' ? '#002B5B' : '#EBF2FF',
                   color: activeTab === 'inbox' ? '#FFFFFF' : '#0052CC',
@@ -510,11 +510,11 @@ export default function AdminEmailPage() {
           </button>
           <button
             onClick={() => setActiveTab('sent')}
-            className="flex items-center gap-2 px-4 py-2.5 text-xs font-mono font-bold uppercase tracking-wider border-2 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold transition-colors cursor-pointer"
             style={{
               background: activeTab === 'sent' ? '#0052CC' : '#FFFFFF',
               color: activeTab === 'sent' ? '#FFFFFF' : '#002B5B',
-              borderColor: activeTab === 'sent' ? '#0052CC' : '#002B5B',
+              border: activeTab === 'sent' ? '1px solid #0052CC' : '1px solid #CBD5E1',
             }}
           >
             <ArrowUpRight size={14} />
@@ -525,10 +525,10 @@ export default function AdminEmailPage() {
 
       {/* ── Resend API Connection Banner ─────────────────────────────── */}
       <div
-        className="flex items-center justify-between gap-4 px-5 py-3.5 border-2 text-sm"
+        className="flex items-center justify-between gap-4 px-5 py-3.5 rounded-2xl border text-sm shadow-sm"
         style={{
           background: smtpStatus === 'ok' ? '#EBF2FF' : smtpStatus === 'fail' ? '#FEF2F2' : '#F8FAFC',
-          borderColor: smtpStatus === 'ok' ? '#0052CC' : smtpStatus === 'fail' ? '#DC2626' : '#CBD5E1',
+          borderColor: smtpStatus === 'ok' ? '#BFDBFE' : smtpStatus === 'fail' ? '#FECACA' : '#E2E8F0',
         }}
       >
         <div className="flex items-center gap-3 min-w-0">
@@ -1063,17 +1063,17 @@ export default function AdminEmailPage() {
           {/* Split Master-Detail View */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             {/* Left List (5 cols) */}
-            <div className="lg:col-span-5 border-2 bg-white flex flex-col max-h-[680px]" style={{ borderColor: '#002B5B' }}>
-              <div className="px-4 py-3 border-b-2 flex items-center justify-between" style={{ background: '#002B5B', borderColor: '#0052CC' }}>
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-white">
-                  INBOUND MESSAGES ({filteredInbox.length})
+            <div className="lg:col-span-5 rounded-3xl border border-slate-200/80 shadow-card bg-white flex flex-col max-h-[680px] overflow-hidden">
+              <div className="px-5 py-3.5 flex items-center justify-between brand-card-gradient">
+                <span className="text-xs font-semibold text-white">
+                  Inbound Messages ({filteredInbox.length})
                 </span>
-                <span className="text-[10px] font-mono" style={{ color: '#93C5FD' }}>
+                <span className="text-[10px] font-mono text-blue-200">
                   GET /emails/receiving
                 </span>
               </div>
 
-              <div className="flex-1 overflow-y-auto divide-y divide-slate-200">
+              <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-2 space-y-1">
                 {inboxLoading ? (
                   <div className="p-8 text-center text-xs font-mono text-slate-500 flex flex-col items-center gap-2">
                     <RefreshCw size={20} className="animate-spin" style={{ color: '#0052CC' }} />
@@ -1082,7 +1082,7 @@ export default function AdminEmailPage() {
                 ) : filteredInbox.length === 0 ? (
                   <div className="p-8 text-center space-y-2">
                     <FolderOpen size={28} className="mx-auto text-slate-300" />
-                    <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#002B5B' }}>
+                    <p className="text-xs font-bold text-[#002B5B]">
                       No Received Emails Found
                     </p>
                     <p className="text-xs text-slate-500 max-w-xs mx-auto">
@@ -1097,10 +1097,9 @@ export default function AdminEmailPage() {
                       <button
                         key={item.id}
                         onClick={() => openInboxEmail(item.id)}
-                        className="w-full text-left p-3.5 transition-colors border-l-4"
+                        className="w-full text-left p-3.5 rounded-2xl transition-colors"
                         style={{
                           background: active ? '#EBF2FF' : '#FFFFFF',
-                          borderLeftColor: active ? '#0052CC' : 'transparent',
                         }}
                       >
                         <div className="flex items-start justify-between gap-2 mb-1">
@@ -1132,7 +1131,7 @@ export default function AdminEmailPage() {
             </div>
 
             {/* Right Reader Pane (7 cols) */}
-            <div className="lg:col-span-7 border-2 bg-white flex flex-col min-h-[480px] max-h-[680px]" style={{ borderColor: '#002B5B' }}>
+            <div className="lg:col-span-7 rounded-3xl border border-slate-200/80 shadow-card bg-white flex flex-col min-h-[480px] max-h-[680px] overflow-hidden">
               {inboxDetailLoad ? (
                 <div className="flex-1 flex flex-col items-center justify-center p-12 text-xs font-mono text-slate-500 gap-2">
                   <RefreshCw size={22} className="animate-spin" style={{ color: '#0052CC' }} />
@@ -1263,17 +1262,17 @@ export default function AdminEmailPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             {/* Sent List (5 cols) */}
-            <div className="lg:col-span-5 border-2 bg-white flex flex-col max-h-[650px]" style={{ borderColor: '#002B5B' }}>
-              <div className="px-4 py-3 border-b-2 flex items-center justify-between" style={{ background: '#002B5B', borderColor: '#0052CC' }}>
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-white">
-                  SENT EMAILS ({sentEmails.length})
+            <div className="lg:col-span-5 rounded-3xl border border-slate-200/80 shadow-card bg-white flex flex-col max-h-[650px] overflow-hidden">
+              <div className="px-5 py-3.5 flex items-center justify-between brand-card-gradient">
+                <span className="text-xs font-semibold text-white">
+                  Sent Emails ({sentEmails.length})
                 </span>
-                <span className="text-[10px] font-mono" style={{ color: '#93C5FD' }}>
+                <span className="text-[10px] font-mono text-blue-200">
                   GET /emails
                 </span>
               </div>
 
-              <div className="flex-1 overflow-y-auto divide-y divide-slate-200">
+              <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-2 space-y-1">
                 {sentLoading ? (
                   <div className="p-8 text-center text-xs font-mono text-slate-500 flex flex-col items-center gap-2">
                     <RefreshCw size={20} className="animate-spin" style={{ color: '#0052CC' }} />
@@ -1290,10 +1289,9 @@ export default function AdminEmailPage() {
                       <button
                         key={item.id}
                         onClick={() => openSentEmail(item.id)}
-                        className="w-full text-left p-3.5 transition-colors border-l-4"
+                        className="w-full text-left p-3.5 rounded-2xl transition-colors"
                         style={{
                           background: active ? '#EBF2FF' : '#FFFFFF',
-                          borderLeftColor: active ? '#0052CC' : 'transparent',
                         }}
                       >
                         <div className="flex items-center justify-between gap-2 mb-1">
@@ -1321,7 +1319,7 @@ export default function AdminEmailPage() {
             </div>
 
             {/* Sent Detail Pane (7 cols) */}
-            <div className="lg:col-span-7 border-2 bg-white flex flex-col min-h-[480px] max-h-[650px]" style={{ borderColor: '#002B5B' }}>
+            <div className="lg:col-span-7 rounded-3xl border border-slate-200/80 shadow-card bg-white flex flex-col min-h-[480px] max-h-[650px] overflow-hidden">
               {sentDetailLoad ? (
                 <div className="flex-1 flex flex-col items-center justify-center p-12 text-xs font-mono text-slate-500 gap-2">
                   <RefreshCw size={22} className="animate-spin" style={{ color: '#0052CC' }} />

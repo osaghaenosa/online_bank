@@ -38,18 +38,18 @@ export default function ReceiptPage() {
 
   if (loading) return (
     <div className="max-w-2xl mx-auto space-y-4">
-      <div className="shimmer h-64" />
-      <div className="shimmer h-96" />
+      <div className="shimmer h-64 rounded-3xl" />
+      <div className="shimmer h-96 rounded-3xl" />
     </div>
   )
 
   if (err || !tx) return (
     <div className="max-w-2xl mx-auto">
-      <Card className="p-10 text-center">
+      <Card className="p-10 text-center rounded-3xl">
         <XCircle size={48} className="text-red-500 mx-auto mb-4" />
-        <h2 className="font-bold text-xl mb-2" style={{ color: '#002B5B' }}>Official Receipt Not Found</h2>
-        <p className="text-sm mb-6" style={{ color: 'var(--color-muted)' }}>{err || 'Transaction record not found or access denied.'}</p>
-        <Link href="/history"><Button variant="secondary"><ArrowLeft size={14} /> Back to Audit History</Button></Link>
+        <h2 className="font-bold text-xl mb-2 text-[#002B5B]">Official Receipt Not Found</h2>
+        <p className="text-sm mb-6 text-slate-500">{err || 'Transaction record not found or access denied.'}</p>
+        <Link href="/history"><Button variant="secondary" className="rounded-full"><ArrowLeft size={14} /> Back to Audit History</Button></Link>
       </Card>
     </div>
   )
@@ -59,27 +59,23 @@ export default function ReceiptPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-5 fade-up">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Link href="/history">
-          <Button variant="secondary" size="sm"><ArrowLeft size={14} /> Audit History</Button>
+          <Button variant="secondary" size="sm" className="rounded-full"><ArrowLeft size={14} /> Audit History</Button>
         </Link>
         <a href={downloadUrl} target="_blank" rel="noreferrer">
-          <Button variant="primary" size="sm"><Download size={14} /> Download Certified PDF</Button>
+          <Button variant="primary" size="sm" className="rounded-full"><Download size={14} /> Download Certified PDF</Button>
         </a>
       </div>
 
       {/* Institutional Receipt Card */}
-      <div className="bg-white border-2" style={{ borderColor: '#002B5B' }}>
-        {/* Solid Corporate Blue Header Strip */}
-        <div
-          className="p-6 border-b-4"
-          style={{ background: '#002B5B', borderColor: '#0052CC', color: '#FFFFFF' }}
-        >
-          <div className="flex items-start justify-between mb-6 pb-4 border-b" style={{ borderColor: '#1E3A5F' }}>
+      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-float overflow-hidden">
+        <div className="p-6 sm:p-7 brand-card-gradient text-white">
+          <div className="flex items-start justify-between mb-6 pb-4 border-b border-white/15">
             <div>
               <BrandLogo variant="light" size="sm" />
-              <p className="text-[10px] font-mono uppercase tracking-widest mt-2" style={{ color: '#93C5FD' }}>
-                OFFICIAL LEDGER AUDIT RECEIPT
+              <p className="text-[11px] font-medium mt-2 text-blue-200">
+                Official Ledger Audit Receipt
               </p>
             </div>
             <StatusBadge status={tx.status} />
@@ -87,27 +83,27 @@ export default function ReceiptPage() {
 
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <p className="text-[10px] font-mono uppercase tracking-wider mb-1" style={{ color: '#93C5FD' }}>
-                {isCredit ? 'CREDIT SETTLEMENT AMOUNT' : 'DEBIT SETTLEMENT AMOUNT'}
+              <p className="text-xs text-blue-200 mb-1">
+                {isCredit ? 'Credit Settlement Amount' : 'Debit Settlement Amount'}
               </p>
               <p className="font-mono text-3xl sm:text-4xl font-bold text-white">
                 {isCredit ? '+' : '-'}{fmtUSD(tx.amount)}
               </p>
               {tx.fee > 0 && (
-                <p className="text-xs font-mono mt-1" style={{ color: '#BFDBFE' }}>
+                <p className="text-xs font-mono mt-1 text-blue-100">
                   Fee: {fmtUSD(tx.fee)} · Net Settlement: {fmtUSD(tx.netAmount)}
                 </p>
               )}
             </div>
-            <div className="sm:text-right p-3 border" style={{ background: '#001F42', borderColor: '#0052CC' }}>
-              <p className="text-[10px] font-mono uppercase" style={{ color: '#93C5FD' }}>REFERENCE ID</p>
+            <div className="sm:text-right px-4 py-2.5 rounded-2xl glass">
+              <p className="text-[10px] text-blue-200">Reference ID</p>
               <p className="font-mono text-xs font-bold text-white mt-0.5">{tx.transactionId}</p>
             </div>
           </div>
         </div>
 
         {/* Details Table */}
-        <div className="p-6 space-y-0">
+        <div className="p-5 sm:p-6 space-y-1">
           {[
             ['Description', tx.description],
             ['Classification', CAT_LABELS[tx.category] || tx.category],
@@ -119,16 +115,13 @@ export default function ReceiptPage() {
           ].map(([label, val], i) => (
             <div
               key={label}
-              className="flex justify-between py-3 border-b last:border-0"
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-4 py-3 rounded-xl"
               style={{
-                borderColor: 'var(--color-border)',
-                background: i % 2 === 0 ? '#FFFFFF' : '#F8FAFC',
-                margin: i % 2 !== 0 ? '0 -24px' : '',
-                padding: '12px 24px',
+                background: i % 2 !== 0 ? '#F4F7FC' : 'transparent',
               }}
             >
-              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{label}</span>
-              <span className="text-sm font-semibold" style={{ color: '#002B5B' }}>
+              <span className="text-xs font-medium text-slate-500">{label}</span>
+              <span className="text-sm font-semibold text-[#002B5B]">
                 {label === 'Verification Status' ? <StatusBadge status={String(val)} /> : String(val)}
               </span>
             </div>
@@ -139,19 +132,19 @@ export default function ReceiptPage() {
       {/* Crypto details */}
       {tx.cryptoCoin && (
         <Card className="p-6">
-          <h3 className="font-bold text-xs mb-4 font-mono uppercase tracking-wider" style={{ color: '#0052CC' }}>
+          <h3 className="font-display font-bold text-sm mb-4 text-[#0052CC]">
             Digital Asset Settlement Details
           </h3>
-          <div className="space-y-0">
+          <div className="space-y-2">
             {[
               ['Asset', tx.cryptoCoin],
               ['Quantity', `${tx.cryptoAmount} ${tx.cryptoCoin}`],
               ['Network', tx.cryptoNetwork || 'N/A'],
               ...(tx.walletAddress ? [['Destination Wallet', tx.walletAddress]] : []),
             ].map(([label, val]) => (
-              <div key={label} className="flex justify-between py-3 border-b last:border-0" style={{ borderColor: 'var(--color-border)' }}>
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{label}</span>
-                <span className="text-sm font-mono font-semibold truncate max-w-[60%] text-right" style={{ color: '#002B5B' }}>{String(val)}</span>
+              <div key={label} className="flex justify-between py-2.5 border-b border-slate-100 last:border-0">
+                <span className="text-xs font-medium text-slate-500">{label}</span>
+                <span className="text-sm font-mono font-semibold truncate max-w-[60%] text-right text-[#002B5B]">{String(val)}</span>
               </div>
             ))}
           </div>
@@ -161,17 +154,17 @@ export default function ReceiptPage() {
       {/* Recipient details */}
       {tx.recipientName && (
         <Card className="p-6">
-          <h3 className="font-bold text-xs mb-4 font-mono uppercase tracking-wider" style={{ color: '#0052CC' }}>
+          <h3 className="font-display font-bold text-sm mb-4 text-[#0052CC]">
             Beneficiary / Counterparty
           </h3>
-          <div className="space-y-0">
+          <div className="space-y-2">
             {[
               ['Counterparty Name', tx.recipientName],
               ...(tx.recipientAccount ? [['Account Number', '****' + String(tx.recipientAccount).slice(-4)]] : []),
             ].map(([label, val]) => (
-              <div key={label} className="flex justify-between py-3 border-b last:border-0" style={{ borderColor: 'var(--color-border)' }}>
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{label}</span>
-                <span className="text-sm font-semibold" style={{ color: '#002B5B' }}>{String(val)}</span>
+              <div key={label} className="flex justify-between py-2.5 border-b border-slate-100 last:border-0">
+                <span className="text-xs font-medium text-slate-500">{label}</span>
+                <span className="text-sm font-semibold text-[#002B5B]">{String(val)}</span>
               </div>
             ))}
           </div>
@@ -181,18 +174,18 @@ export default function ReceiptPage() {
       {/* Account info */}
       {user && (
         <Card className="p-6">
-          <h3 className="font-bold text-xs mb-4 font-mono uppercase tracking-wider" style={{ color: '#0052CC' }}>
+          <h3 className="font-display font-bold text-sm mb-4 text-[#0052CC]">
             Originating Account Information
           </h3>
-          <div className="space-y-0">
+          <div className="space-y-2">
             {[
               ['Account Holder', `${user.firstName} ${user.lastName}`],
               ['Account Number', '****' + String(user.accountNumber || '').slice(-4)],
               ['ABA Routing Number', user.routingNumber || '021000021'],
             ].map(([label, val]) => (
-              <div key={label} className="flex justify-between py-3 border-b last:border-0" style={{ borderColor: 'var(--color-border)' }}>
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{label}</span>
-                <span className="text-sm font-semibold font-mono" style={{ color: '#002B5B' }}>{String(val)}</span>
+              <div key={label} className="flex justify-between py-2.5 border-b border-slate-100 last:border-0">
+                <span className="text-xs font-medium text-slate-500">{label}</span>
+                <span className="text-sm font-semibold font-mono text-[#002B5B]">{String(val)}</span>
               </div>
             ))}
           </div>
@@ -202,19 +195,19 @@ export default function ReceiptPage() {
       {/* Download CTA */}
       <div className="flex flex-col sm:flex-row gap-3">
         <a href={downloadUrl} target="_blank" rel="noreferrer" className="flex-1">
-          <Button variant="primary" className="w-full" size="lg">
+          <Button variant="primary" className="w-full rounded-full" size="lg">
             <Download size={16} /> Download Certified PDF Receipt
           </Button>
         </a>
         <Link href="/history" className="flex-1">
-          <Button variant="secondary" className="w-full" size="lg">
+          <Button variant="secondary" className="w-full rounded-full" size="lg">
             <ArrowLeft size={16} /> Return to Audit History
           </Button>
         </Link>
       </div>
 
-      <p className="text-xs text-center font-mono" style={{ color: 'var(--color-muted)' }}>
-        BLUE RIDGE BANK · CERTIFIED AUDIT RECORD · REF: {tx.transactionId} · SUPPORT@THEBLUERIDGES.COM
+      <p className="text-xs text-center font-mono text-slate-400">
+        Blue ridge Bank · Certified Audit Record · Ref: {tx.transactionId} · support@theblueridges.com
       </p>
     </div>
   )

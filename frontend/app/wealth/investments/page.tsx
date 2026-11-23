@@ -51,32 +51,29 @@ export default function InvestmentsPage() {
   const yearsActive = oldest ? Math.round((new Date('2025-01-01').getTime() - new Date(oldest).getTime()) / (365.25 * 24 * 3600 * 1000)) : 0
 
   return (
-    <div className="max-w-6xl space-y-4 sm:space-y-5 fade-up">
+    <div className="max-w-6xl space-y-5 fade-up">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/wealth">
-            <button
-              className="p-2 border transition-all hover:opacity-80"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface)' }}
-            >
+            <button className="w-10 h-10 rounded-full border border-slate-200/80 bg-white hover:bg-[#F4F7FC] flex items-center justify-center transition-colors cursor-pointer text-[#002B5B]">
               <ArrowLeft size={16} />
             </button>
           </Link>
           <div>
-            <h2 className="font-display text-lg sm:text-2xl font-bold" style={{ color: '#002B5B' }}>Investment Portfolio</h2>
-            <p className="text-xs sm:text-sm" style={{ color: 'var(--color-muted)' }}>
+            <h2 className="font-display text-xl sm:text-2xl font-bold text-[#002B5B]">Investment Portfolio</h2>
+            <p className="text-xs sm:text-sm text-slate-500">
               {investments.length} investments · {yearsActive} years active
             </p>
           </div>
         </div>
-        <div className="inline-flex self-start sm:self-auto border" style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+        <div className="inline-flex self-start sm:self-auto rounded-full p-1 bg-white border border-slate-200/80 shadow-sm">
           {CURRENCIES.map(c => (
             <button
               key={c}
               onClick={() => setCur(c)}
-              className="px-3.5 py-1.5 text-xs font-bold uppercase transition-all"
-              style={{ background: cur === c ? '#002B5B' : 'transparent', color: cur === c ? '#fff' : 'var(--color-muted)' }}
+              className="px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer"
+              style={{ background: cur === c ? '#0052CC' : 'transparent', color: cur === c ? '#fff' : '#475569' }}
             >
               {CUR_SYMBOL[c]} {c}
             </button>
@@ -85,37 +82,37 @@ export default function InvestmentsPage() {
       </div>
 
       {/* Stats hero */}
-      <div className="p-4 sm:p-6 border-2" style={{ background: '#002B5B', borderColor: '#0052CC' }}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="p-6 sm:p-7 rounded-3xl brand-card-gradient text-white shadow-brand">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: '#93C5FD' }}>Current Value</p>
+            <p className="text-xs font-medium text-blue-200 mb-1">Current Value</p>
             <p className="font-mono text-xl sm:text-2xl font-bold text-white truncate">{fmt(totalCurrent)}</p>
           </div>
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: '#93C5FD' }}>Total Invested</p>
+            <p className="text-xs font-medium text-blue-200 mb-1">Total Invested</p>
             <p className="font-mono text-xl sm:text-2xl font-bold text-white truncate">{fmt(totalInvested)}</p>
           </div>
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: '#93C5FD' }}>Total Return</p>
-            <p className="font-mono text-xl sm:text-2xl font-bold truncate" style={{ color: totalReturn >= 0 ? '#60A5FA' : '#F87171' }}>
+            <p className="text-xs font-medium text-blue-200 mb-1">Total Return</p>
+            <p className="font-mono text-xl sm:text-2xl font-bold truncate" style={{ color: totalReturn >= 0 ? '#60A5FA' : '#FCA5A5' }}>
               {totalReturn >= 0 ? '+' : ''}{fmt(totalReturn)}
             </p>
           </div>
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: '#93C5FD' }}>Overall ROI</p>
-            <p className="font-mono text-xl sm:text-2xl font-bold truncate" style={{ color: parseFloat(totalReturnPct) >= 0 ? '#60A5FA' : '#F87171' }}>
+            <p className="text-xs font-medium text-blue-200 mb-1">Overall ROI</p>
+            <p className="font-mono text-xl sm:text-2xl font-bold truncate" style={{ color: parseFloat(totalReturnPct) >= 0 ? '#60A5FA' : '#FCA5A5' }}>
               {parseFloat(totalReturnPct) >= 0 ? '+' : ''}{totalReturnPct}%
             </p>
           </div>
         </div>
-        <div className="flex gap-2 mt-4 pt-4 border-t flex-wrap" style={{ borderColor: '#1E3A5F' }}>
-          <span className="px-2.5 py-1 text-[11px] font-bold uppercase" style={{ background: '#0052CC', color: '#FFFFFF' }}>
+        <div className="flex gap-2 mt-5 pt-4 border-t border-white/15 flex-wrap">
+          <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/15 text-white">
             {activeCount} Active
           </span>
-          <span className="px-2.5 py-1 text-[11px] font-bold uppercase border" style={{ background: '#001F42', borderColor: '#60A5FA', color: '#93C5FD' }}>
+          <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/10 border border-white/15 text-blue-100">
             {exitedCount} Exited
           </span>
-          <span className="px-2.5 py-1 text-[11px] font-bold uppercase border" style={{ background: '#001F42', borderColor: '#60A5FA', color: '#93C5FD' }}>
+          <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/10 border border-white/15 text-blue-100">
             {yearsActive} Years Active
           </span>
         </div>
@@ -128,11 +125,11 @@ export default function InvestmentsPage() {
             <button
               key={t}
               onClick={() => setFilter(t)}
-              className="px-3 py-1.5 text-xs font-semibold border transition-all capitalize"
+              className="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all capitalize cursor-pointer"
               style={{
-                background: filter === t ? '#002B5B' : 'var(--color-surface)',
-                borderColor: filter === t ? '#002B5B' : 'var(--color-border)',
-                color: filter === t ? '#fff' : 'var(--color-muted)',
+                background: filter === t ? '#0052CC' : '#FFFFFF',
+                border: filter === t ? '1px solid #0052CC' : '1px solid #E2E8F0',
+                color: filter === t ? '#fff' : '#475569',
               }}
             >
               {t === 'all' ? 'All' : (INVESTMENT_ICONS[t] || '📊') + ' ' + (TYPE_LABELS[t] || t)}
@@ -144,11 +141,11 @@ export default function InvestmentsPage() {
             <button
               key={s}
               onClick={() => setSortBy(s)}
-              className="px-3 py-1.5 text-xs font-semibold border transition-all capitalize"
+              className="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all capitalize cursor-pointer"
               style={{
-                background: sortBy === s ? '#EBF2FF' : 'var(--color-surface)',
-                borderColor: sortBy === s ? '#0052CC' : 'var(--color-border)',
-                color: sortBy === s ? '#0052CC' : 'var(--color-muted)',
+                background: sortBy === s ? '#EBF2FF' : '#FFFFFF',
+                border: sortBy === s ? '1px solid #0052CC' : '1px solid #E2E8F0',
+                color: sortBy === s ? '#0052CC' : '#475569',
               }}
             >
               Sort: {s}
@@ -166,23 +163,20 @@ export default function InvestmentsPage() {
           const years = inv.startDate ? Math.round((new Date('2025-01-01').getTime() - new Date(inv.startDate).getTime()) / (365.25 * 24 * 3600 * 1000)) : 0
 
           return (
-            <Card key={i} className="p-4 sm:p-5">
-              <div className="flex items-start justify-between gap-3 mb-3.5">
+            <Card key={i} className="p-5">
+              <div className="flex items-start justify-between gap-3 mb-4">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div
-                    className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-base sm:text-lg flex-shrink-0 border"
-                    style={{ background: '#EBF2FF', borderColor: '#93C5FD' }}
-                  >
+                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-lg flex-shrink-0 bg-[#EBF2FF]">
                     {icon}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-xs sm:text-sm truncate" style={{ color: '#002B5B' }}>{inv.name}</p>
+                    <p className="font-bold text-sm truncate text-[#002B5B]">{inv.name}</p>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      <span className="text-[10px] px-1.5 py-0.5 font-bold uppercase" style={{ background: '#EBF2FF', color: '#0052CC' }}>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-[#EBF2FF] text-[#0052CC]">
                         {TYPE_LABELS[inv.type] || inv.type}
                       </span>
                       {inv.ticker && (
-                        <span className="text-xs font-mono font-bold" style={{ color: 'var(--color-muted)' }}>
+                        <span className="text-xs font-mono font-bold text-slate-400">
                           {inv.ticker}
                         </span>
                       )}
@@ -190,47 +184,46 @@ export default function InvestmentsPage() {
                   </div>
                 </div>
                 <span
-                  className="px-2 py-0.5 text-[10px] font-bold uppercase flex-shrink-0 border"
+                  className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold capitalize flex-shrink-0"
                   style={{
-                    background: inv.status === 'active' ? '#EBF2FF' : '#F1F5F9',
-                    borderColor: inv.status === 'active' ? '#93C5FD' : '#CBD5E1',
-                    color: inv.status === 'active' ? '#0052CC' : '#475569',
+                    background: inv.status === 'active' ? '#ECFDF5' : '#F1F5F9',
+                    color: inv.status === 'active' ? '#059669' : '#64748B',
                   }}
                 >
                   {inv.status}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-2.5 sm:gap-3 mb-3">
-                <div className="p-2.5 sm:p-3 border" style={{ background: '#F8FAFC', borderColor: '#CBD5E1' }}>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: 'var(--color-muted)' }}>Invested</p>
-                  <p className="font-mono font-bold text-xs sm:text-sm truncate" style={{ color: '#002B5B' }}>{fmt(inv.amount)}</p>
+              <div className="grid grid-cols-2 gap-3 mb-3.5">
+                <div className="p-3 rounded-2xl bg-[#F4F7FC]">
+                  <p className="text-[11px] font-medium mb-0.5 text-slate-500">Invested</p>
+                  <p className="font-mono font-bold text-sm truncate text-[#002B5B]">{fmt(inv.amount)}</p>
                 </div>
-                <div className="p-2.5 sm:p-3 border" style={{ background: '#F8FAFC', borderColor: '#CBD5E1' }}>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: 'var(--color-muted)' }}>Current Value</p>
-                  <p className={`font-mono font-bold text-xs sm:text-sm truncate ${inv.status === 'exited' ? 'line-through opacity-50' : ''}`} style={{ color: '#002B5B' }}>
+                <div className="p-3 rounded-2xl bg-[#F4F7FC]">
+                  <p className="text-[11px] font-medium mb-0.5 text-slate-500">Current Value</p>
+                  <p className={`font-mono font-bold text-sm truncate text-[#002B5B] ${inv.status === 'exited' ? 'line-through opacity-50' : ''}`}>
                     {inv.status === 'exited' ? fmt(inv.amount) : fmt(inv.currentValue)}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className={`flex items-center gap-1 ${isUp ? 'text-[#0052CC]' : 'text-red-600'}`}>
+                <div className="flex items-center gap-1" style={{ color: isUp ? '#059669' : '#DC2626' }}>
                   {isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                  <span className="font-bold text-xs sm:text-sm">
+                  <span className="font-bold text-sm">
                     {isUp ? '+' : ''}{inv.returnPct?.toFixed(1)}%
                   </span>
-                  <span className="text-xs font-mono" style={{ color: 'var(--color-muted)' }}>
+                  <span className="text-xs font-mono text-slate-400">
                     ({isUp ? '+' : ''}{fmt(ret)})
                   </span>
                 </div>
-                <div className="text-xs truncate" style={{ color: 'var(--color-muted)' }}>
+                <div className="text-xs truncate text-slate-400">
                   {years}yr · {inv.broker}
                 </div>
               </div>
 
               {inv.notes && (
-                <p className="text-xs mt-2 italic" style={{ color: 'var(--color-muted)' }}>💬 {inv.notes}</p>
+                <p className="text-xs mt-2.5 italic text-slate-500">💬 {inv.notes}</p>
               )}
             </Card>
           )

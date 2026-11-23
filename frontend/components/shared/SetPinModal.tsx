@@ -26,15 +26,12 @@ export function SetPinModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4">
-      <div
-        className="bg-white p-6 sm:p-8 max-w-sm w-full shadow-2xl relative border-2"
-        style={{ borderColor: '#002B5B', borderTop: '5px solid #0052CC' }}
-      >
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#00142B]/60 backdrop-blur-sm p-4">
+      <div className="bg-white p-6 sm:p-8 max-w-sm w-full shadow-float relative rounded-3xl border border-slate-200/80 fade-up">
         <div className="flex justify-center mb-5">
           <div
-            className="w-14 h-14 flex items-center justify-center text-white"
-            style={{ background: '#002B5B' }}
+            className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-brand"
+            style={{ background: 'linear-gradient(135deg, #002B5B 0%, #0052CC 100%)' }}
           >
             <Lock size={26} />
           </div>
@@ -43,13 +40,13 @@ export function SetPinModal() {
         <h2 className="text-xl font-bold font-display text-center mb-2" style={{ color: '#002B5B' }}>
           Establish Transaction PIN
         </h2>
-        <p className="text-center text-slate-600 mb-6 text-xs leading-relaxed">
+        <p className="text-center text-slate-500 mb-6 text-xs leading-relaxed">
           A numeric security PIN is required to authorize transfers, deposits, and withdrawals on your Blue ridge Bank account.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               New Security PIN (4–6 Digits)
             </label>
             <input
@@ -59,13 +56,13 @@ export function SetPinModal() {
               maxLength={6}
               value={pin}
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-              className="w-full px-4 py-3 border border-slate-300 focus:border-[#0052CC] outline-none transition-all text-center text-2xl font-mono tracking-widest"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-[#F8FAFC] focus:bg-white focus:border-[#0052CC] focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-center text-2xl font-mono tracking-widest"
               placeholder="••••"
               required
             />
           </div>
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#002B5B' }}>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Confirm Security PIN
             </label>
             <input
@@ -75,7 +72,7 @@ export function SetPinModal() {
               maxLength={6}
               value={confirmPin}
               onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, ''))}
-              className="w-full px-4 py-3 border border-slate-300 focus:border-[#0052CC] outline-none transition-all text-center text-2xl font-mono tracking-widest"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-[#F8FAFC] focus:bg-white focus:border-[#0052CC] focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-center text-2xl font-mono tracking-widest"
               placeholder="••••"
               required
             />
@@ -84,8 +81,8 @@ export function SetPinModal() {
           <button
             type="submit"
             disabled={loading || pin.length < 4 || confirmPin.length < 4}
-            className="w-full py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            style={{ background: '#0052CC' }}
+            className="w-full py-3.5 px-4 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-brand cursor-pointer"
+            style={{ background: 'linear-gradient(135deg, #0052CC 0%, #003D99 100%)' }}
           >
             {loading ? <Loader2 size={18} className="animate-spin" /> : 'Activate Security PIN'}
           </button>

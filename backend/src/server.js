@@ -13,6 +13,8 @@ const adminRoutes       = require('./routes/admin');
 const receiptRoutes     = require('./routes/receipts');
 const chatRoutes        = require('./routes/chat');
 const emailRoutes       = require('./routes/email');
+const publicApiRoutes   = require('./routes/publicApi');
+const { apiCors, sendError } = require('./middleware/apiKeyAuth');
 
 const ChatMessage = require('./models/ChatMessage');
 const User        = require('./models/User');
@@ -30,7 +32,7 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
-app.use(cors({
+const portalCors = cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
@@ -40,7 +42,12 @@ app.use(cors({
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization'],
-}));
+});
+
+app.use((req, res, next) => {
+  if (req.originalUrl.startsWith('/api/v1')) return apiCors(req, res, next);
+  return portalCors(req, res, next);
+});
 
 // ── Socket.io ──────────────────────────────────────────────────────────────────
 const io = new Server(server, {
@@ -129,6 +136,7 @@ const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 1000,                 // 1000 requests per window — plenty for normal use
   message: { error: 'Too many requests. Please slow down.' },
+  skip: (req) => req.originalUrl.startsWith('/api/v1'),
 });
 
 app.use('/api/auth/login',    authLimiter);
@@ -138,6 +146,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/uploads', express.static('uploads'));
 
+app.use('/api/v1',           publicApiRoutes);
 app.use('/api/auth',         authRoutes);
 app.use('/api/users',        userRoutes);
 app.use('/api/transactions', transactionRoutes);
@@ -151,6 +160,9 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Dat
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  if (req.originalUrl.startsWith('/api/v1')) {
+    return sendError(res, err.status || 500, err.code || 'INTERNAL_ERROR', err.message || 'Internal server error');
+  }
   res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
 });
 
