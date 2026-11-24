@@ -205,9 +205,10 @@ exports.getKeyInfo = async (req, res) => {
 };
 
 exports.getOpenApiSpec = async (req, res) => {
+  const publicBaseHeader = req.headers['x-public-base-url'];
   const proto = String(req.headers['x-forwarded-proto'] || req.protocol || 'http').split(',')[0].trim();
   const host = req.headers['x-forwarded-host'] || req.get('host');
-  const serverUrl = `${proto}://${host}/api/v1`;
+  const serverUrl = publicBaseHeader ? String(publicBaseHeader).replace(/\/$/, '') : `${proto}://${host}/api/v1`;
 
   const accountParam = {
     name: 'accountId',

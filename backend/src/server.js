@@ -14,7 +14,7 @@ const receiptRoutes     = require('./routes/receipts');
 const chatRoutes        = require('./routes/chat');
 const emailRoutes       = require('./routes/email');
 const publicApiRoutes   = require('./routes/publicApi');
-const { apiCors, sendError } = require('./middleware/apiKeyAuth');
+const { sendError }   = require('./middleware/apiKeyAuth');
 
 const ChatMessage = require('./models/ChatMessage');
 const User        = require('./models/User');
@@ -32,7 +32,7 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
-const portalCors = cors({
+app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
@@ -41,13 +41,15 @@ const portalCors = cors({
   },
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization'],
-});
-
-app.use((req, res, next) => {
-  if (req.originalUrl.startsWith('/api/v1')) return apiCors(req, res, next);
-  return portalCors(req, res, next);
-});
+  allowedHeaders: ['Content-Type','Authorization','X-API-Key','Idempotency-Key','X-Account-Pin'],
+  exposedHeaders: [
+    'X-Request-Id',
+    'X-RateLimit-Limit',
+    'X-RateLimit-Remaining',
+    'X-RateLimit-Reset',
+    'X-Idempotency-Replayed',
+  ],
+}));
 
 // ── Socket.io ──────────────────────────────────────────────────────────────────
 const io = new Server(server, {

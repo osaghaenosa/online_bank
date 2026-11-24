@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { PublicNav } from '@/components/layout/PublicNav'
 import { BrandLogo } from '@/components/shared/BrandLogo'
@@ -21,8 +21,10 @@ import {
 } from 'lucide-react'
 
 function getDefaultBaseV1() {
-  const raw = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-  return raw.replace(/\/api\/?$/, '') + '/api/v1'
+  const envBase = process.env.NEXT_PUBLIC_BASE_URL?.trim()
+  if (envBase) return envBase.replace(/\/$/, '') + '/api/v1'
+  if (typeof window !== 'undefined') return `${window.location.origin}/api/v1`
+  return 'https://theblueridges.com/api/v1'
 }
 
 const METHOD_STYLES: Record<HttpMethod, { bg: string; text: string; border: string }> = {
@@ -332,6 +334,11 @@ function TryItLive({
 export default function ApiDocsPage() {
   const defaultBase = useMemo(() => getDefaultBaseV1(), [])
   const [baseUrl, setBaseUrl] = useState(defaultBase)
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_BASE_URL?.trim()) {
+      setBaseUrl(`${window.location.origin}/api/v1`)
+    }
+  }, [])
   const [apiKey, setApiKey] = useState('')
   const [showKey, setShowKey] = useState(false)
   const [language, setLanguage] = useState<LanguageId>('curl')
@@ -620,6 +627,14 @@ export default function ApiDocsPage() {
               <p className="text-sm mt-2 leading-relaxed text-slate-600">
                 Blue ridge Bank operates an administrator-governed API. Only integrations and clients approved by the overall bank administrator can receive an API key. Upon approval, the administrator issues a secret key (<span className="font-code font-semibold">brb_live_...</span> or <span className="font-code font-semibold">brb_test_...</span>), defines your account scope (<span className="font-code">all</span>, <span className="font-code">owned</span>, or <span className="font-code">single_user</span>), sets your rate limit, and selects your allowed permission scopes.
               </p>
+              <div className="mt-4 p-4 rounded-2xl border border-blue-200 bg-[#EBF2FF] text-xs leading-relaxed text-[#002B5B]">
+                <p className="font-bold uppercase tracking-wider mb-1 text-[#0052CC]">
+                  Frontend API Gateway &amp; Backend CORS Security
+                </p>
+                <p>
+                  All external API calls are routed through the <strong>Frontend API Gateway</strong> (<span className="font-code font-semibold">{baseUrl}</span>), which securely forwards requests server-to-server to the core banking engine. Because the core backend remains protected by strict origin-locked CORS security and never exposes wildcard browser access, your integrations connect safely through the frontend gateway from any programming language or directly from this page&apos;s Live Playground. <strong>Always use this bank&apos;s full base URL (<span className="font-code">{baseUrl}</span>) in your code</strong> — never a relative path on your own website.
+                </p>
+              </div>
               <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 rounded-2xl bg-[#F4F7FC] border border-slate-200/60">
                   <ShieldCheck size={18} className="mb-2 text-[#0052CC]" />
@@ -776,7 +791,7 @@ npx @openapitools/openapi-generator-cli generate \\
                             {ep.method}
                           </span>
                           <code className="font-code text-xs sm:text-sm font-bold break-all text-[#002B5B]">
-                            /api/v1{ep.path}
+                            {baseUrl.replace(/\/$/, '')}{ep.path}
                           </code>
                         </div>
 

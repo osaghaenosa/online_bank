@@ -211,7 +211,12 @@ function requirePermission(permission) {
 function resolveTargetAccount({ requireActive = false } = {}) {
   return async (req, res, next) => {
     try {
-      const rawId = String(req.params.accountId || '').trim();
+      const rawId = String(
+        req.params.accountId ||
+        req.body?.accountId ||
+        req.query?.accountId ||
+        (req.apiKey?.userId ? 'me' : '')
+      ).trim();
       if (!rawId) {
         return sendError(res, 400, 'INVALID_ACCOUNT_ID', 'Account identifier is required.');
       }

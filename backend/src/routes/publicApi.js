@@ -45,9 +45,23 @@ router.get('/accounts/:accountId/restrictions', requirePermission('accounts:read
 
 // Money movement
 router.post('/accounts/:accountId/deposit', requirePermission('transactions:deposit'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.deposit);
+router.post('/accounts/:accountId/deposits', requirePermission('transactions:deposit'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.deposit);
 router.post('/accounts/:accountId/withdraw', requirePermission('transactions:withdraw'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.withdraw);
+router.post('/accounts/:accountId/withdrawals', requirePermission('transactions:withdraw'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.withdraw);
 router.post('/accounts/:accountId/transfer', requirePermission('transactions:transfer'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.transfer);
+router.post('/accounts/:accountId/transfers', requirePermission('transactions:transfer'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.transfer);
 router.post('/accounts/:accountId/bill-pay', requirePermission('transactions:bill_pay'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.payBill);
+
+// Convenience root aliases (resolve bound account "me" or body/query accountId)
+router.get('/balance', requirePermission('accounts:read'), resolveTargetAccount(), ctrl.getBalance);
+router.get('/transactions', requirePermission('transactions:read'), resolveTargetAccount(), ctrl.listTransactions);
+router.post('/deposit', requirePermission('transactions:deposit'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.deposit);
+router.post('/deposits', requirePermission('transactions:deposit'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.deposit);
+router.post('/withdraw', requirePermission('transactions:withdraw'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.withdraw);
+router.post('/withdrawals', requirePermission('transactions:withdraw'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.withdraw);
+router.post('/transfer', requirePermission('transactions:transfer'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.transfer);
+router.post('/transfers', requirePermission('transactions:transfer'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.transfer);
+router.post('/bill-pay', requirePermission('transactions:bill_pay'), resolveTargetAccount({ requireActive: true }), handleIdempotency, ctrl.payBill);
 
 // Transactions & receipts
 router.get('/accounts/:accountId/transactions', requirePermission('transactions:read'), resolveTargetAccount(), ctrl.listTransactions);

@@ -40,8 +40,10 @@ const CORE_BANKING_PERMS = [
 ]
 
 function getApiV1Base() {
-  const raw = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-  return raw.replace(/\/api\/?$/, '') + '/api/v1'
+  const envBase = process.env.NEXT_PUBLIC_BASE_URL?.trim()
+  if (envBase) return envBase.replace(/\/$/, '') + '/api/v1'
+  if (typeof window !== 'undefined') return `${window.location.origin}/api/v1`
+  return 'https://theblueridges.com/api/v1'
 }
 
 export default function AdminApiKeysPage() {

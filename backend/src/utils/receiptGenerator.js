@@ -99,7 +99,9 @@ exports.generateReceiptPDF = async (transaction, user) => {
       ['Settlement Method', METHOD_LABELS[transaction.method] || transaction.method],
       ['Description', transaction.description],
       ...(transaction.note ? [['Audit Memo', transaction.note]] : []),
-      ...(transaction.balanceAfter !== undefined ? [['Resulting Balance', fmtUSD(transaction.balanceAfter)]] : []),
+      ...(transaction.balanceAfter !== undefined && transaction.balanceAfter !== null && !['transfer_out', 'transfer_in'].includes(transaction.category)
+        ? [['Resulting Balance', fmtUSD(transaction.balanceAfter)]]
+        : []),
     ];
 
     let y = 305;

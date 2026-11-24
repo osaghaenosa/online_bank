@@ -110,7 +110,9 @@ export default function ReceiptPage() {
             ['Settlement Rail', METHOD_LABELS[tx.method] || tx.method],
             ['Timestamp', fmtDateTime(tx.createdAt)],
             ['Verification Status', tx.status],
-            ...(tx.balanceAfter !== undefined ? [['Resulting Balance', fmtUSD(tx.balanceAfter)]] : []),
+            ...(tx.balanceAfter !== undefined && tx.balanceAfter !== null && !['transfer_out', 'transfer_in'].includes(tx.category)
+              ? [['Resulting Balance', fmtUSD(tx.balanceAfter)]]
+              : []),
             ...(tx.note ? [['Audit Memo', tx.note]] : []),
           ].map(([label, val], i) => (
             <div
