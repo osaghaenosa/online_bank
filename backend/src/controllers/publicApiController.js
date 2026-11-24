@@ -1373,12 +1373,6 @@ exports.transfer = async (req, res, next) => {
         targetRecipient = await rq;
       }
 
-      if (targetRecipient && targetRecipient.role === 'admin') {
-        const e = new Error('Cannot transfer to administrative accounts.');
-        e.status = 403; e.code = 'FORBIDDEN_ACCOUNT';
-        throw e;
-      }
-
       const isSelf =
         (targetRecipient && targetRecipient._id.toString() === freshSender._id.toString()) ||
         (recipientEmail && String(recipientEmail).trim().toLowerCase() === freshSender.email) ||
