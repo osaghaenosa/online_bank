@@ -2,11 +2,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Eye, EyeOff, Wifi, ArrowUpRight, CreditCard } from 'lucide-react'
+import { fmtUSD } from '@/lib/api'
 import type { User } from '@/store/auth'
 
 export function VirtualCardWidget({ user }: { user: User | null }) {
   const [showLast4, setShowLast4] = useState(true)
-  const last4 = String(user?.cardNumber || '0000').slice(-4)
+  const last4 = user?.cardNumber ? String(user.cardNumber).slice(-4) : null
   const status = user?.cardStatus || 'Not Requested'
   const isActive = status === 'Active'
 
@@ -74,10 +75,19 @@ export function VirtualCardWidget({ user }: { user: User | null }) {
 
           {/* Card Number */}
           <div className="my-4">
-            <p className="text-[10px] text-blue-200 font-medium mb-1">Blue ridge Commercial Debit</p>
-            <p className="font-mono text-base sm:text-lg font-bold tracking-[0.16em] text-white whitespace-nowrap">
-              {showLast4 ? `•••• •••• •••• ${last4}` : '•••• •••• •••• ••••'}
+            <p className="text-[10px] text-blue-200 font-medium mb-1">
+              {status === 'Not Requested' ? 'No Card Purchased Yet' : 'Blue ridge Commercial Debit'}
             </p>
+            <p className="font-mono text-base sm:text-lg font-bold tracking-[0.16em] text-white whitespace-nowrap">
+              {status === 'Not Requested'
+                ? 'Buy a card to activate'
+                : (showLast4 && last4 ? `•••• •••• •••• ${last4}` : '•••• •••• •••• ••••')}
+            </p>
+            {isActive && (
+              <p className="text-xs font-mono text-blue-100 mt-1.5">
+                Card Balance: <strong className="text-white">{fmtUSD(user?.cardBalance || 0)}</strong>
+              </p>
+            )}
           </div>
 
           {/* Bottom Row */}

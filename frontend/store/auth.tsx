@@ -11,6 +11,7 @@ export interface User {
   location?: string
   address?: { street?: string; city?: string; state?: string; zip?: string; country?: string }
   balance: number
+  cardBalance?: number
   savingsBalance: number
   savingsGoal: number
   accountNumber: string
@@ -22,7 +23,20 @@ export interface User {
   cardStatus: 'Not Requested' | 'Pending Approval' | 'Active' | 'Blocked'
   cardType: string
   status: 'active' | 'suspended' | 'pending'
+  accountType?: 'personal' | 'business'
   kyc: 'Verified' | 'Pending' | 'Rejected' | 'Not Started'
+  businessDetails?: {
+    companyName?: string
+    registrationNumber?: string
+    businessType?: string
+    complianceStatus?: 'Not Started' | 'Pending' | 'Verified' | 'Rejected'
+    registrationDocs?: string
+    directorIdAndProof?: string
+    boardResolution?: string
+    businessActivity?: string
+    submittedAt?: string
+    rejectionReason?: string
+  }
   role: 'user' | 'admin'
   notifications: { email: boolean; sms: boolean; push: boolean }
   linkedAccounts: Array<{

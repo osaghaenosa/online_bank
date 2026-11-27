@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/store/auth'
 import { api, fmtUSD } from '@/lib/api'
 import { Card, Button, SectionHeader, Divider } from '@/components/ui'
-import { CreditCard, Clock, ShieldAlert, Eye, EyeOff, Landmark, Wifi } from 'lucide-react'
+import { CreditCard, Clock, ShieldAlert, Eye, EyeOff, Landmark, Wifi, ArrowRightLeft } from 'lucide-react'
 import { TransactionAuthModal } from '@/components/shared/TransactionAuthModal'
 
 export default function DebitCardPage() {
@@ -13,6 +13,8 @@ export default function DebitCardPage() {
   const [selectedType, setSelectedType] = useState('Visa')
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [revealed, setRevealed] = useState(false)
+  const [fundAmount, setFundAmount] = useState('')
+  const [funding, setFunding] = useState(false)
 
   useEffect(() => {
     api.settings.getCardFee().then(d => setCardFee(d.cardFee ?? 50)).catch(() => {})
@@ -20,57 +22,23 @@ export default function DebitCardPage() {
 
   if (!user) return null
 
-  const kyc = (user as any)?.kyc
-  if (kyc === 'Pending') {
-    return (
-      <div className="max-w-xl mx-auto mt-8 fade-up">
-        <Card className="p-8 text-center rounded-3xl shadow-float">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center bg-amber-50 text-amber-600 mx-auto mb-5">
-            <Clock size={30} />
-          </div>
-          <h2 className="text-2xl font-bold font-display mb-2 text-[#002B5B]">
-            KYC Verification Under Review
-          </h2>
-          <p className="text-sm text-slate-600 mb-2">
-            Your KYC compliance documents are currently under review by our onboarding team.
-          </p>
-          <p className="text-xs text-slate-400 mb-6">
-            Card issuance will unlock automatically once verification completes (1–2 business days).
-          </p>
-          <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>
-            Return to Account Overview
-          </Button>
-        </Card>
-      </div>
-    )
-  }
+  const handleFundCard = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const amt = parseFloat(fundAmount)
+    if (!amt || amt <= 0) { toast('Enter a valid amount', 'error'); return }
+    if (amt > (user.balance || 0)) { toast('Insufficient checking balance', 'error'); return }
 
-  if (kyc !== 'Verified') {
-    return (
-      <div className="max-w-xl mx-auto mt-8 fade-up">
-        <Card className="p-8 text-center rounded-3xl shadow-float">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center bg-[#EBF2FF] text-[#0052CC] mx-auto mb-5">
-            <ShieldAlert size={30} />
-          </div>
-          <h2 className="text-2xl font-bold font-display mb-2 text-[#002B5B]">
-            {kyc === 'Rejected' ? 'KYC Verification Declined' : 'Identity Verification Required'}
-          </h2>
-          <p className="text-sm text-slate-500 mb-8">
-            {kyc === 'Rejected'
-              ? 'Your previous KYC submission was declined. Please re-submit your verification documents to request a commercial debit card.'
-              : 'You must complete KYC compliance verification before requesting a virtual or commercial debit card.'}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>
-              Return to Overview
-            </Button>
-            <Button variant="primary" onClick={() => window.location.href = '/kyc'}>
-              {kyc === 'Rejected' ? 'Re-submit KYC' : 'Complete KYC Verification'}
-            </Button>
-          </div>
-        </Card>
-      </div>
-    )
+    setFunding(true)
+    try {
+      await api.users.fundCard({ amount: amt })
+      await refreshUser()
+      setFundAmount('')
+      toast(`${fmtUSD(amt)} transferred to your debit card`, 'success')
+    } catch (err: any) {
+      toast(err.message || 'Failed to fund card', 'error')
+    } finally {
+      setFunding(false)
+    }
   }
 
   const handleRequest = async () => {
@@ -268,6 +236,64 @@ export default function DebitCardPage() {
               <EyeOff size={16} /> Mask Card Credentials
             </Button>
           )}
+
+          {/* Card Balance & Transfer from Checking */}
+          <Card className="p-6 max-w-md mx-auto space-y-5">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3.5 rounded-2xl bg-[#EBF2FF] border border-blue-200/70">
+                <p className="text-[11px] font-semibold text-[#0052CC]">Card Balance</p>
+                <p className="font-mono text-xl font-bold text-[#002B5B] mt-0.5">
+                  {fmtUSD(user.cardBalance || 0)}
+                </p>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-[#F4F7FC] border border-slate-200/80">
+                <p className="text-[11px] font-semibold text-slate-500">Checking Balance</p>
+                <p className="font-mono text-xl font-bold text-[#002B5B] mt-0.5">
+                  {fmtUSD(user.balance || 0)}
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleFundCard} className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-[#002B5B] mb-1.5">
+                  Transfer Money from Checking Balance to Card
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">$</span>
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={fundAmount}
+                    onChange={(e) => setFundAmount(e.target.value)}
+                    className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-slate-200 bg-[#F8FAFC] focus:bg-white focus:border-[#0052CC] text-sm font-mono outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {[50, 100, 500, 1000].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setFundAmount(String(preset))}
+                    className="px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 bg-slate-50 hover:bg-[#EBF2FF] text-[#002B5B] transition-colors cursor-pointer"
+                  >
+                    +${preset}
+                  </button>
+                ))}
+              </div>
+
+              <Button type="submit" variant="primary" className="w-full rounded-full" loading={funding}>
+                <ArrowRightLeft size={15} /> Transfer Funds to Card
+              </Button>
+              <p className="text-[11px] text-slate-500 text-center">
+                Card withdrawals draw from your Card Balance.
+              </p>
+            </form>
+          </Card>
         </div>
       )}
 

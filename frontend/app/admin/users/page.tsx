@@ -107,6 +107,20 @@ export default function AdminUsersPage() {
     } catch (err: any) { toast(err.message, 'error') }
   }
 
+  const handleBusinessComplianceUpdate = async (u: any, status: 'Verified' | 'Rejected') => {
+    if (status === 'Rejected' && !kycReason.trim()) {
+      toast('Please provide a reason for rejection', 'error')
+      return
+    }
+    try {
+      const d = await api.admin.updateBusinessCompliance(u._id, { status, reason: kycReason })
+      setUsers(p => p.map(x => x._id === d.user._id ? d.user : x))
+      if (selected?._id === d.user._id) setSelected(d.user)
+      setKycReason('')
+      toast(`Business compliance ${status.toLowerCase()}`, 'success')
+    } catch (err: any) { toast(err.message, 'error') }
+  }
+
   const handleTokensUpdate = async () => {
     if (!selected) return
     try {
@@ -279,6 +293,44 @@ export default function AdminUsersPage() {
                                  )}
                                </div>],
                   ['Status',   <StatusBadge key="s" status={selected.status} />],
+                  ['Account Type', <span key="at" className="capitalize">{selected.accountType || 'personal'}</span>],
+                  ...(selected.accountType === 'business' ? [[
+                    'Business KYB',
+                    <div key="biz" className="flex flex-col gap-2 items-end max-w-xs">
+                      <div className="flex items-center gap-2">
+                        <StatusBadge status={selected.businessDetails?.complianceStatus || 'Not Started'} />
+                        {selected.businessDetails?.complianceStatus === 'Pending' && (
+                          <div className="flex gap-2">
+                            <button onClick={() => handleBusinessComplianceUpdate(selected, 'Verified')} className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-bold hover:bg-emerald-200 transition-all cursor-pointer">
+                              Activate
+                            </button>
+                            <button onClick={() => handleBusinessComplianceUpdate(selected, 'Rejected')} className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold hover:bg-red-200 transition-all cursor-pointer">
+                              Reject
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      {selected.businessDetails && (
+                        <div className="p-2 rounded border text-xs text-left w-full space-y-1" style={{ background: 'var(--color-bg)', borderColor: 'var(--color-border)' }}>
+                          <div><strong>Company:</strong> {selected.businessDetails.companyName || '—'}</div>
+                          {selected.businessDetails.registrationNumber && <div><strong>Reg No:</strong> {selected.businessDetails.registrationNumber}</div>}
+                          {selected.businessDetails.businessType && <div><strong>Type:</strong> {selected.businessDetails.businessType}</div>}
+                          {selected.businessDetails.registrationDocs && (
+                            <div><strong>Reg Docs:</strong> <a href={selected.businessDetails.registrationDocs} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View</a></div>
+                          )}
+                          {selected.businessDetails.directorIdAndProof && (
+                            <div><strong>Director/UBO IDs:</strong> <a href={selected.businessDetails.directorIdAndProof} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View</a></div>
+                          )}
+                          {selected.businessDetails.boardResolution && (
+                            <div><strong>Board Resolution:</strong> <a href={selected.businessDetails.boardResolution} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View</a></div>
+                          )}
+                          {selected.businessDetails.businessActivity && (
+                            <div><strong>Activity:</strong> {selected.businessDetails.businessActivity}</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ]] : []),
                   ['Role',     selected.role],
                 ].map(([l, v], i) => (
                   <div key={i} className="flex justify-between py-2.5 border-b last:border-0" style={{ borderColor: 'var(--color-border)' }}>

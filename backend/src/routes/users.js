@@ -140,6 +140,91 @@ router.post('/kyc', upload.fields([{ name: 'idCard' }, { name: 'otherVerificatio
   } catch (err) { next(err); }
 });
 
+router.post(
+  '/business-compliance',
+  upload.fields([
+    { name: 'registrationDocs' },
+    { name: 'directorIdAndProof' },
+    { name: 'boardResolution' },
+  ]),
+  async (req, res, next) => {
+    try {
+      const { businessActivity, companyName, registrationNumber, businessType } = req.body;
+      let { registrationDocs, directorIdAndProof, boardResolution } = req.body;
+
+      const user = await User.findById(req.user._id);
+      if (!user) return res.status(404).json({ error: 'User not found' });
+      if (user.accountType !== 'business') {
+        return res.status(400).json({ error: 'Business compliance is only applicable to business accounts' });
+      }
+
+      const { uploadToImageKit } = require('../utils/imagekit');
+      const hasImageKit = Boolean(
+        process.env.IMAGEKIT_PUBLIC_KEY &&
+        process.env.IMAGEKIT_PRIVATE_KEY &&
+        process.env.IMAGEKIT_URL_ENDPOINT
+      );
+
+      const uploadField = async (fieldKey, currentVal) => {
+        if (req.files && req.files[fieldKey] && req.files[fieldKey][0]) {
+          const file = req.files[fieldKey][0];
+          if (hasImageKit) {
+            const result = await uploadToImageKit(file.buffer, `biz_${fieldKey}_${user._id}_${Date.now()}`, '/nexabank/business-kyc');
+            return result.url;
+          }
+          return `uploaded:${file.originalname}`;
+        }
+        if (currentVal && typeof currentVal === 'string' && currentVal.startsWith('data:') && hasImageKit) {
+          const result = await uploadToImageKit(currentVal, `biz_${fieldKey}_${user._id}_${Date.now()}`, '/nexabank/business-kyc');
+          return result.url;
+        }
+        return currentVal;
+      };
+
+      registrationDocs = await uploadField('registrationDocs', registrationDocs);
+      directorIdAndProof = await uploadField('directorIdAndProof', directorIdAndProof);
+      boardResolution = await uploadField('boardResolution', boardResolution);
+
+      if (!registrationDocs || !directorIdAndProof || !boardResolution || !String(businessActivity || '').trim()) {
+        return res.status(400).json({
+          error: 'All business compliance documents and a description of business activity are required',
+        });
+      }
+
+      user.kyc = 'Pending';
+      user.businessDetails = {
+        ...(user.businessDetails?.toObject?.() || user.businessDetails || {}),
+        ...(companyName ? { companyName: String(companyName).trim() } : {}),
+        ...(registrationNumber !== undefined ? { registrationNumber: String(registrationNumber).trim() } : {}),
+        ...(businessType !== undefined ? { businessType: String(businessType).trim() } : {}),
+        registrationDocs,
+        directorIdAndProof,
+        boardResolution,
+        businessActivity: String(businessActivity).trim(),
+        complianceStatus: 'Pending',
+        submittedAt: new Date(),
+        rejectionReason: '',
+      };
+
+      await user.save();
+
+      await Notification.create({
+        userId: user._id,
+        title: 'Business Compliance Submitted',
+        message: 'Your corporate registration, director IDs, board resolution, and business activity profile have been submitted for review.',
+        type: 'system',
+        priority: 'high',
+      });
+
+      res.json({
+        success: true,
+        message: 'Business compliance documents submitted successfully',
+        user: user.toPublicJSON(),
+      });
+    } catch (err) { next(err); }
+  }
+);
+
 
 // ── Payment method settings (public to all authenticated users) ───────────────
 router.get('/deposit-settings', async (req, res, next) => {
@@ -187,7 +272,64 @@ router.post('/card/request', protect, async (req, res, next) => {
     user.cardType = cardType;
     await user.save();
 
-    res.json({ message: 'Card requested successfully', user });
+    res.json({ message: 'Card requested successfully', user: user.toPublicJSON() });
+  } catch (err) { next(err); }
+});
+
+// @desc    Transfer money from checking balance to debit card balance
+// @route   POST /api/users/card/fund
+// @access  Private
+router.post('/card/fund', protect, async (req, res, next) => {
+  try {
+    const numAmount = parseFloat(req.body.amount);
+    if (!Number.isFinite(numAmount) || numAmount <= 0) {
+      return res.status(400).json({ error: 'Enter a valid positive amount' });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (user.cardStatus !== 'Active') {
+      return res.status(400).json({ error: 'An active debit card is required before funding it' });
+    }
+    if (user.balance < numAmount) {
+      return res.status(400).json({ error: `Insufficient checking balance. Available: $${user.balance.toFixed(2)}` });
+    }
+
+    user.balance = parseFloat((user.balance - numAmount).toFixed(2));
+    user.cardBalance = parseFloat(((user.cardBalance || 0) + numAmount).toFixed(2));
+    await user.save();
+
+    const Transaction = require('../models/Transaction');
+    const tx = await Transaction.create({
+      userId: user._id,
+      type: 'debit',
+      category: 'transfer_out',
+      method: 'card',
+      amount: numAmount,
+      fee: 0,
+      description: 'Transfer to Debit Card',
+      note: `Card funded (${user.cardType || 'Debit'} •••• ${String(user.cardNumber || '').slice(-4)})`,
+      status: 'completed',
+      balanceAfter: user.balance,
+    });
+
+    await Notification.create({
+      userId: user._id,
+      title: 'Debit Card Funded',
+      message: `$${numAmount.toFixed(2)} has been transferred from your checking balance to your debit card. Card balance: $${user.cardBalance.toFixed(2)}.`,
+      type: 'transaction',
+      priority: 'medium',
+    });
+
+    res.json({
+      success: true,
+      message: 'Funds transferred to your debit card successfully',
+      balance: user.balance,
+      cardBalance: user.cardBalance,
+      transaction: tx,
+      user: user.toPublicJSON(),
+    });
   } catch (err) { next(err); }
 });
 

@@ -108,7 +108,19 @@ export default function WithdrawPage() {
 
   const handleWithdraw = async () => {
     if (!num || num <= 0)             { toast('Enter a valid amount', 'error'); return }
-    if (total > (user?.balance || 0)) { toast(`Insufficient funds. You need ${fmtUSD(total)}`, 'error'); return }
+    if (method === 'card') {
+      if (user?.cardStatus !== 'Active') {
+        toast('An active debit card is required. Buy and activate a card first.', 'error')
+        return
+      }
+      if (total > (user?.cardBalance || 0)) {
+        toast(`Insufficient card balance (${fmtUSD(user?.cardBalance || 0)}). Transfer funds to your card first.`, 'error')
+        return
+      }
+    } else if (total > (user?.balance || 0)) {
+      toast(`Insufficient funds. You need ${fmtUSD(total)}`, 'error')
+      return
+    }
     if (isCrypto && !wallet)          { toast('Enter recipient wallet address', 'error'); return }
 
     if (isIBAN) {
@@ -522,6 +534,27 @@ export default function WithdrawPage() {
                   value={referenceMemo}
                   onChange={e => setReferenceMemo(e.target.value)}
                 />
+              </div>
+            )}
+
+            {method === 'card' && (
+              <div className="mb-5 p-4 rounded-2xl border border-blue-200/80 bg-[#EBF2FF] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold text-[#002B5B]">
+                    Debit Card Balance: <span className="font-mono text-[#0052CC]">{fmtUSD(user?.cardBalance || 0)}</span>
+                  </p>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    {user?.cardStatus === 'Active'
+                      ? 'Card withdrawals are funded from your Card Balance. Transfer money into your card first if needed.'
+                      : 'You need an active debit card before withdrawing via card.'}
+                  </p>
+                </div>
+                <Link
+                  href="/card"
+                  className="px-4 py-2 rounded-full bg-[#0052CC] text-white text-xs font-semibold whitespace-nowrap text-center"
+                >
+                  {user?.cardStatus === 'Active' ? 'Fund Card' : 'Buy Debit Card'}
+                </Link>
               </div>
             )}
 

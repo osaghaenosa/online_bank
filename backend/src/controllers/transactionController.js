@@ -136,8 +136,18 @@ exports.withdraw = async (req, res, next) => {
     if (securityCheck.error) {
       return res.status(400).json({ error: securityCheck.error });
     }
-    
-    if (user.balance < total) {
+
+    if (method === 'card') {
+      if (user.cardStatus !== 'Active') {
+        return res.status(400).json({ error: 'An active debit card is required for card withdrawals. Please buy and activate a card first.' });
+      }
+      const cardBal = user.cardBalance || 0;
+      if (cardBal < total) {
+        return res.status(400).json({
+          error: `Insufficient card balance. Available on card: ${fmtUSD(cardBal)}, Required: ${fmtUSD(total)}. Transfer funds from your checking balance to your card first.`
+        });
+      }
+    } else if (user.balance < total) {
       return res.status(400).json({ error: `Insufficient funds. Available: ${fmtUSD(user.balance)}, Required: ${fmtUSD(total)}` });
     }
 
@@ -438,6 +448,10 @@ exports.payBill = async (req, res, next) => {
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) return res.status(400).json({ error: 'Invalid amount' });
     const user = await User.findById(req.user._id).session(session);
+    if (user.accountType === 'business' && user.businessDetails?.complianceStatus !== 'Verified' && !user.transfersEnabled) {
+      await session.abortTransaction();
+      return res.status(403).json({ error: 'Business compliance verification is required before outbound payments are enabled. Your account can receive funds only.' });
+    }
     if (user.balance < numAmount) { await session.abortTransaction(); return res.status(400).json({ error: 'Insufficient funds' }); }
     const newBalance = parseFloat((user.balance - numAmount).toFixed(2));
     const tx = new Transaction({

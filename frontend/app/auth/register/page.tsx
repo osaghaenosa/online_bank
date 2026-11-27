@@ -220,6 +220,19 @@ export default function RegisterPage() {
             </div>
           )}
 
+          {/* Account Type Switcher */}
+          <div className="mb-5 grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-[#F4F7FC] border border-slate-200">
+            <div className="py-2.5 px-3 rounded-xl text-center text-xs font-bold bg-[#002B5B] text-white shadow-sm">
+              Personal Account
+            </div>
+            <Link
+              href="/auth/register/business"
+              className="py-2.5 px-3 rounded-xl text-center text-xs font-bold text-[#002B5B] hover:bg-white transition-colors"
+            >
+              Business Account →
+            </Link>
+          </div>
+
           <form onSubmit={submit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[

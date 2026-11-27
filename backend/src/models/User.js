@@ -21,15 +21,29 @@ const userSchema = new mongoose.Schema({
   cardStatus:     { type: String, enum: ['Not Requested', 'Pending Approval', 'Active', 'Blocked'], default: 'Not Requested' },
   cardType:       { type: String, enum: ['Visa', 'Mastercard'] },
   balance:        { type: Number, default: 0, min: 0 },
+  cardBalance:    { type: Number, default: 0, min: 0 },
   savingsBalance: { type: Number, default: 0, min: 0 },
   savingsGoal:    { type: Number, default: 5000 },
   status: { type: String, enum: ['active', 'suspended', 'pending'], default: 'active' },
-  kyc:    { type: String, enum: ['Verified', 'Pending', 'Rejected', 'Not Started'], default: 'Pending' },
+  accountType: { type: String, enum: ['personal', 'business'], default: 'personal' },
+  kyc:    { type: String, enum: ['Verified', 'Pending', 'Rejected', 'Not Started'], default: 'Not Started' },
   kycDetails: {
     idCard: { type: String, select: false },
     otherVerification: { type: String, select: false },
     ssnOrBvn: { type: String },
     submittedAt: { type: Date }
+  },
+  businessDetails: {
+    companyName:        { type: String, default: '' },
+    registrationNumber: { type: String, default: '' },
+    businessType:       { type: String, default: '' },
+    complianceStatus:   { type: String, enum: ['Not Started', 'Pending', 'Verified', 'Rejected'], default: 'Not Started' },
+    registrationDocs:   { type: String, select: false },
+    directorIdAndProof: { type: String, select: false },
+    boardResolution:    { type: String, select: false },
+    businessActivity:   { type: String, default: '' },
+    submittedAt:        { type: Date },
+    rejectionReason:    { type: String, default: '' },
   },
   pin: { type: String }, // Hashed transaction PIN
   trackTokenNumber: { type: String },
@@ -135,11 +149,7 @@ userSchema.pre('save', async function(next) {
 
 userSchema.pre('save', async function(next) {
   if (!this.accountNumber) {
-    this.accountNumber = Array.from({ length: 12 }, () => Math.floor(Math.random() * 10)).join('');
-    this.cardNumber    = Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join('');
-    const d = new Date(); d.setFullYear(d.getFullYear() + 4);
-    this.cardExpiry = String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getFullYear()).slice(-2);
-    this.cvv = Math.floor(100 + Math.random() * 900).toString();
+    this.accountNumber = '99' + Array.from({ length: 10 }, () => Math.floor(Math.random() * 10)).join('');
   }
   next();
 });

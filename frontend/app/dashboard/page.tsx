@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [hideBalance, setHideBalance] = useState(false)
   const [copiedAcct, setCopiedAcct] = useState(false)
+  const [copiedRouting, setCopiedRouting] = useState(false)
   const [greeting, setGreeting] = useState('Welcome back')
 
   useEffect(() => {
@@ -77,6 +78,14 @@ export default function DashboardPage() {
     setCopiedAcct(true)
     toast('Account number copied', 'success')
     setTimeout(() => setCopiedAcct(false), 1800)
+  }
+
+  const copyRoutingNumber = () => {
+    const routing = user?.routingNumber || '021000021'
+    navigator.clipboard?.writeText(routing).catch(() => {})
+    setCopiedRouting(true)
+    toast('Routing number copied', 'success')
+    setTimeout(() => setCopiedRouting(false), 1800)
   }
 
   const QUICK = [
@@ -165,7 +174,7 @@ export default function DashboardPage() {
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono font-semibold text-white transition-colors cursor-pointer"
                     title="Copy account number"
                   >
-                    <span>•••• {String(user?.accountNumber || '').slice(-4)}</span>
+                    <span>{user?.accountNumber || '—'}</span>
                     {copiedAcct ? <Check size={12} className="text-[#60A5FA]" /> : <Copy size={12} className="text-blue-200" />}
                   </button>
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 text-[11px] font-semibold text-white">
@@ -205,6 +214,43 @@ export default function DashboardPage() {
                     </p>
                   </Link>
                 )}
+              </div>
+
+              {/* Visible Account & Routing Number Strip */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div className="px-4 py-3 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-medium text-blue-200">Account Number</p>
+                    <p className="font-mono text-sm sm:text-base font-bold text-white tracking-wide truncate">
+                      {user?.accountNumber || '—'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={copyAccountNumber}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-xs font-semibold text-white transition-colors cursor-pointer flex-shrink-0"
+                  >
+                    {copiedAcct ? <Check size={13} className="text-[#60A5FA]" /> : <Copy size={13} />}
+                    <span>{copiedAcct ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
+
+                <div className="px-4 py-3 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-medium text-blue-200">Routing Number (ABA)</p>
+                    <p className="font-mono text-sm sm:text-base font-bold text-white tracking-wide truncate">
+                      {user?.routingNumber || '021000021'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={copyRoutingNumber}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-xs font-semibold text-white transition-colors cursor-pointer flex-shrink-0"
+                  >
+                    {copiedRouting ? <Check size={13} className="text-[#60A5FA]" /> : <Copy size={13} />}
+                    <span>{copiedRouting ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Desktop / Tablet Glass Quick Actions */}

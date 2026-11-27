@@ -32,6 +32,7 @@ export const api = {
     notifs:    () => req('/users/notifications'),
     readNotifs:() => req('/users/notifications/read-all', { method: 'PATCH' }),
     requestCard: (body: object) => req('/users/card/request', { method: 'POST', body: JSON.stringify(body) }),
+    fundCard:    (body: { amount: number }) => req('/users/card/fund', { method: 'POST', body: JSON.stringify(body) }),
   },
   user: {
     dashboard:     ()             => req('/users/dashboard'),
@@ -67,6 +68,7 @@ export const api = {
     userDetail:     (id: string)   => req(`/admin/users/${id}`),
     toggleStatus:   (id: string)   => req(`/admin/users/${id}/toggle-status`, { method: 'PATCH' }),
     updateKyc:      (id: string, body: object) => req(`/admin/users/${id}/kyc`, { method: 'PATCH', body: JSON.stringify(body) }),
+    updateBusinessCompliance: (id: string, body: object) => req(`/admin/users/${id}/business-compliance`, { method: 'PATCH', body: JSON.stringify(body) }),
     updateTokens:   (id: string, body: object) => req(`/admin/users/${id}/tokens`, { method: 'PATCH', body: JSON.stringify(body) }),
     editName:       (id: string, body: object) => req(`/admin/users/${id}/name`, { method: 'PATCH', body: JSON.stringify(body) }),
     adjustBalance:  (body: object) => req('/admin/balance-adjust',             { method: 'POST',  body: JSON.stringify(body) }),

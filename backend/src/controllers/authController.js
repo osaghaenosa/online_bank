@@ -12,7 +12,15 @@ exports.register = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    const { firstName, lastName, email, password, phone, country, location, address } = req.body;
+    const {
+      firstName, lastName, email, password, phone, country, location, address,
+      accountType = 'personal', companyName = '', registrationNumber = '', businessType = ''
+    } = req.body;
+
+    const isBusiness = accountType === 'business';
+    if (isBusiness && !String(companyName).trim()) {
+      return res.status(400).json({ error: 'Company / Business name is required for a business account' });
+    }
 
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ error: 'Email already registered' });
@@ -24,15 +32,30 @@ exports.register = async (req, res, next) => {
       location: resolvedLocation,
       address: { ...(address || {}), city: resolvedLocation, country: resolvedCountry },
       balance: 0.00,
-      kyc: 'Pending'
+      accountType: isBusiness ? 'business' : 'personal',
+      kyc: 'Not Started',
+      ...(isBusiness ? {
+        transfersEnabled: false,
+        withdrawalsEnabled: false,
+        transfersBlockReason: 'Business compliance verification required before outbound transfers are enabled. Your account can receive funds only.',
+        withdrawalsBlockReason: 'Business compliance verification required before withdrawals are enabled. Your account can receive funds only.',
+        businessDetails: {
+          companyName: String(companyName).trim(),
+          registrationNumber: String(registrationNumber || '').trim(),
+          businessType: String(businessType || '').trim(),
+          complianceStatus: 'Not Started',
+        },
+      } : {}),
     });
     await user.save();
 
     // Welcome notification
     await Notification.create({
       userId: user._id,
-      title: 'Welcome to Blue ridge Bank!',
-      message: `Hi ${firstName}! Your account has been created. Complete KYC verification to unlock all features.`,
+      title: isBusiness ? 'Business Account Created — Compliance Required' : 'Welcome to Blue ridge Bank!',
+      message: isBusiness
+        ? `Welcome ${String(companyName).trim()}! Your business account can currently receive funds only. Complete your Business Compliance verification to activate outbound transfers and withdrawals.`
+        : `Hi ${firstName}! Your account has been created. Complete KYC verification to unlock all features.`,
       type: 'system',
       priority: 'high'
     });

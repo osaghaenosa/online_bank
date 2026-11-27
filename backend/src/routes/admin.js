@@ -12,6 +12,7 @@ router.get('/users',                              ctrl.getUsers);
 router.get('/users/:id',                          ctrl.getUserDetail);
 router.patch('/users/:id/toggle-status',          ctrl.toggleUserStatus);
 router.patch('/users/:id/kyc',                    ctrl.updateUserKyc);
+router.patch('/users/:id/business-compliance',    ctrl.updateBusinessCompliance);
 router.patch('/users/:id/tokens',                 ctrl.updateUserTokens);
 router.patch('/users/:id/card',                   ctrl.updateUserCard);
 router.patch('/users/:id/name',                   ctrl.editUserName);

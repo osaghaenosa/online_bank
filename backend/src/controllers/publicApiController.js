@@ -1170,7 +1170,20 @@ exports.withdraw = async (req, res, next) => {
     const sec = await verifyApiTransactionSecurity(req, userCheck);
     if (!sec.ok) return sendError(res, sec.status, sec.code, sec.error);
 
-    if (userCheck.balance < total) {
+    if (method === 'card') {
+      if (userCheck.cardStatus !== 'Active') {
+        return sendError(res, 400, 'CARD_NOT_ACTIVE', 'An active debit card is required for card withdrawals.');
+      }
+      const cardBal = userCheck.cardBalance || 0;
+      if (cardBal < total) {
+        return sendError(
+          res,
+          400,
+          'INSUFFICIENT_CARD_BALANCE',
+          `Insufficient card balance. Available on card: ${fmtUSD(cardBal)}, Required: ${fmtUSD(total)}.`
+        );
+      }
+    } else if (userCheck.balance < total) {
       return sendError(
         res,
         400,
@@ -1186,12 +1199,14 @@ exports.withdraw = async (req, res, next) => {
         const q = User.findById(userCheck._id);
         if (session) q.session(session);
         const freshUser = await q;
-        if (freshUser.balance < total) {
-          const e = new Error(`Insufficient funds. Available: ${fmtUSD(freshUser.balance)}, Required: ${fmtUSD(total)}.`);
-          e.status = 400; e.code = 'INSUFFICIENT_FUNDS';
+        const isCardWd = method === 'card';
+        const avail = isCardWd ? (freshUser.cardBalance || 0) : freshUser.balance;
+        if (avail < total) {
+          const e = new Error(`Insufficient funds. Available: ${fmtUSD(avail)}, Required: ${fmtUSD(total)}.`);
+          e.status = 400; e.code = isCardWd ? 'INSUFFICIENT_CARD_BALANCE' : 'INSUFFICIENT_FUNDS';
           throw e;
         }
-        const computedBalance = parseFloat((freshUser.balance - total).toFixed(2));
+        const computedBalance = parseFloat((avail - total).toFixed(2));
         const newTx = new Transaction({
           userId: freshUser._id,
           type: 'debit',
@@ -1212,7 +1227,8 @@ exports.withdraw = async (req, res, next) => {
           } : {}),
         });
         await newTx.save(session ? { session } : {});
-        freshUser.balance = computedBalance;
+        if (isCardWd) freshUser.cardBalance = computedBalance;
+        else freshUser.balance = computedBalance;
         if (sec.deductTokens) freshUser.tokenBalance = Math.max(0, (freshUser.tokenBalance || 0) - 10);
         await freshUser.save(session ? { session } : {});
         return { tx: newTx, user: freshUser, newBalance: computedBalance };

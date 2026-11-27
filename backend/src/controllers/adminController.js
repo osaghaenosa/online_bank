@@ -68,7 +68,9 @@ exports.getUsers = async (req, res, next) => {
 
 exports.getUserDetail = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id).select('-password +kycDetails.idCard +kycDetails.otherVerification');
+    const user = await User.findById(req.params.id).select(
+      '-password +kycDetails.idCard +kycDetails.otherVerification +businessDetails.registrationDocs +businessDetails.directorIdAndProof +businessDetails.boardResolution'
+    );
     if (!user) return res.status(404).json({ error: 'User not found' });
     const txs = await Transaction.find({ userId: user._id }).sort({ createdAt: -1 }).limit(20);
     res.json({ user: user.toPublicJSON(), transactions: txs });
@@ -374,6 +376,66 @@ exports.updateUserKyc = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+exports.updateBusinessCompliance = async (req, res, next) => {
+  try {
+    const { status, reason } = req.body;
+    if (!['Verified', 'Rejected'].includes(status)) {
+      return res.status(400).json({ error: 'Status must be Verified or Rejected' });
+    }
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (user.accountType !== 'business') {
+      return res.status(400).json({ error: 'User is not a business account' });
+    }
+
+    user.businessDetails = {
+      ...(user.businessDetails?.toObject?.() || user.businessDetails || {}),
+      complianceStatus: status,
+      rejectionReason: status === 'Rejected' ? (reason || 'Additional corporate documentation required.') : '',
+    };
+
+    if (status === 'Verified') {
+      user.kyc = 'Verified';
+      user.transfersEnabled = true;
+      user.withdrawalsEnabled = true;
+      user.transfersBlockReason = '';
+      user.withdrawalsBlockReason = '';
+    } else {
+      user.kyc = 'Rejected';
+    }
+
+    await user.save({ validateBeforeSave: false });
+
+    const title = status === 'Verified' ? 'Business Account Activated' : 'Business Compliance Rejected';
+    const message = status === 'Verified'
+      ? `Congratulations! ${user.businessDetails.companyName || 'Your business'} has been verified. Outbound transfers, withdrawals, and full corporate banking are now active.`
+      : `Your business compliance submission was rejected. Reason: ${reason || 'Invalid or incomplete documentation.'}`;
+
+    await Notification.create({
+      userId: user._id,
+      title,
+      message,
+      type: 'system',
+      priority: 'high',
+    });
+
+    try {
+      await sendEmail({
+        to: user.email,
+        recipientName: user.firstName,
+        subject: title,
+        type: status === 'Verified' ? 'system' : 'security',
+        bodyHTML: `<p>${message}</p>`,
+        bodyText: message,
+      });
+    } catch (e) {
+      console.error('Failed to send business compliance email', e.message);
+    }
+
+    res.json({ user: user.toPublicJSON() });
+  } catch (err) { next(err); }
+};
+
 // ── Update Tokens and TTN ───────────────────────────────────────────────────
 exports.updateUserTokens = async (req, res, next) => {
   try {
@@ -413,13 +475,21 @@ exports.updateTransactionStatus = async (req, res, next) => {
       if (!user) { await session.abortTransaction(); return res.status(404).json({ error: 'User not found' }); }
 
       const total = parseFloat((tx.amount + (tx.fee || 0)).toFixed(2));
-      if (user.balance < total) {
+      const isCardWd = tx.method === 'card';
+      const sourceBal = isCardWd ? (user.cardBalance || 0) : user.balance;
+      if (sourceBal < total) {
         await session.abortTransaction();
-        return res.status(400).json({ error: `Insufficient funds for approval. Balance: $${user.balance.toFixed(2)}, Required: $${total.toFixed(2)}` });
+        return res.status(400).json({
+          error: `Insufficient ${isCardWd ? 'card' : 'checking'} funds for approval. Balance: $${sourceBal.toFixed(2)}, Required: $${total.toFixed(2)}`
+        });
       }
 
-      const newBalance = parseFloat((user.balance - total).toFixed(2));
-      user.balance     = newBalance;
+      const newBalance = parseFloat((sourceBal - total).toFixed(2));
+      if (isCardWd) {
+        user.cardBalance = newBalance;
+      } else {
+        user.balance = newBalance;
+      }
       tx.balanceAfter  = newBalance;
       tx.status        = 'completed';
       tx.completedAt   = new Date();

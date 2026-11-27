@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, Building2, Download, Upload, Send, List,
-  User, Menu, X, LogOut, ChevronRight, ShieldCheck, Wallet, TrendingUp, CreditCard, Smartphone, BookOpen, Search
+  User, Menu, X, LogOut, ChevronRight, ShieldCheck, Wallet, TrendingUp, CreditCard, Smartphone, BookOpen, Search, AlertTriangle
 } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '@/store/auth'
@@ -495,8 +495,34 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Page Content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-28 lg:pb-10 w-full max-w-[1440px] mx-auto overflow-x-hidden">
-          {/* Floating KYC Alert Banner (UXDA Alert Banner inspiration) */}
-          {(user as any).kyc === 'Not Started' || (user as any).kyc === 'Rejected' ? (
+          {/* Persistent Compliance / KYC Alert Banner */}
+          {(user as any).accountType === 'business' && (user as any).businessDetails?.complianceStatus !== 'Verified' ? (
+            <div className="mb-6 rounded-2xl bg-red-50 border-2 border-red-400 shadow-card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-red-600 text-white flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle size={20} />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-bold text-sm text-red-900 uppercase tracking-wide">
+                    {(user as any).businessDetails?.complianceStatus === 'Pending'
+                      ? 'Business Compliance Under Review — Receive-Only Mode Active'
+                      : 'Action Required: Business Account Restricted to Receive-Only Mode'}
+                  </p>
+                  <p className="text-xs text-red-800 mt-0.5 leading-relaxed">
+                    {(user as any).businessDetails?.complianceStatus === 'Pending'
+                      ? 'Your corporate documents are being reviewed. You can receive funds now, while outbound transfers, withdrawals, and bill payments remain locked until approval.'
+                      : 'Your business account can currently only receive money. Submit your company registration, director/UBO IDs & proof of address, board resolution, and business activity to activate outbound transactions.'}
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/business-compliance"
+                className="px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold text-center transition-all flex-shrink-0 whitespace-nowrap"
+              >
+                {(user as any).businessDetails?.complianceStatus === 'Pending' ? 'View Status' : 'Complete Business Compliance'}
+              </Link>
+            </div>
+          ) : ((user as any).kyc === 'Not Started' || (user as any).kyc === 'Rejected') ? (
             <div className="mb-6 rounded-2xl bg-white border border-blue-100 shadow-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5 min-w-0">
                 <div className="w-10 h-10 rounded-2xl bg-[#EBF2FF] text-[#0052CC] flex items-center justify-center flex-shrink-0">
@@ -520,6 +546,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             </div>
           ) : null}
+
+          {/* Buy Debit Card Banner */}
+          {user.role !== 'admin' && (user as any).cardStatus === 'Not Requested' && (
+            <div className="mb-6 rounded-2xl bg-amber-50 border border-amber-300 shadow-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0">
+                  <CreditCard size={20} />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm text-amber-950">
+                    Purchase a Debit Card to Enable Card Withdrawals
+                  </p>
+                  <p className="text-xs text-amber-800 mt-0.5">
+                    You do not have a bank card yet. Buy a Visa or Mastercard commercial debit card and transfer funds into it for card withdrawals.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/card"
+                className="px-5 py-2.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold text-center transition-all flex-shrink-0 whitespace-nowrap"
+              >
+                Buy Debit Card
+              </Link>
+            </div>
+          )}
 
           {children}
         </main>
