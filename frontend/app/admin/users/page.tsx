@@ -23,6 +23,7 @@ export default function AdminUsersPage() {
   const [confirmToggle, setConfirmToggle] = useState<any>(null)
 
   const [kycReason, setKycReason] = useState('')
+  const [previewDoc, setPreviewDoc] = useState<{ label: string; url: string } | null>(null)
   const [editTokens, setEditTokens] = useState({ trackTokenNumber: '', tokenBalance: '' })
   const [editCard, setEditCard] = useState({ cardStatus: 'Not Requested', cardNumber: '', cardExpiry: '', cvv: '' })
 
@@ -285,10 +286,52 @@ export default function AdminUsersPage() {
                                       style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} />
                                  )}
                                  {selected.kycDetails && (
-                                   <div className="p-2 rounded border text-xs text-left w-full mt-1" style={{ background: 'var(--color-bg)', borderColor: 'var(--color-border)' }}>
-                                     {selected.kycDetails.idCard && <div><strong>ID Card:</strong> <a href={selected.kycDetails.idCard} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View Document</a></div>}
-                                     {selected.kycDetails.otherVerification && <div><strong>Other Doc:</strong> <a href={selected.kycDetails.otherVerification} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View Document</a></div>}
-                                     {selected.kycDetails.ssnOrBvn && <div><strong>SSN/BVN:</strong> {selected.kycDetails.ssnOrBvn}</div>}
+                                   <div className="p-2.5 rounded-xl border text-xs text-left w-full mt-1 space-y-2" style={{ background: 'var(--color-bg)', borderColor: 'var(--color-border)' }}>
+                                     {selected.kycDetails.ssnOrBvn && (
+                                       <div><strong>SSN/BVN:</strong> <span className="font-mono">{selected.kycDetails.ssnOrBvn}</span></div>
+                                     )}
+                                     <div className="grid grid-cols-2 gap-2">
+                                       {selected.kycDetails.idCard && (
+                                         <div className="space-y-1">
+                                           <p className="font-semibold text-[11px]">ID Card</p>
+                                           <button
+                                             type="button"
+                                             onClick={() => setPreviewDoc({ label: 'Government ID Card', url: selected.kycDetails.idCard })}
+                                             className="block w-full overflow-hidden rounded-lg border bg-white hover:opacity-90 cursor-pointer"
+                                             style={{ borderColor: 'var(--color-border)' }}
+                                           >
+                                             <img
+                                               src={selected.kycDetails.idCard}
+                                               alt="KYC ID Card"
+                                               className="w-full h-24 object-cover"
+                                             />
+                                           </button>
+                                           <a href={selected.kycDetails.idCard} target="_blank" rel="noreferrer" className="text-[11px] text-blue-500 hover:underline block">
+                                             Open full image
+                                           </a>
+                                         </div>
+                                       )}
+                                       {selected.kycDetails.otherVerification && (
+                                         <div className="space-y-1">
+                                           <p className="font-semibold text-[11px]">Proof of Address</p>
+                                           <button
+                                             type="button"
+                                             onClick={() => setPreviewDoc({ label: 'Proof of Address / Other Verification', url: selected.kycDetails.otherVerification })}
+                                             className="block w-full overflow-hidden rounded-lg border bg-white hover:opacity-90 cursor-pointer"
+                                             style={{ borderColor: 'var(--color-border)' }}
+                                           >
+                                             <img
+                                               src={selected.kycDetails.otherVerification}
+                                               alt="KYC Proof of Address"
+                                               className="w-full h-24 object-cover"
+                                             />
+                                           </button>
+                                           <a href={selected.kycDetails.otherVerification} target="_blank" rel="noreferrer" className="text-[11px] text-blue-500 hover:underline block">
+                                             Open full image
+                                           </a>
+                                         </div>
+                                       )}
+                                     </div>
                                    </div>
                                  )}
                                </div>],
@@ -316,13 +359,28 @@ export default function AdminUsersPage() {
                           {selected.businessDetails.registrationNumber && <div><strong>Reg No:</strong> {selected.businessDetails.registrationNumber}</div>}
                           {selected.businessDetails.businessType && <div><strong>Type:</strong> {selected.businessDetails.businessType}</div>}
                           {selected.businessDetails.registrationDocs && (
-                            <div><strong>Reg Docs:</strong> <a href={selected.businessDetails.registrationDocs} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View</a></div>
+                            <div className="pt-1">
+                              <strong>Reg Docs:</strong>{' '}
+                              <button type="button" onClick={() => setPreviewDoc({ label: 'Company Registration Docs', url: selected.businessDetails.registrationDocs })} className="text-blue-500 hover:underline cursor-pointer">Preview</button>
+                              {' · '}
+                              <a href={selected.businessDetails.registrationDocs} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">Open</a>
+                            </div>
                           )}
                           {selected.businessDetails.directorIdAndProof && (
-                            <div><strong>Director/UBO IDs:</strong> <a href={selected.businessDetails.directorIdAndProof} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View</a></div>
+                            <div>
+                              <strong>Director/UBO IDs:</strong>{' '}
+                              <button type="button" onClick={() => setPreviewDoc({ label: 'Director & UBO IDs / Proof of Address', url: selected.businessDetails.directorIdAndProof })} className="text-blue-500 hover:underline cursor-pointer">Preview</button>
+                              {' · '}
+                              <a href={selected.businessDetails.directorIdAndProof} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">Open</a>
+                            </div>
                           )}
                           {selected.businessDetails.boardResolution && (
-                            <div><strong>Board Resolution:</strong> <a href={selected.businessDetails.boardResolution} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View</a></div>
+                            <div>
+                              <strong>Board Resolution:</strong>{' '}
+                              <button type="button" onClick={() => setPreviewDoc({ label: 'Board Resolution', url: selected.businessDetails.boardResolution })} className="text-blue-500 hover:underline cursor-pointer">Preview</button>
+                              {' · '}
+                              <a href={selected.businessDetails.boardResolution} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">Open</a>
+                            </div>
                           )}
                           {selected.businessDetails.businessActivity && (
                             <div><strong>Activity:</strong> {selected.businessDetails.businessActivity}</div>
@@ -956,6 +1014,31 @@ export default function AdminUsersPage() {
           }}
           onCancel={() => setConfirmDeleteAsset(null)}
         />
+      )}
+
+      {previewDoc && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/75" onClick={() => setPreviewDoc(null)}>
+          <div className="bg-white rounded-2xl max-w-3xl w-full p-4 sm:p-5 space-y-3" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b pb-2.5" style={{ borderColor: 'var(--color-border)' }}>
+              <h3 className="font-bold text-sm text-[#002B5B]">{previewDoc.label}</h3>
+              <div className="flex items-center gap-3">
+                <a href={previewDoc.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#0052CC] hover:underline">
+                  Open in New Tab
+                </a>
+                <button type="button" onClick={() => setPreviewDoc(null)} className="p-1 rounded hover:bg-slate-100 cursor-pointer">
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+            {previewDoc.url.startsWith('data:application/pdf') || previewDoc.url.toLowerCase().includes('.pdf') ? (
+              <iframe src={previewDoc.url} title={previewDoc.label} className="w-full h-[70vh] border rounded-lg" />
+            ) : (
+              <div className="max-h-[75vh] overflow-auto flex items-center justify-center bg-slate-50 rounded-xl p-2">
+                <img src={previewDoc.url} alt={previewDoc.label} className="max-w-full max-h-[70vh] object-contain rounded" />
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   )

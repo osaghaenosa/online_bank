@@ -172,7 +172,7 @@ router.post(
             const result = await uploadToImageKit(file.buffer, `biz_${fieldKey}_${user._id}_${Date.now()}`, '/nexabank/business-kyc');
             return result.url;
           }
-          return `uploaded:${file.originalname}`;
+          return `data:${file.mimetype || 'application/octet-stream'};base64,${file.buffer.toString('base64')}`;
         }
         if (currentVal && typeof currentVal === 'string' && currentVal.startsWith('data:') && hasImageKit) {
           const result = await uploadToImageKit(currentVal, `biz_${fieldKey}_${user._id}_${Date.now()}`, '/nexabank/business-kyc');

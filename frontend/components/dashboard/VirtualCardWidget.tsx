@@ -80,7 +80,7 @@ export function VirtualCardWidget({ user }: { user: User | null }) {
             </p>
             <p className="font-mono text-base sm:text-lg font-bold tracking-[0.16em] text-white whitespace-nowrap">
               {status === 'Not Requested'
-                ? 'Buy a card to activate'
+                ? 'Apply For a Debit Card'
                 : (showLast4 && last4 ? `•••• •••• •••• ${last4}` : '•••• •••• •••• ••••')}
             </p>
             {isActive && (
