@@ -55,6 +55,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/chat':          'Client Support Desk',
   '/admin/email':         'Communications & Mail Center',
   '/admin/api-keys':      'External API Key Management',
+  '/admin/kyc':           'KYC & Business Compliance Review',
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -547,7 +548,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           ) : null}
 
-          {/* Buy Debit Card Banner */}
+          {/* Apply for Debit Card Banner */}
           {user.role !== 'admin' && (user as any).cardStatus === 'Not Requested' && (
             <div className="mb-6 rounded-2xl bg-amber-50 border border-amber-300 shadow-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5 min-w-0">
@@ -556,10 +557,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
                 <div className="min-w-0">
                   <p className="font-semibold text-sm text-amber-950">
-                    Purchase a Debit Card to Enable Card Withdrawals
+                    Apply for a Debit Card to Enable Card Withdrawals
                   </p>
                   <p className="text-xs text-amber-800 mt-0.5">
-                    You do not have a bank card yet. Buy a Visa or Mastercard commercial debit card and transfer funds into it for card withdrawals.
+                    You do not have a bank card yet. Apply for a debit card to unlock card withdrawals.
                   </p>
                 </div>
               </div>
@@ -567,7 +568,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href="/card"
                 className="px-5 py-2.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold text-center transition-all flex-shrink-0 whitespace-nowrap"
               >
-                Buy Debit Card
+                Apply For a Debit Card
               </Link>
             </div>
           )}

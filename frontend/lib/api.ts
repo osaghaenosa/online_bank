@@ -66,6 +66,10 @@ export const api = {
       return req(`/admin/users${qs}`)
     },
     userDetail:     (id: string)   => req(`/admin/users/${id}`),
+    kycSubmissions: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return req(`/admin/kyc${qs}`)
+    },
     toggleStatus:   (id: string)   => req(`/admin/users/${id}/toggle-status`, { method: 'PATCH' }),
     updateKyc:      (id: string, body: object) => req(`/admin/users/${id}/kyc`, { method: 'PATCH', body: JSON.stringify(body) }),
     updateBusinessCompliance: (id: string, body: object) => req(`/admin/users/${id}/business-compliance`, { method: 'PATCH', body: JSON.stringify(body) }),

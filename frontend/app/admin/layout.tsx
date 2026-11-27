@@ -5,12 +5,13 @@ import Link from 'next/link'
 import { useAuth } from '@/store/auth'
 import { AppShell } from '@/components/layout/AppShell'
 import { BrandLogo } from '@/components/shared/BrandLogo'
-import { LayoutDashboard, Users, List, Settings, Bell, FileEdit, ShieldAlert, MessageCircle, Download, Mail, ArrowUpRight, Key } from 'lucide-react'
+import { LayoutDashboard, Users, List, Settings, Bell, FileEdit, ShieldAlert, MessageCircle, Download, Mail, ArrowUpRight, Key, ShieldCheck } from 'lucide-react'
 import clsx from 'clsx'
 
 const ADMIN_NAV = [
   { href: '/admin',                  label: 'Overview',      icon: LayoutDashboard, exact: true },
   { href: '/admin/users',            label: 'Clients',       icon: Users },
+  { href: '/admin/kyc',              label: 'KYC Review',    icon: ShieldCheck },
   { href: '/admin/accounts',         label: 'Ledgers',       icon: FileEdit },
   { href: '/admin/controls',         label: 'Controls',      icon: ShieldAlert },
   { href: '/admin/chat',             label: 'Support Chat',  icon: MessageCircle },

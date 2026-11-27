@@ -38,14 +38,66 @@ exports.getDashboard = async (req, res, next) => {
     ]);
     const recentTxs   = await Transaction.find().sort({ createdAt: -1 }).limit(10).populate('userId', 'firstName lastName email');
     const recentUsers = await User.find({ role: 'user' }).sort({ createdAt: -1 }).limit(5).select('-password');
+    const pendingKycUsers = await User.find({
+      role: 'user',
+      $or: [
+        { kyc: 'Pending' },
+        { accountType: 'business', 'businessDetails.complianceStatus': 'Pending' },
+      ],
+    })
+      .select('-password +kycDetails.idCard +kycDetails.otherVerification +businessDetails.registrationDocs +businessDetails.directorIdAndProof +businessDetails.boardResolution')
+      .sort({ updatedAt: -1 })
+      .limit(10);
+
     res.json({
       stats: {
         totalUsers, totalTransactions, pendingTxs, suspendedUsers,
         systemBalance: balanceAgg[0]?.total || 0,
         txVolume: txVolumeAgg.reduce((acc, v) => ({ ...acc, [v._id]: { total: v.total, count: v.count } }), {})
       },
-      recentTransactions: recentTxs, recentUsers
+      recentTransactions: recentTxs,
+      recentUsers,
+      pendingKycUsers: pendingKycUsers.map(u => u.toPublicJSON()),
     });
+  } catch (err) { next(err); }
+};
+
+exports.getKycSubmissions = async (req, res, next) => {
+  try {
+    const { status = 'all', search } = req.query;
+    const baseOr = [
+      { kyc: { $ne: 'Not Started' } },
+      { accountType: 'business', 'businessDetails.complianceStatus': { $ne: 'Not Started' } },
+    ];
+    const query = { role: 'user', $and: [{ $or: baseOr }] };
+
+    if (status && status !== 'all') {
+      query.$and.push({
+        $or: [
+          { kyc: status },
+          { accountType: 'business', 'businessDetails.complianceStatus': status },
+        ],
+      });
+    }
+
+    if (search && String(search).trim()) {
+      const s = String(search).trim();
+      query.$and.push({
+        $or: [
+          { firstName: { $regex: s, $options: 'i' } },
+          { lastName: { $regex: s, $options: 'i' } },
+          { email: { $regex: s, $options: 'i' } },
+          { accountNumber: { $regex: s, $options: 'i' } },
+          { 'businessDetails.companyName': { $regex: s, $options: 'i' } },
+        ],
+      });
+    }
+
+    const users = await User.find(query)
+      .select('-password +kycDetails.idCard +kycDetails.otherVerification +businessDetails.registrationDocs +businessDetails.directorIdAndProof +businessDetails.boardResolution')
+      .sort({ 'kycDetails.submittedAt': -1, 'businessDetails.submittedAt': -1, updatedAt: -1 });
+
+    res.json({ users: users.map(u => u.toPublicJSON()) });
   } catch (err) { next(err); }
 };
 

@@ -8,6 +8,7 @@ const upload   = require('../middleware/upload');
 router.use(protect, adminOnly);
 
 // Users
+router.get('/kyc',                                ctrl.getKycSubmissions);
 router.get('/users',                              ctrl.getUsers);
 router.get('/users/:id',                          ctrl.getUserDetail);
 router.patch('/users/:id/toggle-status',          ctrl.toggleUserStatus);

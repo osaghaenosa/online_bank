@@ -52,7 +52,11 @@ export default function AdminUsersPage() {
       cardExpiry: u.cardExpiry || '', 
       cvv: u.cvv || '' 
     })
-    try { const d = await api.admin.userDetail(u._id); setUserTxs(d.transactions) } catch {}
+    try {
+      const d = await api.admin.userDetail(u._id)
+      if (d.user) setSelected(d.user)
+      setUserTxs(d.transactions || [])
+    } catch {}
   }
 
   const handleAdjust = async () => {

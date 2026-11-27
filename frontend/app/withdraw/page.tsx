@@ -553,7 +553,7 @@ export default function WithdrawPage() {
                   href="/card"
                   className="px-4 py-2 rounded-full bg-[#0052CC] text-white text-xs font-semibold whitespace-nowrap text-center"
                 >
-                  {user?.cardStatus === 'Active' ? 'Fund Card' : 'Buy Debit Card'}
+                  {user?.cardStatus === 'Active' ? 'Fund Card' : 'Apply For a Debit Card'}
                 </Link>
               </div>
             )}
